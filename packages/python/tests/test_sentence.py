@@ -5,7 +5,9 @@ have, over a sample large enough that a broken option cannot pass by luck.
 """
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+from functools import cache
+from typing import NamedTuple, cast
 
 from randino import (
     RAND_COUNT_MAX,
@@ -40,9 +42,11 @@ from randino.sentence.data._types import (
     PredicateForm,
     PredicateForms,
     PredicateTense,
+    SentenceAuxiliary,
     SentenceLanguageData,
     SentenceMark,
     StateGroup,
+    VerbField,
     VerbGroup,
 )
 from randino.word._generator import agree
@@ -172,6 +176,152 @@ def agreed_by(rules: WordAgreement, word: str) -> list[str]:
                 break
 
     return out
+
+
+class Helped(NamedTuple):
+    """One way a predicate phrase reads: the predicate, and the auxiliary written around it."""
+
+    verb: str
+    helper: str
+    auxiliary: SentenceAuxiliary | None
+
+
+@cache
+def helped_in(language: WordLanguage, slot: SentenceSlot, phrase: str) -> tuple[Helped, ...]:
+    """The ways a predicate phrase reads.
+
+    As itself, and as a predicate with one of the language's auxiliaries written around it
+    — `먹고 싶어 했다` is `먹` and `싶어 했다`, `没吃` is `吃`, `did not eat` is `eat` and
+    `did not`. Every reading the templates allow, because which one the generator meant is
+    not written down anywhere but in the phrase.
+    """
+    out = [Helped(phrase, "", None)]
+
+    for auxiliary in SENTENCE_DATA[language].auxiliaries:
+        if auxiliary.on != slot:
+            continue
+
+        predicate = auxiliary.predicate
+        helpers = (
+            dict.fromkeys(every_form(predicate.words, predicate.forms, predicate.past))
+            if predicate is not None
+            else {"": None}
+        )
+        templates = [
+            template
+            for template in (auxiliary.template, auxiliary.past_template)
+            if template is not None
+        ]
+
+        for template in templates:
+            for helper in helpers:
+                front, back = template.replace("{a}", helper, 1).split("{v}")
+
+                if (
+                    len(phrase) > len(front) + len(back)
+                    and phrase.startswith(front)
+                    and phrase.endswith(back)
+                ):
+                    out.append(
+                        Helped(phrase[len(front) : len(phrase) - len(back)], helper, auxiliary)
+                    )
+
+    return tuple(out)
+
+
+_JOINTS: dict[tuple[int, int], frozenset[str]] = {}
+
+
+def joints_of(group: VerbGroup | StateGroup, auxiliary: SentenceAuxiliary) -> frozenset[str]:
+    """The entries of a group an auxiliary follows.
+
+    The form it is joined by for a chained one, and the group's every form for a
+    particle, which leaves the predicate as it was. Held per group and auxiliary, both of
+    which are module constants.
+    """
+    key = (id(group), id(auxiliary))
+    known = _JOINTS.get(key)
+
+    if known is not None:
+        return known
+
+    if auxiliary.predicate is None:
+        out = frozenset(every_form(group.words, group.forms, group.past))
+    elif (auxiliary.joint or "words") == "words":
+        out = frozenset(group.words)
+    else:
+        joint = auxiliary.joint or "words"
+        pool = cast("Mapping[str, WordPool]", group.joints).get(joint) or cast(
+            "Mapping[str, WordPool]", group.forms
+        ).get(joint, ())
+        out = frozenset(endings(pool))
+
+    _JOINTS[key] = out
+
+    return out
+
+
+_WRITTEN: dict[tuple[int, str], frozenset[str]] = {}
+
+
+def every_form_of(language: WordLanguage, group: VerbGroup | StateGroup) -> frozenset[str]:
+    """Every form of a group, agreed for every gender where the language's past agrees."""
+    key = (id(group), language)
+    known = _WRITTEN.get(key)
+
+    if known is None:
+        agreement = SENTENCE_DATA[language].past_agreement
+        forms = every_form(group.words, group.forms, group.past)
+        known = frozenset(
+            [agreed for word in forms for agreed in agreed_by(agreement, word)]
+            if agreement
+            else forms
+        )
+        _WRITTEN[key] = known
+
+    return known
+
+
+_AGREED_JOINTS: dict[tuple[int, int, str], frozenset[str]] = {}
+
+
+def agreed_joints_of(
+    language: WordLanguage, group: VerbGroup | StateGroup, auxiliary: SentenceAuxiliary
+) -> frozenset[str]:
+    """`joints_of`, agreed for every gender where the language's past agrees."""
+    key = (id(group), id(auxiliary), language)
+    known = _AGREED_JOINTS.get(key)
+
+    if known is None:
+        agreement = SENTENCE_DATA[language].past_agreement
+        joints = joints_of(group, auxiliary)
+        known = (
+            frozenset(each for word in joints for each in agreed_by(agreement, word))
+            if agreement
+            else joints
+        )
+        _AGREED_JOINTS[key] = known
+
+    return known
+
+
+def writes(
+    language: WordLanguage, group: VerbGroup | StateGroup, slot: SentenceSlot, phrase: str
+) -> bool:
+    """Whether a group wrote this predicate phrase.
+
+    As one of its forms, or as the form an auxiliary follows with that auxiliary around it.
+    A past that agrees with its subject is any of its agreed forms: `откинулась`.
+    """
+    return any(
+        reading.verb
+        in (
+            every_form_of(language, group)
+            if reading.auxiliary is None
+            else agreed_joints_of(language, group, reading.auxiliary)
+        )
+        for reading in helped_in(language, slot, phrase)
+    )
 
 
 def times_of(data: SentenceLanguageData) -> list[str]:
@@ -411,6 +561,7 @@ def test_the_mixed_language_uses_every_language_it_knows() -> None:
 
 def test_every_phrase_is_written_out_of_the_languages_own_pools() -> None:
     for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
         predicates: tuple[SentenceSlot, ...] = ("verb", "state", "manner", "time", "degree")
         fixed: dict[SentenceSlot, set[str]] = {
             slot: pool_for(language, slot) for slot in predicates
@@ -434,9 +585,20 @@ def test_every_phrase_is_written_out_of_the_languages_own_pools() -> None:
                 pool = fixed.get(slot)
 
                 if pool is not None:
-                    assert written in pool or phrase in pool, (
-                        f"{language}: {phrase} is not in the {slot} pools ({detail.sentence})"
-                    )
+                    # A predicate may carry an auxiliary, and is then the form that
+                    # auxiliary follows, from the same pools.
+                    assert (
+                        written in pool
+                        or phrase in pool
+                        or (
+                            slot in ("verb", "state")
+                            and any(
+                                writes(language, group, slot, each)
+                                for each in (written, phrase)
+                                for group in (data.verbs if slot == "verb" else data.states)
+                            )
+                        )
+                    ), f"{language}: {phrase} is not in the {slot} pools ({detail.sentence})"
 
                     continue
 
@@ -522,7 +684,7 @@ def test_a_verb_only_takes_the_subject_and_object_its_group_allows() -> None:
             groups = [
                 group
                 for group in data.verbs
-                if detail.phrases[at] in every_form(group.words, group.forms)
+                if writes(language, group, "verb", detail.phrases[at])
                 and (group.object is not None) == transitive
             ]
 
@@ -763,8 +925,10 @@ def test_a_range_only_a_noun_phrase_can_reach_is_not_answered_with_a_name() -> N
     # `die schlanke Wolke` — so a range only the longer one can reach is a range a
     # name cannot be in. Drawn rather than asked for, it is one more thing to decide
     # against the room, and deciding it before the range was even known left
-    # `_name_fits` unreachable.
-    asks: list[tuple[WordLanguage, int]] = [("ko", 54), ("zh", 33), ("ja", 58), ("de", 92)]
+    # `_name_fits` unreachable. Korean is not among them: its multi-word predicates and
+    # adverbials are spaced the way they are written, and a named sentence reaches the top
+    # of its range.
+    asks: list[tuple[WordLanguage, int]] = [("zh", 33), ("ja", 58), ("de", 92)]
 
     for language, min_length in asks:
         named = [
@@ -1684,14 +1848,22 @@ def test_a_place_takes_the_particle_it_takes() -> None:
             if "place" not in detail.slots:
                 continue
 
-            phrase = detail.phrases[detail.slots.index("place")]
+            at = detail.slots.index("place")
+            phrase = detail.phrases[at]
             named = [
                 tail
                 for noun in nouns_in(language, phrase)
                 for tail, pool in tails.items()
                 if noun in pool
             ]
-            after = detail.sentence[detail.sentence.index(phrase) + len(phrase) :]
+            # Found where the phrases before it leave off, because the place's noun may be
+            # inside one of them too.
+            start = 0
+
+            for before in detail.phrases[:at]:
+                start = detail.sentence.find(before, start) + len(before)
+
+            after = detail.sentence[detail.sentence.index(phrase, start) + len(phrase) :]
 
             listed += 1 if named else 0
             assert (
@@ -2284,9 +2456,34 @@ def test_a_predicate_is_written_in_the_form_its_type_asks_for() -> None:
 
                 written = phrase[:1].lower() + phrase[1:] if index == 0 else phrase
                 pool = expected[slot]
+                groups: list[VerbGroup] | list[StateGroup] = (
+                    list(data.verbs) if slot == "verb" else list(data.states)
+                )
+                # An auxiliary that carries the sentence's form is the one asked in it, and
+                # a particle leaves the predicate in the form it would have had.
+                helped = any(
+                    reading.auxiliary is not None
+                    and (
+                        reading.helper
+                        in forms_of(
+                            reading.auxiliary.predicate.words,
+                            reading.auxiliary.predicate.forms,
+                            "plain",
+                            "question",
+                        )
+                        and any(
+                            reading.verb in joints_of(group, reading.auxiliary) for group in groups
+                        )
+                        if reading.auxiliary.predicate is not None
+                        else reading.verb in pool
+                    )
+                    for each in (written, phrase)
+                    for reading in helped_in(language, slot, each)
+                )
 
-                assert written in pool or phrase in pool, (
-                    f"{language}: '{phrase}' is not the {slot} form a question asks for"
+                assert written in pool or phrase in pool or helped, (
+                    f"{language}: '{phrase}' is not the {slot} form a question asks for "
+                    f"({detail.sentence})"
                 )
 
 
@@ -2591,9 +2788,504 @@ def test_a_predicate_comes_out_of_the_pool_its_level_and_mood_land_on() -> None:
                         if slot not in ("verb", "state"):
                             continue
 
-                        assert phrase in pools[slot], (
-                            f"{language} {style} {mark}: '{phrase}' is not a {style} {slot}"
+                        groups: list[VerbGroup] | list[StateGroup] = (
+                            list(data.verbs) if slot == "verb" else list(data.states)
                         )
+                        # An auxiliary carries the level and the mood where it is a predicate
+                        # of its own, and the predicate in front of it the form it follows.
+                        helped = any(
+                            reading.auxiliary is not None
+                            and reading.auxiliary.predicate is not None
+                            and reading.helper
+                            in forms_of(
+                                reading.auxiliary.predicate.words,
+                                reading.auxiliary.predicate.forms,
+                                style,
+                                mark,
+                            )
+                            and any(
+                                reading.verb in joints_of(group, reading.auxiliary)
+                                for group in groups
+                            )
+                            for reading in helped_in(language, slot, phrase)
+                        )
+
+                        assert phrase in pools[slot] or helped, (
+                            f"{language} {style} {mark}: '{phrase}' is not a {style} {slot} "
+                            f"({detail.sentence})"
+                        )
+
+
+def test_every_pool_a_group_writes_is_as_long_as_the_words_it_restates_in_either_tense() -> None:
+    # Index alignment is what translates a required word, and what keeps a verb's past the
+    # same verb. Korean spells its past out of its 해체 forms, and a form written in two
+    # words — `배를 문질러` — once split into two stems and put every past after it one
+    # verb out of step: `배를다`.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        groups: list[VerbGroup | StateGroup] = [*data.verbs, *data.states]
+
+        for group in groups:
+            pools: list[tuple[str, WordPool]] = [
+                *group.forms.items(),
+                *group.joints.items(),
+                *(
+                    [
+                        ("past", group.past.words),
+                        *((f"past {form}", pool) for form, pool in group.past.forms.items()),
+                    ]
+                    if group.past is not None
+                    else []
+                ),
+            ]
+
+            for form, pool in pools:
+                assert len(pool) == len(group.words), f"{language} {form}: {group.words[0]}"
+
+
+def test_a_korean_predicate_is_spaced_where_korean_spaces_it_and_carries_no_object() -> None:
+    # `입을 다시다` is two words, and `입을다시다` is one that does not exist. And a verb
+    # that already has its object takes no second one: `팽이버섯을 값을 치렀다` is a
+    # mushroom paid twice.
+    data = SENTENCE_DATA["ko"]
+    groups: list[VerbGroup | StateGroup] = [*data.verbs, *data.states]
+
+    for group in groups:
+        for word in group.words:
+            assert not re.search(r"[을를](?=[가-힣])", word), (
+                f"ko: '{word}' runs its object into its verb"
+            )
+
+            if isinstance(group, VerbGroup) and group.object:
+                assert not re.search(r"[을를] ", word), (
+                    f"ko: '{word}' takes an object and carries one"
+                )
+
+
+def test_an_auxiliary_is_written_around_a_predicate_the_way_the_language_writes_it() -> None:
+    # The kinds that still say the thing happened — the only ones a story writes — and the
+    # ones only somebody can do.
+    happens = ("begin", "progressive", "attempt", "completive")
+    willed = ("unable", "desire", "resolve", "effort", "attempt")
+    # The fields a story tells as not coming off.
+    failing: set[VerbField] = {
+        field for story in STORIES for step in story.steps if step.fails for field in step.fields
+    }
+
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        auxiliaries = data.auxiliaries
+
+        # Every one of them has somewhere to put the predicate, and a chained one an
+        # auxiliary of its own and a form of the predicate to follow.
+        for auxiliary in auxiliaries:
+            for template in (auxiliary.template, auxiliary.past_template):
+                if template is None:
+                    continue
+
+                assert len(template.split("{v}")) == 2, f"{language}: {template}"
+                assert ("{a}" in template) == (auxiliary.predicate is not None), (
+                    f"{language}: {template}"
+                )
+
+            if auxiliary.predicate is not None:
+                groups: list[VerbGroup] | list[StateGroup] = (
+                    list(data.verbs) if auxiliary.on == "verb" else list(data.states)
+                )
+
+                assert any(joints_of(group, auxiliary) for group in groups), (
+                    f"{language} {auxiliary.kind}: no group writes the form it follows"
+                )
+
+        if not auxiliaries:
+            continue
+
+        def helped(
+            detail: SentenceDetail, language: WordLanguage = language
+        ) -> list[SentenceAuxiliary]:
+            # A predicate with an auxiliary around it, read the way `writes` reads one.
+            data = SENTENCE_DATA[language]
+            out: list[SentenceAuxiliary] = []
+
+            for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+                if slot not in ("verb", "state"):
+                    continue
+
+                groups: list[VerbGroup] | list[StateGroup] = (
+                    list(data.verbs) if slot == "verb" else list(data.states)
+                )
+
+                if any(
+                    phrase in every_form(group.words, group.forms, group.past) for group in groups
+                ):
+                    continue
+
+                out.extend(
+                    reading.auxiliary
+                    for reading in helped_in(language, slot, phrase)
+                    if reading.auxiliary is not None
+                    and any(reading.verb in joints_of(group, reading.auxiliary) for group in groups)
+                )
+
+            return out
+
+        seen = 0
+
+        for detail in rand_sentence(
+            language=language, include_name=False, count=300, output="detail"
+        ):
+            for auxiliary in helped(detail):
+                seen += 1
+
+                # Only somebody wants, decides, tries or fails to: a soup cools and a bus
+                # runs, and neither of them wants to.
+                if auxiliary.kind in willed and detail.theme is not None:
+                    assert THEME_CLASS[detail.theme] in ("person", "creature"), (
+                        f"{language}: {detail.theme} cannot {auxiliary.kind} ({detail.sentence})"
+                    )
+
+        assert seen > 0, f"{language} never wrote an auxiliary"
+
+        # A story builds on what each of its sentences did, so it writes only the ones that
+        # say the thing happened — and denies one only where a step of it does not come
+        # off: the hero looks and does not find, lies down and cannot sleep.
+        def failed(detail: SentenceDetail, language: WordLanguage = language) -> bool:
+            data = SENTENCE_DATA[language]
+
+            return any(
+                slot == "verb"
+                and any(
+                    group.field in failing and writes(language, group, "verb", phrase)
+                    for group in data.verbs
+                )
+                for phrase, slot in zip(detail.phrases, detail.slots, strict=True)
+            )
+
+        for detail in rand_sentence(
+            language=language, sentences=4, include_name=False, count=80, output="detail"
+        ):
+            if detail.story is None:
+                continue
+
+            for auxiliary in helped(detail):
+                assert auxiliary.kind in happens or (
+                    auxiliary.kind in ("negative", "unable") and failed(detail)
+                ), f"{language}: a story said {auxiliary.kind} ({detail.sentence})"
+
+
+def test_a_reaction_says_what_the_moment_was_like_after_what_it_answers_and_never_first() -> None:
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        impersonal = [group for group in data.states if group.impersonal]
+        shaped = any(
+            not any(part.slot in ("subject", "quantity") for part in frame.parts)
+            for frame in data.frames
+        )
+
+        # A language has the shape with no subject and the groups that go in it, or
+        # neither; and such a group describes nobody, so nothing else draws it.
+        assert bool(impersonal) == shaped, language
+
+        for group in impersonal:
+            assert not group.subject, f"{language}: {group.words[0]}"
+
+        if not impersonal:
+            continue
+
+        personal = set(
+            inflected(
+                language,
+                tuple(
+                    word
+                    for group in data.states
+                    if not group.impersonal
+                    for word in every_form(group.words, group.forms, group.past)
+                ),
+            )
+        )
+        # What each reaction answers: the fields of the groups it is in, or None where one
+        # of them fits after anything.
+        answers: dict[str, set[VerbField] | None] = {}
+
+        for group in impersonal:
+            for word in every_form(group.words, group.forms, group.past):
+                known = answers.get(word, set())
+                answers[word] = (
+                    None if group.after is None or known is None else {*known, *group.after}
+                )
+
+        def lower(word: str) -> str:
+            return word[:1].lower() + word[1:]
+
+        def unmarked(verb: str, data: SentenceLanguageData = data) -> str:
+            # A verb in the past with the language's own mark beside it: `触摸了`, `đã ăn`.
+            mark = data.past_mark
+            head = mark.head + data.space if mark is not None and mark.head else ""
+            tail = mark.tail if mark is not None else ""
+
+            if verb.startswith(head) and verb.endswith(tail):
+                return verb[len(head) : len(verb) - len(tail)]
+
+            return verb
+
+        seen = 0
+
+        for detail in rand_sentence(
+            language=language, sentences=5, include_name=False, count=150, output="detail"
+        ):
+            at = sentence_of(detail)
+
+            def reaction(
+                i: int,
+                detail: SentenceDetail = detail,
+                at: list[int] = at,
+                personal: set[str] = personal,
+                answers: dict[str, set[VerbField] | None] = answers,
+            ) -> str | None:
+                slots = [slot for j, slot in enumerate(detail.slots) if at[j] == i]
+                phrases = [phrase for j, phrase in enumerate(detail.phrases) if at[j] == i]
+
+                if "state" not in slots or any(slot not in ("state", "degree") for slot in slots):
+                    return None
+
+                state = lower(phrases[slots.index("state")])
+
+                if state in personal or state not in answers:
+                    return None
+
+                return state
+
+            for i, sentence in enumerate(detail.sentences):
+                said = reaction(i)
+
+                if said is None:
+                    continue
+
+                seen += 1
+
+                assert i > 0, f"{language}: a result opened on a reaction ({detail.sentence})"
+                assert reaction(i - 1) is None, f"{language}: two reactions ({detail.sentence})"
+
+                # One that answers something answers what the sentence before did.
+                after = answers[said]
+
+                if after:
+                    verbs = [
+                        phrase
+                        for j, phrase in enumerate(detail.phrases)
+                        if at[j] == i - 1 and detail.slots[j] == "verb"
+                    ]
+
+                    assert any(
+                        group.field in after
+                        and any(
+                            writes(language, group, "verb", each)
+                            for written in (verb, lower(verb))
+                            for each in (written, unmarked(written))
+                        )
+                        for verb in verbs
+                        for group in data.verbs
+                    ), f"{language}: '{said}' answers nothing before it ({sentence})"
+
+        assert seen > 0, f"{language} never wrote a reaction"
+
+
+def test_a_step_that_does_not_come_off_is_told_denied_and_the_story_carries_on() -> None:
+    # `잠들지 못했다` and then, later, `잠들었다`: the night is long, and it ends.
+    languages: tuple[WordLanguage, ...] = ("ko", "en", "ja")
+
+    for language in languages:
+        data = SENTENCE_DATA[language]
+        sleeps = [group for group in data.verbs if group.field == "sleep"]
+
+        def denied(
+            phrase: str, language: WordLanguage = language, sleeps: list[VerbGroup] = sleeps
+        ) -> bool:
+            return any(
+                reading.auxiliary is not None
+                and reading.auxiliary.kind in ("negative", "unable")
+                and any(reading.verb in joints_of(group, reading.auxiliary) for group in sleeps)
+                for reading in helped_in(language, "verb", phrase)
+            )
+
+        def sleeping(
+            phrase: str, language: WordLanguage = language, sleeps: list[VerbGroup] = sleeps
+        ) -> bool:
+            return not denied(phrase) and any(
+                writes(language, group, "verb", phrase) for group in sleeps
+            )
+
+        seen = 0
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            story="evening",
+            sentences=6,
+            count=80,
+            output="detail",
+        ):
+            verbs = [
+                phrase
+                for phrase, slot in zip(detail.phrases, detail.slots, strict=True)
+                if slot == "verb"
+            ]
+            at = next((i for i, verb in enumerate(verbs) if denied(verb)), -1)
+
+            if at < 0:
+                continue
+
+            seen += 1
+
+            assert any(sleeping(verb) for verb in verbs[at + 1 :]), (
+                f"{language}: the hero never sleeps after all ({detail.sentence})"
+            )
+
+        assert seen > 0, f"{language} never told a step that did not come off"
+
+
+def test_a_turn_connective_opens_a_sentence_about_something_that_just_came_along() -> None:
+    # `그때 참새가 날아갔다`, `Just then the sky darkened`: something new, named, and at the
+    # moment the connective has already said.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        turns = [
+            (upper_first(word) if data.capitalize else word) + data.space
+            for word in data.connectives.get("turn", ())
+        ]
+
+        if not turns:
+            continue
+
+        # The pronouns a topic is referred to by, and not a first or second person:
+        # Vietnamese `bạn` is `you` and a friend alike.
+        topical = [word for pool in data.pronouns.values() for word in pool]
+        pronouns = {*topical, *(upper_first(word) for word in topical)}
+        seen = 0
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=5,
+            count=150,
+            output="detail",
+        ):
+            at = sentence_of(detail)
+
+            for i, sentence in enumerate(detail.sentences):
+                if not any(sentence.startswith(turn) for turn in turns):
+                    continue
+
+                seen += 1
+                slots = [slot for j, slot in enumerate(detail.slots) if at[j] == i]
+                subject = next(
+                    (
+                        phrase
+                        for j, phrase in enumerate(detail.phrases)
+                        if at[j] == i and detail.slots[j] == "subject"
+                    ),
+                    None,
+                )
+
+                assert subject is not None and subject not in pronouns, (
+                    f"{language}: a turn names nothing new ({sentence})"
+                )
+                assert "time" not in slots, f"{language}: a turn says when twice ({sentence})"
+
+        assert seen > 0, f"{language} never wrote a turn"
+
+
+def test_a_connective_claims_one_thing_and_is_no_other_word_of_the_language() -> None:
+    # A word in two pools is read as either: `그때` is a time a sentence names and a turn
+    # it opens on, and a check on one of them cannot tell which it was.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        seen: dict[str, str] = {}
+        pools: list[tuple[str, WordPool]] = [
+            ("time", tuple(times_of(data))),
+            ("manner", tuple(word for group in data.manners for word in group.words)),
+            *data.connectives.items(),
+        ]
+
+        for kind, pool in pools:
+            for word in dict.fromkeys(pool):
+                # A time may be a manner too, which nothing reads the other way round; a
+                # connective is checked against everything before it.
+                if kind not in ("time", "manner"):
+                    assert word not in seen or seen[word] == kind, (
+                        f"{language}: '{word}' is {seen.get(word)} and {kind}"
+                    )
+
+                seen.setdefault(word, kind)
+
+
+def test_a_connective_is_no_prefix_of_a_word_a_sentence_can_open_on() -> None:
+    # Japanese and Chinese write nothing after a connective, so one that is the start of a
+    # word a phrase can open on reads as a connective where there is none: `突然` was a
+    # turn and `突然の` a modifier.
+    languages: tuple[WordLanguage, ...] = ("ja", "zh")
+
+    for language in languages:
+        openings = [
+            *modifiers_for(language),
+            *pool_for(language, "subject"),
+            *pool_for(language, "time"),
+            *pool_for(language, "manner"),
+            *pool_for(language, "degree"),
+        ]
+
+        for connective in connectives_of(language):
+            longer = next(
+                (word for word in openings if word != connective and word.startswith(connective)),
+                None,
+            )
+
+            assert longer is None, f"{language}: '{connective}' opens '{longer}'"
+
+
+def test_a_sentence_does_not_put_one_noun_where_it_is_and_where_it_happens() -> None:
+    # `水星在水星上沉睡`, `공원에서 공원이 조용해졌다`.
+    seats: tuple[SentenceSlot, ...] = ("subject", "place", "destination")
+
+    for language in WORD_LANGUAGES:
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            slots=["place", "destination"],
+            count=200,
+            output="detail",
+        ):
+            known = [
+                max(sorted(found), key=len)
+                for slot in seats
+                if slot in detail.slots
+                for found in (nouns_in(language, detail.phrases[detail.slots.index(slot)]),)
+                if found
+            ]
+
+            assert len(set(known)) == len(known), f"{language}: {detail.sentence}"
+
+
+def test_a_time_is_never_somewhere() -> None:
+    # A month, a dawn and a weekend are when, not what: `중순이 갯벌에서 저물었다`.
+    for language in WORD_LANGUAGES:
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            slots=["place", "destination"],
+            count=300,
+            output="detail",
+        ):
+            if "place" in detail.slots or "destination" in detail.slots:
+                assert detail.theme != "time", f"{language}: {detail.sentence}"
 
 
 def test_a_number_is_written_against_its_counter_the_way_the_language_writes_it() -> None:
@@ -2832,8 +3524,7 @@ def test_slots_money_writes_an_amount_the_language_actually_writes() -> None:
             verb = detail.phrases[detail.slots.index("verb")]
 
             assert any(
-                group.field in money_fields
-                and verb in every_form(group.words, group.forms, group.past)
+                group.field in money_fields and writes(language, group, "verb", verb)
                 for group in data.verbs
             ), f"{language}: '{verb}' does not handle money ({detail.sentence})"
 
@@ -3157,24 +3848,47 @@ def test_tense_decides_when_it_happened_and_a_result_keeps_one_tense() -> None:
                     if slot == "verb":
                         head = mark.head + data.space if mark.head else ""
                         tail = mark.tail or ""
+                        marked = written.startswith(head) and written.endswith(tail)
+                        bare = written[len(head) : len(written) - len(tail)] if marked else written
+                        # The mark goes around an auxiliary too — `đã không ăn` — except
+                        # where the auxiliary has no room for it: `没吃`, never `没吃了`.
+                        readings = [
+                            reading
+                            for reading in helped_in(language, slot, bare)
+                            if marked
+                            or (reading.auxiliary is not None and reading.auxiliary.drops_past_mark)
+                        ]
 
-                        assert written.startswith(head) and written.endswith(tail), (
+                        assert readings, (
                             f"{language}: '{phrase}' carries no past mark ({detail.sentence})"
                         )
-                        assert written[len(head) : len(written) - len(tail)] in present, (
-                            f"{language}: '{phrase}' is not a verb the pools hold"
+                        assert any(reading.verb in present for reading in readings), (
+                            f"{language}: '{phrase}' is not a verb the pools hold "
+                            f"({detail.sentence})"
                         )
 
                     continue
 
                 usable = present if slot == "state" and not states_change else past
                 forms = inflected(language, tuple(usable)) if data.predicate_agrees else usable
+                # An auxiliary that carries the tense is the one in the past, and a
+                # particle leaves the predicate in the past it would have been in.
+                helped = any(
+                    reading.auxiliary is not None
+                    and (
+                        reading.helper in past_forms(reading.auxiliary.predicate.past)
+                        if reading.auxiliary.predicate is not None
+                        else reading.verb in forms
+                    )
+                    for each in (written, phrase)
+                    for reading in helped_in(language, slot, each)
+                )
 
-                assert written in forms or phrase in forms or written in present, (
+                assert written in forms or phrase in forms or written in present or helped, (
                     f"{language}: '{phrase}' is not a past {slot} ({detail.sentence})"
                 )
 
-                if slot == "verb" and verbs_change:
+                if slot == "verb" and verbs_change and not helped:
                     assert written not in present or written in past, (
                         f"{language}: '{phrase}' is a present verb in a past sentence"
                     )
@@ -3513,9 +4227,15 @@ def test_a_destination_follows_only_a_verb_that_goes_somewhere() -> None:
             phrase = detail.phrases[verb]
             written = phrase[:1].lower() + phrase[1:] if verb == 0 else phrase
 
-            assert written in going or phrase in going, (
-                f"{language}: '{phrase}' goes nowhere, and has a destination ({detail.sentence})"
-            )
+            assert (
+                written in going
+                or phrase in going
+                or any(
+                    group.requires == "destination" and writes(language, group, "verb", each)
+                    for group in data.verbs
+                    for each in (written, phrase)
+                )
+            ), f"{language}: '{phrase}' goes nowhere, and has a destination ({detail.sentence})"
 
             # And it goes somewhere one can go: a market or a library, never Pluto or a sky.
             where_to = detail.phrases[detail.slots.index("destination")]
@@ -3636,10 +4356,20 @@ def test_haeche_and_haeyoche_ask_with_ji_and_jyo_and_never_tell_with_them() -> N
 def test_a_sentence_that_opens_on_later_does_not_also_say_when() -> None:
     for language in ("ko", "en", "ja"):
         data = SENTENCE_DATA[language]
-        temporal = [
-            upper_first(word) if data.capitalize else word
-            for word in data.connectives.get("temporal", ())
-        ]
+
+        def written(word: str, capitalize: bool = data.capitalize) -> str:
+            return upper_first(word) if capitalize else word
+
+        # The ones that say when: time passing, and something new coming along just then.
+        # Read against every connective, longest first, because Japanese writes no space
+        # after one and `一方で` opens on `一方`.
+        dating = {
+            written(word)
+            for word in (*data.connectives.get("temporal", ()), *data.connectives.get("turn", ()))
+        }
+        openers = sorted(
+            (written(word) for word in connectives_of(language)), key=len, reverse=True
+        )
         times = pool_for(language, "time")
         opened = 0
 
@@ -3655,7 +4385,11 @@ def test_a_sentence_that_opens_on_later_does_not_also_say_when() -> None:
             belongs = sentence_of(detail)
 
             for at, sentence in enumerate(detail.sentences):
-                if not any(sentence.startswith(word + data.space) for word in temporal):
+                opener = next(
+                    (word for word in openers if sentence.startswith(word + data.space)), None
+                )
+
+                if opener is None or opener not in dating:
                     continue
 
                 opened += 1

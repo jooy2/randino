@@ -244,30 +244,41 @@ final SentenceLanguageData es = SentenceLanguageData(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.content,
-      words: words(r'''
-        ríe sonríe tararea se_ríe silba vitorea asiente aplaude guiña_un_ojo se_ríe_a_carcajadas
-        canturrea sonríe_de_oreja_a_oreja
-      '''),
+      words: words(r'ríe sonríe se_ríe se_ríe_a_carcajadas sonríe_de_oreja_a_oreja'),
       past: PredicateTense(
-        words: words(r'''
-          rió sonrió tarareó se_rió silbó vitoreó asintió aplaudió guiñó_un_ojo se_rió_a_carcajadas
-          canturreó sonrió_de_oreja_a_oreja
-        '''),
+        words: words(r'rió sonrió se_rió se_rió_a_carcajadas sonrió_de_oreja_a_oreja'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.content,
+      words: words(r'tararea silba vitorea asiente aplaude guiña_un_ojo canturrea'),
+      past: PredicateTense(
+        words: words(r'tarareó silbó vitoreó asintió aplaudió guiñó_un_ojo canturreó'),
       ),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.restless,
+      words: words(r'llora solloza gime gruñe lloriquea resopla da_vueltas'),
+      past: PredicateTense(
+        words: words(r'lloró sollozó gimió gruñó lloriqueó resopló dio_vueltas'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.restless,
       words: words(r'''
-        llora suspira murmura solloza gime gruñe refunfuña lloriquea resopla balbucea hace_una_mueca
-        niega_con_la_cabeza frunce_el_ceño se_muerde_el_labio se_rasca_la_cabeza da_vueltas
+        suspira murmura refunfuña balbucea hace_una_mueca niega_con_la_cabeza frunce_el_ceño
+        se_muerde_el_labio se_rasca_la_cabeza
       '''),
       past: PredicateTense(
         words: words(r'''
-          lloró suspiró murmuró sollozó gimió gruñó refunfuñó lloriqueó resopló balbuceó
-          hizo_una_mueca negó_con_la_cabeza frunció_el_ceño se_mordió_el_labio se_rascó_la_cabeza
-          dio_vueltas
+          suspiró murmuró refunfuñó balbuceó hizo_una_mueca negó_con_la_cabeza frunció_el_ceño
+          se_mordió_el_labio se_rascó_la_cabeza
         '''),
       ),
     ),
@@ -275,32 +286,48 @@ final SentenceLanguageData es = SentenceLanguageData(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.tired,
-      words: words(r'bosteza se_frota_los_ojos se_estira se_masajea_los_hombros parpadea'),
-      past: PredicateTense(
-        words: words(r'bostezó se_frotó_los_ojos se_estiró se_masajeó_los_hombros parpadeó'),
-      ),
+      words: words(r'bosteza se_estira parpadea'),
+      past: PredicateTense(words: words(r'bostezó se_estiró parpadeó')),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.tired,
+      words: words(r'se_frota_los_ojos se_masajea_los_hombros'),
+      past: PredicateTense(words: words(r'se_frotó_los_ojos se_masajeó_los_hombros')),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.hungry,
-      words: words(r'traga_saliva se_relame se_frota_la_barriga olfatea_el_aire'),
-      past: PredicateTense(
-        words: words(r'tragó_saliva se_relamió se_frotó_la_barriga olfateó_el_aire'),
-      ),
+      words: words(r'traga_saliva se_relame olfatea_el_aire'),
+      past: PredicateTense(words: words(r'tragó_saliva se_relamió olfateó_el_aire')),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.hungry,
+      words: words(r'se_frota_la_barriga'),
+      past: PredicateTense(words: words(r'se_frotó_la_barriga')),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
-        grita exclama jadea se_encoge_de_hombros estornuda se_sonroja chilla saluda_con_la_mano
-        ladea_la_cabeza abre_los_ojos_como_platos se_sobresalta
+        grita jadea estornuda chilla ladea_la_cabeza abre_los_ojos_como_platos se_sobresalta
       '''),
       past: PredicateTense(
         words: words(r'''
-          gritó exclamó jadeó se_encogió_de_hombros estornudó se_sonrojó chilló saludó_con_la_mano
-          ladeó_la_cabeza abrió_los_ojos_como_platos se_sobresaltó
+          gritó jadeó estornudó chilló ladeó_la_cabeza abrió_los_ojos_como_platos se_sobresaltó
         '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      words: words(r'exclama se_encoge_de_hombros se_sonroja saluda_con_la_mano'),
+      past: PredicateTense(
+        words: words(r'exclamó se_encogió_de_hombros se_sonrojó saludó_con_la_mano'),
       ),
     ),
     VerbGroup(
@@ -1043,6 +1070,60 @@ final SentenceLanguageData es = SentenceLanguageData(
         cálido frío dolorido rígido suave áspero terso pálido fuerte entumecido pesado
       '''),
     ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.find, VerbField.look],
+      words: words(r'extraño sorprendente curioso'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.lose],
+      words: words(r'terrible frustrante triste'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.eat, VerbField.cook, VerbField.drink],
+      words: words(r'delicioso'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.meet, VerbField.talk],
+      words: words(r'agradable divertido'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.rest, VerbField.sleep],
+      words: words(r'agradable relajante'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.make, VerbField.tend, VerbField.sell],
+      words: words(r'satisfactorio'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.go, VerbField.move, VerbField.play],
+      words: words(r'divertido emocionante'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.search, VerbField.wait],
+      words: words(r'aburrido agotador'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.think],
+      words: words(r'extraño raro'),
+    ),
   ],
   modifiers: <ModifierGroup>[
     ModifierGroup(
@@ -1242,6 +1323,7 @@ final SentenceLanguageData es = SentenceLanguageData(
     ConnectiveKind.causal: words(r'''
       entonces por_eso así_que por_tanto, en_consecuencia, de_ahí_que por_esa_razón,
     '''),
+    ConnectiveKind.turn: words(r'de_pronto, en_ese_momento, justo_entonces, de_golpe,'),
   },
   traits: <NounTrait, WordPool>{
     NounTrait.flier: words(r'''
@@ -1363,6 +1445,9 @@ final SentenceLanguageData es = SentenceLanguageData(
       past: PredicateTense(words: <String>['fue']),
     ),
   ),
+  auxiliaries: <SentenceAuxiliary>[
+    SentenceAuxiliary(kind: AuxiliaryKind.negative, template: 'no {v}'),
+  ],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.date, head: 'el', tail: ','),
@@ -1487,5 +1572,10 @@ final SentenceLanguageData es = SentenceLanguageData(
       SentencePart(SentenceSlot.verb),
       SentencePart(SentenceSlot.money),
     ], 6),
+    SentenceFrame(<SentencePart>[SentencePart(SentenceSlot.state, head: 'es', pastHead: 'era')], 8),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state, head: 'es', pastHead: 'era'),
+    ], 8),
   ],
 );

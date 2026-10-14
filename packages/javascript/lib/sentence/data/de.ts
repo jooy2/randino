@@ -149,13 +149,24 @@ export const DE: SentenceLanguageData = {
 		},
 		// What somebody shows, split by what it shows — see the Korean data. One
 		// word or a reflexive each, because a question moves the whole token.
+		// What anything with a face can show, and beside each group what takes hands,
+		// shoulders or words and is a person's alone.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
 			...tensed(
-				`lacht lächelt summt kichert grinst pfeift jauchzt jubelt nickt klatscht zwinkert strahlt schmunzelt gluckst`,
-				`lachte lächelte summte kicherte grinste pfiff jauchzte jubelte nickte klatschte zwinkerte strahlte schmunzelte gluckste`
+				`lacht lächelt kichert grinst strahlt gluckst`,
+				`lachte lächelte kicherte grinste strahlte gluckste`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
+			...tensed(
+				`summt pfeift jauchzt jubelt nickt klatscht zwinkert schmunzelt`,
+				`summte pfiff jauchzte jubelte nickte klatschte zwinkerte schmunzelte`
 			)
 		},
 		{
@@ -163,8 +174,17 @@ export const DE: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'restless',
 			...tensed(
-				`weint seufzt murmelt schluchzt stöhnt murrt brummt schnieft schnaubt stammelt wimmert heult jammert flucht zappelt grummelt zittert bebt`,
-				`weinte seufzte murmelte schluchzte stöhnte murrte brummte schniefte schnaubte stammelte wimmerte heulte jammerte fluchte zappelte grummelte zitterte bebte`
+				`weint schluchzt stöhnt schnieft schnaubt wimmert heult zappelt zittert bebt`,
+				`weinte schluchzte stöhnte schniefte schnaubte wimmerte heulte zappelte zitterte bebte`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
+			...tensed(
+				`seufzt murmelt murrt brummt stammelt jammert flucht grummelt`,
+				`seufzte murmelte murrte brummte stammelte jammerte fluchte grummelte`
 			)
 		},
 		{
@@ -186,9 +206,14 @@ export const DE: SentenceLanguageData = {
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`ruft schreit keucht niest prustet kreischt hustet räuspert_sich grunzt quiekt fiept kräht zirpt brüllt faucht knurrt jault winselt errötet schnalzt winkt zuckt stutzt`,
-				`rief schrie keuchte nieste prustete kreischte hustete räusperte_sich grunzte quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte errötete schnalzte winkte zuckte stutzte`
+				`ruft schreit keucht niest prustet kreischt hustet grunzt quiekt fiept kräht zirpt brüllt faucht knurrt jault winselt zuckt stutzt`,
+				`rief schrie keuchte nieste prustete kreischte hustete grunzte quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte zuckte stutzte`
 			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			...tensed(`räuspert_sich errötet schnalzt winkt`, `räusperte_sich errötete schnalzte winkte`)
 		},
 		{
 			field: 'talk',
@@ -487,7 +512,50 @@ export const DE: SentenceLanguageData = {
 		{
 			subject: ['body'],
 			words: words(`warm kalt wund steif weich rau glatt blass stark taub schwer`)
-		}
+		},
+		// A reaction says what the moment was like, with `es` standing for it: `Es
+		// war seltsam`, `Es war sehr still`. Each group answers what the sentence
+		// before did, and the last fits after anything.
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'look'],
+			words: words(`seltsam überraschend merkwürdig`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['lose'],
+			words: words(`schrecklich ärgerlich traurig`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['eat', 'cook', 'drink'],
+			words: words(`köstlich lecker`)
+		},
+		{ subject: [], impersonal: true, after: ['meet', 'talk'], words: words(`schön angenehm nett`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rest', 'sleep'],
+			words: words(`gemütlich angenehm erholsam`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['make', 'tend', 'sell'],
+			words: words(`befriedigend lohnend`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rise', 'go', 'move', 'play'],
+			words: words(`lustig erfrischend`)
+		},
+		{ subject: [], impersonal: true, after: ['search', 'wait'], words: words(`langweilig mühsam`) },
+		{ subject: [], impersonal: true, after: ['think'], words: words(`seltsam rätselhaft`) },
+		{ subject: [], impersonal: true, words: words(`still ruhig kalt warm kühl friedlich`) }
 	],
 	// Base forms, which `agreement` gives the strong endings after `ein`.
 	modifiers: [
@@ -886,6 +954,12 @@ export const DE: SentenceLanguageData = {
 			],
 			weight: 6,
 			mood: 'question'
+		},
+		// A reaction, with no subject at all: `Es war still.`, `Es ist sehr kalt.`
+		{ parts: [{ slot: 'state', head: 'es ist', pastHead: 'es war' }], weight: 8 },
+		{
+			parts: [{ slot: 'degree' }, { slot: 'state', head: 'es ist', pastHead: 'es war' }],
+			weight: 8
 		}
 	]
 };

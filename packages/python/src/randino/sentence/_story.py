@@ -77,6 +77,18 @@ to be one.
 ASK_CHANCE = 40
 """How often a hero with somebody beside them asks how they are, where they could speak."""
 
+REACTION_CHANCE = 35
+"""How often something the hero did is followed by a reaction to it.
+
+`열쇠를 찾았다. 정말 다행이었다.` — where the story can spare the step after it.
+"""
+
+REACTION_SHARE = 4
+"""The most reactions one telling has: one in every this many sentences."""
+
+SETBACKS: tuple[Condition, ...] = ("restless", "tired", "hungry")
+"""The conditions a story is worse off for. A setback is one of these coming about."""
+
 LINE_FIELDS: tuple[VerbField, ...] = (
     "go",
     "arrive",
@@ -196,6 +208,17 @@ class Beat:
 
     answered: bool = False
     """Whether the sentence after this line answers it, which makes it said aloud."""
+
+    reaction: VerbField | Literal["ambient"] | None = None
+    """Set for a reaction, which is not a step of the story either.
+
+    A sentence with no subject that says what the one before it was like — the field that
+    sentence's verb came from, or `"ambient"` after the place changing. `step` is the one
+    it reacts to, kept for bookkeeping the way a reply keeps the line's.
+    """
+
+    fails: bool = False
+    """Whether this sentence tells its step as not coming off."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -437,6 +460,15 @@ def _after(
     said = set(memory.said)
     field, condition = settled
 
+    # A step that does not come off changes nothing its field would have, and leaves the
+    # hero uneasy: the key still lost, the night still long.
+    if step.fails:
+        state.add("restless")
+        given.add("restless")
+        _discard_opposite(state, "restless")
+
+        return _Memory(frozenset(state), frozenset(given), frozenset(said))
+
     # What the place or somebody else does changes nothing of the hero.
     if field is not None and step.kind not in ("scene", "other"):
         rule = FIELD_RULES[field]
@@ -654,6 +686,30 @@ def _is_action(step: StoryStep) -> bool:
     return step.kind == "act"
 
 
+def _setback(current: _Walked) -> bool:
+    """Whether a step is a setback: an action that leaves the hero uneasy.
+
+    That is losing something, a step that does not come off, or a state that says one of
+    `SETBACKS` straight after the story itself had made the opposite true.
+    """
+    if current.step.fails:
+        return True
+
+    if current.step.kind == "act" and current.field is not None:
+        return "restless" in FIELD_RULES[current.field].gives
+
+    if (
+        current.step.kind == "state"
+        and current.condition is not None
+        and current.condition in SETBACKS
+    ):
+        opposite = OPPOSITES.get(current.condition)
+
+        return opposite is not None and opposite in current.before and opposite in current.given
+
+    return False
+
+
 def _links_for(previous: _Walked | None, current: _Walked) -> tuple[ConnectiveKind, ...]:
     """The connectives a sentence may open on, by what it claims.
 
@@ -666,6 +722,12 @@ def _links_for(previous: _Walked | None, current: _Walked) -> tuple[ConnectiveKi
 
     if previous is None:
         return ()
+
+    # A setback cuts against what came before it, whatever the step asked for: losing
+    # what the hero carried, or the hero worn out, hungry or uneasy again just after the
+    # story had them otherwise — `그런데 열쇠를 잃어버렸다`, `But soon she was tired`.
+    if _setback(current):
+        return ("contrastive",)
 
     if asked == "causal":
         rule = FIELD_RULES[current.field] if current.field is not None else None
@@ -690,6 +752,13 @@ def _links_for(previous: _Walked | None, current: _Walked) -> tuple[ConnectiveKi
 
         return ("additive", "temporal")
 
+    # Somebody else turning up, or the place changing, while the hero is about something,
+    # is something new coming along, and opens on what says so: `바로 그때 참새가
+    # 날아갔다`, `Just then the sky darkened`. One scene after another is a place
+    # described, which nothing interrupts.
+    if current.step.kind in ("other", "scene") and previous.step.kind in ("act", "state"):
+        return ("turn",)
+
     return (asked,) if asked is not None else ("additive", "temporal")
 
 
@@ -706,6 +775,8 @@ def plan(
     count: int,
     joinable: bool,
     spoken: bool = True,
+    reactable: bool = False,
+    denies: bool = False,
 ) -> Plan | None:
     """Plan a telling of `story` in exactly `count` sentences.
 
@@ -715,7 +786,14 @@ def plan(
     again for each join, so the count comes out exact. A story that has fewer required
     steps than the caller wants sentences is padded; one that has more is cut where it
     stands.
+
+    `reactable` says whether the result can carry a reaction at all, and `denies` whether
+    the language can say a thing did not happen, which a step that does not come off needs.
     """
+    # A step that does not come off is told only where the language can say so.
+    if not denies and any(step.fails for step in story.steps):
+        story = replace(story, steps=tuple(step for step in story.steps if not step.fails))
+
     required = [step for step in story.steps if step.required]
     # The prop is drawn once per telling, the way the item is drawn once per story.
     props = prop_themes_for(data, story, hero)
@@ -800,10 +878,15 @@ def plan(
     # Which neighbouring actions become one sentence. Every pair that could is a
     # candidate, and the draw decides, up to the number the telling paid for.
     joined: set[int] = set()
+    # A step that does not come off is said on its own: as a first clause it would link on
+    # to the next rather than say it did not happen.
     pairs = [
         i
         for i in range(len(walked) - 1)
-        if _is_action(walked[i].step) and _is_action(walked[i + 1].step)
+        if _is_action(walked[i].step)
+        and _is_action(walked[i + 1].step)
+        and not walked[i].step.fails
+        and not walked[i + 1].step.fails
     ]
 
     shuffle(pairs)
@@ -861,6 +944,11 @@ def plan(
     voice, asked, cue, answered, walked = _voices_for(
         data, story, hero, item, prop, chosen, walked, joined, spoken
     )
+    reaction: list[VerbField | Literal["ambient"] | None] = (
+        _reactions_for(data, hero, item, prop, chosen, walked, joined, voice)
+        if reactable
+        else [None] * len(walked)
+    )
     beats: list[Beat] = []
 
     for i, one in enumerate(walked):
@@ -870,10 +958,18 @@ def plan(
                 field=one.field,
                 condition=one.condition,
                 before=one.before,
-                links=_links_for(walked[i - 1] if i > 0 else None, one),
+                # A reaction stands bare: `정말 다행이었다`, with nothing in front of it to
+                # say how it follows, because what it follows is the whole of what it is
+                # about.
+                links=()
+                if reaction[i] is not None
+                else _links_for(walked[i - 1] if i > 0 else None, one),
                 # A kind beside the statement is the step's own, and `trailing` is kept
-                # for the sentence that closes the result.
-                kinds=tuple(
+                # for the sentence that closes the result — a paragraph that trails off in
+                # the middle has not trailed off. A reaction may be exclaimed.
+                kinds=("exclamation",)
+                if reaction[i] is not None
+                else tuple(
                     kind for kind in one.step.kinds if kind != "trailing" or i == len(walked) - 1
                 ),
                 join="first" if i in joined else "second" if i - 1 in joined else None,
@@ -881,6 +977,8 @@ def plan(
                 asked=asked[i],
                 cue=cue[i],
                 answered=answered[i],
+                reaction=reaction[i],
+                fails=reaction[i] is None and voice[i] != "reply" and one.step.fails,
             )
         )
 
@@ -953,7 +1051,8 @@ def _voices_for(
         # never reported — `집에 도달했습니다` is nothing anybody says — but said in the
         # language's own words where it has them, first person or not.
         return (
-            data.speech is not None
+            not one.step.fails
+            and data.speech is not None
             and one.step.kind == "act"
             and one.field is not None
             and one.field in LINE_FIELDS
@@ -977,6 +1076,10 @@ def _voices_for(
         # The ways this beat could be spoken, if any.
         step = one.step
         out: list[Voice] = []
+
+        # What did not come off is narrated: `“열쇠를 찾았어!”` would say it did.
+        if step.fails:
+            return out
 
         if step.kind == "state" and one.condition is not None:
             if data.speech is not None:
@@ -1132,6 +1235,103 @@ def _voices_for(
         i = following + 1
 
     return voice, asked, cue, answered, walked
+
+
+def _reacts(data: SentenceLanguageData, reaction: VerbField | Literal["ambient"]) -> bool:
+    """Whether the language can react to a sentence of this field.
+
+    It has a shape with no subject, and a group that answers the field or fits after
+    anything.
+    """
+    return any(
+        not any(part.slot in ("subject", "quantity") for part in frame.parts)
+        for frame in data.frames
+    ) and any(
+        group.impersonal
+        and (group.after is None or (reaction != "ambient" and reaction in group.after))
+        for group in data.states
+    )
+
+
+def _reactions_for(
+    data: SentenceLanguageData,
+    hero: NounClass,
+    item: WordTheme | None,
+    prop: WordTheme | None,
+    chosen: list[StoryStep],
+    walked: list[_Walked],
+    joined: set[int],
+    voice: Sequence[Voice | None],
+) -> list[VerbField | Literal["ambient"] | None]:
+    """Which sentences of a telling are reactions to the one before.
+
+    A reaction follows something the hero did, or the place changing, and takes the place
+    of the step after it the way an answer does — where that step is not one the story
+    needs, is a whole sentence nobody speaks, and the rest of the telling still walks
+    without it. Never two in a row, never straight after a line, and no more than one in
+    every `REACTION_SHARE` sentences. `chosen` and `walked` are rewritten in place for the
+    reactions it makes.
+    """
+    reaction: list[VerbField | Literal["ambient"] | None] = [None] * len(walked)
+    most = max(1, len(walked) // REACTION_SHARE)
+    made = 0
+    i = 0
+
+    def whole(at: int) -> bool:
+        return at not in joined and at - 1 not in joined
+
+    while i + 1 < len(walked) and made < most:
+        one = walked[i]
+        following = i + 1
+        answered: VerbField | Literal["ambient"] | None = (
+            one.field
+            if one.step.kind == "act" and one.field is not None
+            else "ambient"
+            if one.step.kind == "scene"
+            else None
+        )
+        # A reaction is the hero's, so it waits for a sentence about the hero: one after
+        # the opening scene would have nobody yet to be about.
+        heard = any(each.step.kind in ("act", "state") for each in walked[: i + 1])
+
+        if (
+            answered is None
+            or one.step.fails
+            or not heard
+            or voice[i] is not None
+            or voice[following] is not None
+            or reaction[i] is not None
+            or not whole(following)
+            or walked[following].step.required
+            or not _reacts(data, answered)
+            or not chance(REACTION_CHANCE)
+        ):
+            i += 1
+            continue
+
+        rest = _walk_from(data, chosen[following + 1 :], hero, item, prop, walked[following].memory)
+
+        if rest is None:
+            i += 1
+            continue
+
+        chosen[following] = one.step
+        walked[following:] = [
+            _Walked(
+                one.step,
+                None,
+                None,
+                walked[following].before,
+                walked[following].given,
+                walked[following].memory,
+            ),
+            *rest,
+        ]
+        reaction[following] = answered
+        made += 1
+        i = following + 1
+
+    return reaction
 
 
 def unjoined(beat: Beat) -> Beat:

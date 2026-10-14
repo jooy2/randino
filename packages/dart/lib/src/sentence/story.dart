@@ -59,6 +59,12 @@ const Map<_VoiceMode, int> _replyChance = <_VoiceMode, int>{
 // they are, where the step could be a line of their own instead.
 const int _askChance = 40;
 
+// How often something the hero did is followed by a reaction to it — `열쇠를
+// 찾았다. 정말 다행이었다.` — where the story can spare the step after it, and
+// the most one telling has: one in every `_reactionShare` sentences.
+const int _reactionChance = 35;
+const int _reactionShare = 4;
+
 // The fields a person may report in their own words — `“열쇠를 찾았어!”`, `“I
 // went to the market.”` — as against the ones nobody says aloud. Told in the
 // past whatever tense the story is in.
@@ -142,6 +148,20 @@ enum Voice {
   reply,
 }
 
+/// What a reaction answers: the field the sentence before it drew its verb
+/// from, or — with a null [field] — the moment itself, after a sentence that had
+/// none, such as the place changing.
+class Reaction {
+  /// Creates a reaction to a sentence of [field].
+  const Reaction(this.field);
+
+  /// A reaction to the moment rather than to something done.
+  static const Reaction ambient = Reaction(null);
+
+  /// The field it answers, or null for [ambient].
+  final VerbField? field;
+}
+
 /// Whether a beat is the first or the second clause of one sentence.
 enum JoinSide {
   /// The first clause, which closes on nothing.
@@ -168,6 +188,8 @@ class Beat {
     required this.asked,
     required this.cue,
     required this.answered,
+    this.reaction,
+    this.fails = false,
   });
 
   /// The step this sentence tells.
@@ -206,6 +228,16 @@ class Beat {
   /// Whether the sentence after this line answers it, which makes it said aloud.
   final bool answered;
 
+  /// Set for a reaction, which is not a step of the story either: a sentence
+  /// with no subject that says what the one before it was like — the field
+  /// that sentence's verb came from, or [Reaction.ambient] after the place
+  /// changing. [step] is the one it reacts to, kept for bookkeeping the way a
+  /// reply keeps the line's.
+  final Reaction? reaction;
+
+  /// Whether this sentence tells its step as not coming off.
+  final bool fails;
+
   /// The same beat, written as a whole sentence rather than as a clause.
   Beat unjoined() => Beat(
     step: step,
@@ -219,6 +251,8 @@ class Beat {
     asked: asked,
     cue: cue,
     answered: answered,
+    reaction: reaction,
+    fails: fails,
   );
 }
 
@@ -442,6 +476,16 @@ _Memory _after(_Memory memory, StoryStep step, _Settled settled) {
   final said = <Condition>{...memory.said};
   final field = settled.field;
 
+  // A step that does not come off changes nothing its field would have, and
+  // leaves the hero uneasy: the key still lost, the night still long.
+  if (step.fails) {
+    state.add(Condition.restless);
+    given.add(Condition.restless);
+    state.remove(opposites[Condition.restless]);
+
+    return _Memory(state, given, said);
+  }
+
   // What the place or somebody else does changes nothing of the hero.
   if (field != null && step.kind != StepKind.scene && step.kind != StepKind.other) {
     final rule = fieldRules[field]!;
@@ -650,6 +694,36 @@ List<Story> storiesFor(SentenceLanguageData data, List<NounClass> heroes, Senten
 /// Whether a step is something the hero does, which is what two clauses share.
 bool _isAction(StoryStep step) => step.kind == StepKind.act;
 
+// The conditions a story is worse off for. A setback is one of these coming about.
+const List<Condition> _setbacks = <Condition>[
+  Condition.restless,
+  Condition.tired,
+  Condition.hungry,
+];
+
+/// Whether a step is a setback: one that does not come off, an action that
+/// leaves the hero uneasy, which is losing something, or a state that says one
+/// of `_setbacks` straight after the story itself had made the opposite true.
+bool _setback(_Walked current) {
+  if (current.step.fails) return true;
+
+  final field = current.field;
+
+  if (current.step.kind == StepKind.act && field != null) {
+    return fieldRules[field]!.gives.contains(Condition.restless);
+  }
+
+  final condition = current.condition;
+
+  if (current.step.kind == StepKind.state && condition != null && _setbacks.contains(condition)) {
+    final opposite = opposites[condition]!;
+
+    return current.before.contains(opposite) && current.given.contains(opposite);
+  }
+
+  return false;
+}
+
 /// The connectives a sentence may open on, by what it claims. A causal one is
 /// kept only where the story has given it a reason: what this sentence needs, or
 /// what makes a hero do it, is true because an earlier sentence made it so, or
@@ -659,6 +733,12 @@ List<ConnectiveKind> _linksFor(_Walked? previous, _Walked current) {
   final asked = current.step.link;
 
   if (previous == null) return const <ConnectiveKind>[];
+
+  // A setback cuts against what came before it, whatever the step asked for:
+  // losing what the hero carried, or the hero worn out, hungry or uneasy again
+  // just after the story had them otherwise — `그런데 열쇠를 잃어버렸다`, `But
+  // soon she was tired`.
+  if (_setback(current)) return const <ConnectiveKind>[ConnectiveKind.contrastive];
 
   if (asked == ConnectiveKind.causal) {
     final field = current.field;
@@ -682,6 +762,15 @@ List<ConnectiveKind> _linksFor(_Walked? previous, _Walked current) {
         : const <ConnectiveKind>[ConnectiveKind.additive, ConnectiveKind.temporal];
   }
 
+  // Somebody else turning up, or the place changing, while the hero is about
+  // something, is something new coming along, and opens on what says so: `바로
+  // 그때 참새가 날아갔다`, `Just then the sky darkened`. One scene after another
+  // is a place described, which nothing interrupts.
+  if ((current.step.kind == StepKind.other || current.step.kind == StepKind.scene) &&
+      (previous.step.kind == StepKind.act || previous.step.kind == StepKind.state)) {
+    return const <ConnectiveKind>[ConnectiveKind.turn];
+  }
+
   return asked == null
       ? const <ConnectiveKind>[ConnectiveKind.additive, ConnectiveKind.temporal]
       : <ConnectiveKind>[asked];
@@ -697,13 +786,20 @@ List<ConnectiveKind> _linksFor(_Walked? previous, _Walked current) {
 /// more is cut where it stands.
 Plan? plan(
   SentenceLanguageData data,
-  Story story,
+  Story original,
   NounClass hero,
   WordTheme? item,
   int count,
   bool joinable, [
   bool spoken = true,
+  bool reactable = false,
+  bool denies = false,
 ]) {
+  // A step that does not come off is told only where the language can say so.
+  final story =
+      !denies && original.steps.any((step) => step.fails)
+          ? _without(original, (step) => step.fails)
+          : original;
   final required = story.steps.where((step) => step.required).toList(growable: false);
   // The prop is drawn once per telling, the way the item is drawn once per story.
   final props = propThemesFor(data, story, hero);
@@ -788,9 +884,15 @@ Plan? plan(
   // Which neighbouring actions become one sentence. Every pair that could is a
   // candidate, and the draw decides, up to the number the telling paid for.
   final joined = <int>{};
+  // A step that does not come off is said on its own: as a first clause it would
+  // link on to the next rather than say it did not happen.
   final pairs = <int>[
     for (var i = 0; i + 1 < walked!.length; i += 1)
-      if (_isAction(walked![i].step) && _isAction(walked![i + 1].step)) i,
+      if (_isAction(walked![i].step) &&
+          _isAction(walked![i + 1].step) &&
+          !walked![i].step.fails &&
+          !walked![i + 1].step.fails)
+        i,
   ]..shuffle(randomSource);
 
   for (final at in pairs) {
@@ -861,8 +963,14 @@ Plan? plan(
 
   walked = voices.walked;
 
+  final reaction =
+      reactable
+          ? _reactionsFor(data, hero, item, prop, chosen, walked!, joined, voices.voice)
+          : List<Reaction?>.filled(walked!.length, null);
+
   for (var i = 0; i < walked!.length; i += 1) {
     final one = walked![i];
+    final reacting = reaction[i] != null;
 
     beats.add(
       Beat(
@@ -870,12 +978,18 @@ Plan? plan(
         field: one.field,
         condition: one.condition,
         before: one.before,
-        links: _linksFor(i > 0 ? walked![i - 1] : null, one),
+        // A reaction stands bare: `정말 다행이었다`, with nothing in front of it to
+        // say how it follows, because what it follows is the whole of what it is
+        // about.
+        links: reacting ? const <ConnectiveKind>[] : _linksFor(i > 0 ? walked![i - 1] : null, one),
         // A kind beside the statement is the step's own, and `trailing` is kept
-        // for the sentence that closes the result.
-        kinds: one.step.kinds
-            .where((kind) => kind != SentenceType.trailing || i == walked!.length - 1)
-            .toList(growable: false),
+        // for the sentence that closes the result. A reaction may be exclaimed.
+        kinds:
+            reacting
+                ? const <SentenceType>[SentenceType.exclamation]
+                : one.step.kinds
+                    .where((kind) => kind != SentenceType.trailing || i == walked!.length - 1)
+                    .toList(growable: false),
         join:
             joined.contains(i)
                 ? JoinSide.first
@@ -886,6 +1000,8 @@ Plan? plan(
         asked: voices.asked[i],
         cue: voices.cue[i],
         answered: voices.answered[i],
+        reaction: reaction[i],
+        fails: !reacting && voices.voice[i] != Voice.reply && one.step.fails,
       ),
     );
   }
@@ -971,7 +1087,8 @@ _Voices _voicesFor(
   bool reportable(_Walked one) {
     final field = one.field;
 
-    return data.speech != null &&
+    return !one.step.fails &&
+        data.speech != null &&
         one.step.kind == StepKind.act &&
         field != null &&
         _lineFields.contains(field) &&
@@ -994,6 +1111,9 @@ _Voices _voicesFor(
     final step = one.step;
     final field = one.field;
     final out = <Voice>[];
+
+    // What did not come off is narrated: `“열쇠를 찾았어!”` would say it did.
+    if (step.fails) return out;
 
     if (step.kind == StepKind.state && one.condition != null) {
       if (data.speech != null) out.add(Voice.line);
@@ -1136,6 +1256,111 @@ _Voices _voicesFor(
 
   return _Voices(voice, asked, cue, answered, walked);
 }
+
+/// Whether the language can react to a sentence of this kind: it has a shape
+/// with no subject, and a group that answers the field or fits after anything.
+bool _reacts(SentenceLanguageData data, Reaction reaction) {
+  final field = reaction.field;
+
+  return data.frames.any(
+        (frame) =>
+            !frame.parts.any(
+              (part) => part.slot == SentenceSlot.subject || part.slot == SentenceSlot.quantity,
+            ),
+      ) &&
+      data.states.any(
+        (group) =>
+            group.impersonal &&
+            (group.after == null || (field != null && group.after!.contains(field))),
+      );
+}
+
+/// Which sentences of a telling are reactions to the one before.
+///
+/// A reaction follows something the hero did, or the place changing, and takes
+/// the place of the step after it the way an answer does — where that step is
+/// not one the story needs, is a whole sentence nobody speaks, and the rest of
+/// the telling still walks without it. Never two in a row, never straight after
+/// a line, and no more than one in every `_reactionShare` sentences. `walked` is
+/// rewritten in place where one is made, the way an answer rewrites it.
+List<Reaction?> _reactionsFor(
+  SentenceLanguageData data,
+  NounClass hero,
+  WordTheme? item,
+  WordTheme? prop,
+  List<StoryStep> chosen,
+  List<_Walked> walked,
+  Set<int> joined,
+  List<Voice?> voice,
+) {
+  final reaction = List<Reaction?>.filled(walked.length, null);
+  final share = walked.length ~/ _reactionShare;
+  final most = share < 1 ? 1 : share;
+  var made = 0;
+
+  bool whole(int i) => !joined.contains(i) && !joined.contains(i - 1);
+
+  for (var i = 0; i + 1 < walked.length && made < most; i += 1) {
+    final one = walked[i];
+    final next = i + 1;
+    final field = one.field;
+    final Reaction? answered =
+        one.step.kind == StepKind.act && field != null
+            ? Reaction(field)
+            : one.step.kind == StepKind.scene
+            ? Reaction.ambient
+            : null;
+
+    // A reaction is the hero's, so it waits for a sentence about the hero: one
+    // after the opening scene would have nobody yet to be about.
+    final heard = walked
+        .take(i + 1)
+        .any((each) => each.step.kind == StepKind.act || each.step.kind == StepKind.state);
+
+    if (answered == null ||
+        one.step.fails ||
+        !heard ||
+        voice[i] != null ||
+        voice[next] != null ||
+        reaction[i] != null ||
+        !whole(next) ||
+        walked[next].step.required ||
+        !_reacts(data, answered) ||
+        !chance(_reactionChance)) {
+      continue;
+    }
+
+    final rest = _walkFrom(data, chosen.sublist(next + 1), hero, item, prop, walked[next].memory);
+
+    if (rest == null) continue;
+
+    chosen[next] = one.step;
+    walked.replaceRange(next, walked.length, <_Walked>[
+      _Walked(one.step, null, null, walked[next].before, walked[next].given, walked[next].memory),
+      ...rest,
+    ]);
+    reaction[next] = answered;
+    made += 1;
+    i = next;
+  }
+
+  return reaction;
+}
+
+/// The same story with the steps [drop] picks left out.
+Story _without(Story story, bool Function(StoryStep step) drop) => Story(
+  name: story.name,
+  hero: story.hero,
+  start: story.start,
+  steps: story.steps.where((step) => !drop(step)).toList(growable: false),
+  weight: story.weight,
+  item: story.item,
+  itemThemes: story.itemThemes,
+  prop: story.prop,
+  propThemes: story.propThemes,
+  heroThemes: story.heroThemes,
+  lines: story.lines,
+);
 
 /// One story out of several, by weight.
 Story pickStory(List<Story> stories) => pickWeighted<Story>(stories, (story) => story.weight);

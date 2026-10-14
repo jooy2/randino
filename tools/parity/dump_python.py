@@ -190,6 +190,7 @@ def step(source: StoryStep) -> dict[str, object]:
         "destination": source.destination or "",
         "needs": list(source.needs),
         "required": source.required,
+        "fails": source.fails,
         "link": source.link or "",
         "kinds": list(source.kinds),
         "actor": source.actor or "",
@@ -331,6 +332,7 @@ sentence = {
                 "words": listed(group.words),
                 "forms": {form: listed(pool) for form, pool in group.forms.items()},
                 "past": tense(group.past),
+                "joints": {joint: listed(pool) for joint, pool in group.joints.items()},
             }
             for group in data.verbs
         ],
@@ -341,11 +343,41 @@ sentence = {
                 "condition": group.condition or "",
                 "head": group.head or "",
                 "pastHead": group.past_head or "",
+                "impersonal": group.impersonal,
+                "after": listed(group.after),
                 "words": listed(group.words),
                 "forms": {form: listed(pool) for form, pool in group.forms.items()},
                 "past": tense(group.past),
+                "joints": {joint: listed(pool) for joint, pool in group.joints.items()},
             }
             for group in data.states
+        ],
+        # Optional in one package and defaulted in another; written as a list either way,
+        # with every optional field present.
+        "auxiliaries": [
+            {
+                "kind": auxiliary.kind,
+                "on": auxiliary.on,
+                "template": auxiliary.template,
+                "pastTemplate": auxiliary.past_template or "",
+                "joint": auxiliary.joint or "",
+                "predicate": (
+                    None
+                    if auxiliary.predicate is None
+                    else {
+                        "words": listed(auxiliary.predicate.words),
+                        "forms": {
+                            form: listed(pool) for form, pool in auxiliary.predicate.forms.items()
+                        },
+                        "past": tense(auxiliary.predicate.past),
+                    }
+                ),
+                "dropsPastMark": auxiliary.drops_past_mark,
+                "moods": listed(auxiliary.moods),
+                "tense": auxiliary.tense or "",
+                "unless": listed(auxiliary.unless),
+            }
+            for auxiliary in data.auxiliaries
         ],
         "modifiers": groups(data.modifiers),
         "manners": groups(data.manners),

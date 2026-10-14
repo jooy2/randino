@@ -5,8 +5,10 @@ Ported verbatim from the JavaScript package; see CLAUDE.md.
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    AuxiliaryPredicate,
     ModifierGroup,
     PredicateTense,
+    SentenceAuxiliary,
     SentenceCalendar,
     SentenceFrame,
     SentenceJoin,
@@ -380,26 +382,31 @@ EN = SentenceLanguageData(
             field="express",
             subject=("creature", "person"),
             condition="content",
-            words=words("""
-                laughs smiles hums giggles chuckles grins whistles cheers beams claps nods winks
-                chortles brightens
-            """),
+            words=words("laughs smiles grins beams brightens perks_up"),
             forms={
-                "question": words("""
-                    laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle
-                    brighten
-                """),
+                "question": words("laugh smile grin beam brighten perk_up"),
+            },
+            past=PredicateTense(
+                words=words("laughed smiled grinned beamed brightened perked_up"),
+                forms={
+                    "question": words("laugh smile grin beam brighten perk_up"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="content",
+            words=words("hums giggles chuckles whistles cheers claps nods winks chortles"),
+            forms={
+                "question": words("hum giggle chuckle whistle cheer clap nod wink chortle"),
             },
             past=PredicateTense(
                 words=words("""
-                    laughed smiled hummed giggled chuckled grinned whistled cheered beamed clapped
-                    nodded winked chortled brightened
+                    hummed giggled chuckled whistled cheered clapped nodded winked chortled
                 """),
                 forms={
-                    "question": words("""
-                        laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle
-                        brighten
-                    """),
+                    "question": words("hum giggle chuckle whistle cheer clap nod wink chortle"),
                 },
             ),
         ),
@@ -407,25 +414,38 @@ EN = SentenceLanguageData(
             field="express",
             subject=("creature", "person"),
             condition="restless",
+            words=words("cries sobs whimpers snorts fidgets paces"),
+            forms={
+                "question": words("cry sob whimper snort fidget pace"),
+            },
+            past=PredicateTense(
+                words=words("cried sobbed whimpered snorted fidgeted paced"),
+                forms={
+                    "question": words("cry sob whimper snort fidget pace"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="restless",
             words=words("""
-                cries sighs mutters sobs weeps groans grumbles whimpers snorts frowns sniffles
-                fidgets paces grimaces scowls pouts fumes sulks
+                sighs mutters weeps groans grumbles frowns sniffles grimaces scowls pouts fumes
+                sulks
             """),
             forms={
                 "question": words("""
-                    cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget pace
-                    grimace scowl pout fume sulk
+                    sigh mutter weep groan grumble frown sniffle grimace scowl pout fume sulk
                 """),
             },
             past=PredicateTense(
                 words=words("""
-                    cried sighed muttered sobbed wept groaned grumbled whimpered snorted frowned
-                    sniffled fidgeted paced grimaced scowled pouted fumed sulked
+                    sighed muttered wept groaned grumbled frowned sniffled grimaced scowled pouted
+                    fumed sulked
                 """),
                 forms={
                     "question": words("""
-                        cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget
-                        pace grimace scowl pout fume sulk
+                        sigh mutter weep groan grumble frown sniffle grimace scowl pout fume sulk
                     """),
                 },
             ),
@@ -463,23 +483,28 @@ EN = SentenceLanguageData(
         VerbGroup(
             field="express",
             subject=("creature", "person"),
-            words=words("""
-                shouts gasps shrugs blushes squints flinches exclaims looks_up looks_round
-            """),
+            words=words("gasps squints flinches looks_up looks_round startles"),
             forms={
-                "question": words(
-                    "shout gasp shrug blush squint flinch exclaim look_up look_round"
-                ),
+                "question": words("gasp squint flinch look_up look_round startle"),
             },
             past=PredicateTense(
-                words=words("""
-                    shouted gasped shrugged blushed squinted flinched exclaimed looked_up
-                    looked_round
-                """),
+                words=words("gasped squinted flinched looked_up looked_round startled"),
                 forms={
-                    "question": words("""
-                        shout gasp shrug blush squint flinch exclaim look_up look_round
-                    """),
+                    "question": words("gasp squint flinch look_up look_round startle"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            words=words("shouts shrugs blushes exclaims"),
+            forms={
+                "question": words("shout shrug blush exclaim"),
+            },
+            past=PredicateTense(
+                words=words("shouted shrugged blushed exclaimed"),
+                forms={
+                    "question": words("shout shrug blush exclaim"),
                 },
             ),
         ),
@@ -1725,6 +1750,77 @@ EN = SentenceLanguageData(
                 warm cold sore stiff steady strong weak numb tender rough smooth heavy
             """),
         ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "arrive"),
+            words=words("lucky fortunate wonderful"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "look"),
+            words=words("surprising amazing curious"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("lose",),
+            words=words("awful frustrating maddening unlucky"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("eat", "cook"),
+            words=words("delicious tasty filling"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("drink",),
+            words=words("refreshing delicious soothing"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("meet", "talk"),
+            words=words("nice pleasant lovely cheerful"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rest", "sleep"),
+            words=words("peaceful cozy restful"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("make", "tend", "sell", "hide", "buy"),
+            words=words("satisfying rewarding worthwhile"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rise", "go", "move", "play"),
+            words=words("refreshing fun lively"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("search", "wait"),
+            words=words("tiring hopeless dull tedious"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("think", "look"),
+            words=words("odd puzzling strange"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            words=words("quiet peaceful still silent chilly cold warm calm"),
+        ),
     ),
     modifiers=(
         ModifierGroup(
@@ -1844,9 +1940,27 @@ EN = SentenceLanguageData(
                 "idea",
                 "body",
             ),
-            words=words("""
-                beautiful mysterious strange new lovely familiar odd ordinary splendid humble
-            """),
+            words=words("beautiful strange odd lovely"),
+        ),
+        ModifierGroup(
+            subject=("creature", "person", "plant", "thing", "place", "idea", "event"),
+            words=words("mysterious"),
+        ),
+        ModifierGroup(
+            subject=("person", "thing", "vehicle", "place", "idea", "event"),
+            words=words("new"),
+        ),
+        ModifierGroup(
+            subject=("person", "creature", "place", "thing", "vehicle", "idea"),
+            words=words("familiar ordinary"),
+        ),
+        ModifierGroup(
+            subject=("thing", "place", "event", "vehicle", "creature", "plant"),
+            words=words("splendid"),
+        ),
+        ModifierGroup(
+            subject=("person", "place", "thing"),
+            words=words("humble"),
         ),
     ),
     manners=(
@@ -1957,6 +2071,7 @@ EN = SentenceLanguageData(
         "causal": words("""
             so therefore in_the_end thus hence as_a_result for_that_reason consequently
         """),
+        "turn": words("just_then at_that_moment out_of_nowhere right_then all_of_a_sudden"),
     },
     traits={
         "flier": words("""
@@ -2119,6 +2234,102 @@ EN = SentenceLanguageData(
             past=PredicateTense(
                 words=words("was"),
             ),
+        ),
+    ),
+    auxiliaries=(
+        SentenceAuxiliary(
+            kind="negative",
+            template="{a} {v}",
+            joint="question",
+            predicate=AuxiliaryPredicate(
+                words=words("does_not"),
+                past=PredicateTense(
+                    words=words("did_not"),
+                ),
+            ),
+            moods=("statement",),
+        ),
+        SentenceAuxiliary(
+            kind="unable",
+            template="{a} {v}",
+            joint="question",
+            predicate=AuxiliaryPredicate(
+                words=words("cannot"),
+                past=PredicateTense(
+                    words=words("could_not"),
+                ),
+            ),
+            moods=("statement",),
+        ),
+        SentenceAuxiliary(
+            kind="desire",
+            template="{a} {v}",
+            joint="question",
+            predicate=AuxiliaryPredicate(
+                words=words("wants_to"),
+                forms={
+                    "question": words("want_to"),
+                },
+                past=PredicateTense(
+                    words=words("wanted_to"),
+                    forms={
+                        "question": words("want_to"),
+                    },
+                ),
+            ),
+            unless=("wants",),
+        ),
+        SentenceAuxiliary(
+            kind="resolve",
+            template="{a} {v}",
+            joint="question",
+            predicate=AuxiliaryPredicate(
+                words=words("decides_to"),
+                forms={
+                    "question": words("decide_to"),
+                },
+                past=PredicateTense(
+                    words=words("decided_to"),
+                    forms={
+                        "question": words("decide_to"),
+                    },
+                ),
+            ),
+        ),
+        SentenceAuxiliary(
+            kind="effort",
+            template="{a} {v}",
+            joint="question",
+            predicate=AuxiliaryPredicate(
+                words=words("tries_to"),
+                forms={
+                    "question": words("try_to"),
+                },
+                past=PredicateTense(
+                    words=words("tried_to"),
+                    forms={
+                        "question": words("try_to"),
+                    },
+                ),
+            ),
+        ),
+        SentenceAuxiliary(
+            kind="begin",
+            template="{a} {v}",
+            joint="question",
+            predicate=AuxiliaryPredicate(
+                words=words("begins_to starts_to"),
+                forms={
+                    "question": words("begin_to start_to"),
+                },
+                past=PredicateTense(
+                    words=words("began_to started_to"),
+                    forms={
+                        "question": words("begin_to start_to"),
+                    },
+                ),
+            ),
+            unless=("begins", "starts"),
         ),
     ),
     frames=(
@@ -2288,6 +2499,34 @@ EN = SentenceLanguageData(
                 SentencePart("place", head="in", modifiable=True),
             ),
             3,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("place", head="in", tail=",", modifiable=True),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            6,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("place", head="in", tail=",", modifiable=True),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("object", modifiable=True),
+            ),
+            4,
+        ),
+        SentenceFrame(
+            (SentencePart("state", head="it is", past_head="it was"),),
+            8,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("degree"),
+                SentencePart("state", head="it is", past_head="it was"),
+            ),
+            8,
         ),
         SentenceFrame(
             (

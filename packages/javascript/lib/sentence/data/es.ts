@@ -185,13 +185,24 @@ export const ES: SentenceLanguageData = {
 			)
 		},
 		// What somebody shows, split by what it shows — see the Korean data.
+		// What anything with a face can show, and beside each group what takes hands,
+		// shoulders or words and is a person's alone.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
 			...tensed(
-				`ríe sonríe tararea se_ríe silba vitorea asiente aplaude guiña_un_ojo se_ríe_a_carcajadas canturrea sonríe_de_oreja_a_oreja`,
-				`rió sonrió tarareó se_rió silbó vitoreó asintió aplaudió guiñó_un_ojo se_rió_a_carcajadas canturreó sonrió_de_oreja_a_oreja`
+				`ríe sonríe se_ríe se_ríe_a_carcajadas sonríe_de_oreja_a_oreja`,
+				`rió sonrió se_rió se_rió_a_carcajadas sonrió_de_oreja_a_oreja`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
+			...tensed(
+				`tararea silba vitorea asiente aplaude guiña_un_ojo canturrea`,
+				`tarareó silbó vitoreó asintió aplaudió guiñó_un_ojo canturreó`
 			)
 		},
 		{
@@ -199,34 +210,60 @@ export const ES: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'restless',
 			...tensed(
-				`llora suspira murmura solloza gime gruñe refunfuña lloriquea resopla balbucea hace_una_mueca niega_con_la_cabeza frunce_el_ceño se_muerde_el_labio se_rasca_la_cabeza da_vueltas`,
-				`lloró suspiró murmuró sollozó gimió gruñó refunfuñó lloriqueó resopló balbuceó hizo_una_mueca negó_con_la_cabeza frunció_el_ceño se_mordió_el_labio se_rascó_la_cabeza dio_vueltas`
+				`llora solloza gime gruñe lloriquea resopla da_vueltas`,
+				`lloró sollozó gimió gruñó lloriqueó resopló dio_vueltas`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
+			...tensed(
+				`suspira murmura refunfuña balbucea hace_una_mueca niega_con_la_cabeza frunce_el_ceño se_muerde_el_labio se_rasca_la_cabeza`,
+				`suspiró murmuró refunfuñó balbuceó hizo_una_mueca negó_con_la_cabeza frunció_el_ceño se_mordió_el_labio se_rascó_la_cabeza`
 			)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'tired',
+			...tensed(`bosteza se_estira parpadea`, `bostezó se_estiró parpadeó`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'tired',
 			...tensed(
-				`bosteza se_frota_los_ojos se_estira se_masajea_los_hombros parpadea`,
-				`bostezó se_frotó_los_ojos se_estiró se_masajeó_los_hombros parpadeó`
+				`se_frota_los_ojos se_masajea_los_hombros`,
+				`se_frotó_los_ojos se_masajeó_los_hombros`
 			)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'hungry',
-			...tensed(
-				`traga_saliva se_relame se_frota_la_barriga olfatea_el_aire`,
-				`tragó_saliva se_relamió se_frotó_la_barriga olfateó_el_aire`
-			)
+			...tensed(`traga_saliva se_relame olfatea_el_aire`, `tragó_saliva se_relamió olfateó_el_aire`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'hungry',
+			...tensed(`se_frota_la_barriga`, `se_frotó_la_barriga`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`grita exclama jadea se_encoge_de_hombros estornuda se_sonroja chilla saluda_con_la_mano ladea_la_cabeza abre_los_ojos_como_platos se_sobresalta`,
-				`gritó exclamó jadeó se_encogió_de_hombros estornudó se_sonrojó chilló saludó_con_la_mano ladeó_la_cabeza abrió_los_ojos_como_platos se_sobresaltó`
+				`grita jadea estornuda chilla ladea_la_cabeza abre_los_ojos_como_platos se_sobresalta`,
+				`gritó jadeó estornudó chilló ladeó_la_cabeza abrió_los_ojos_como_platos se_sobresaltó`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			...tensed(
+				`exclama se_encoge_de_hombros se_sonroja saluda_con_la_mano`,
+				`exclamó se_encogió_de_hombros se_sonrojó saludó_con_la_mano`
 			)
 		},
 		{
@@ -696,7 +733,38 @@ export const ES: SentenceLanguageData = {
 		{
 			subject: ['body'],
 			words: words(`cálido frío dolorido rígido suave áspero terso pálido fuerte entumecido pesado`)
-		}
+		},
+		// A reaction says what the moment was like, with nobody to say it of: `Era
+		// extraño`, `Era delicioso`. Each group answers what the sentence before did.
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'look'],
+			words: words(`extraño sorprendente curioso`)
+		},
+		{ subject: [], impersonal: true, after: ['lose'], words: words(`terrible frustrante triste`) },
+		{ subject: [], impersonal: true, after: ['eat', 'cook', 'drink'], words: words(`delicioso`) },
+		{ subject: [], impersonal: true, after: ['meet', 'talk'], words: words(`agradable divertido`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rest', 'sleep'],
+			words: words(`agradable relajante`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['make', 'tend', 'sell'],
+			words: words(`satisfactorio`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['go', 'move', 'play'],
+			words: words(`divertido emocionante`)
+		},
+		{ subject: [], impersonal: true, after: ['search', 'wait'], words: words(`aburrido agotador`) },
+		{ subject: [], impersonal: true, after: ['think'], words: words(`extraño raro`) }
 	],
 	// Masculine singular, the form `agreement` reshapes, after the noun.
 	modifiers: [
@@ -883,7 +951,9 @@ export const ES: SentenceLanguageData = {
 		contrastive: words(
 			`pero sin_embargo, aun_así en_cambio, no_obstante, con_todo, por_el_contrario, aun_entonces,`
 		),
-		causal: words(`entonces por_eso así_que por_tanto, en_consecuencia, de_ahí_que por_esa_razón,`)
+		causal: words(`entonces por_eso así_que por_tanto, en_consecuencia, de_ahí_que por_esa_razón,`),
+		// Something new coming along: somebody else, the weather, the place changing.
+		turn: words(`de_pronto, en_ese_momento, justo_entonces, de_golpe,`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -1014,6 +1084,9 @@ export const ES: SentenceLanguageData = {
 			past: { words: words(`fue`) }
 		}
 	},
+	// A Spanish negative is `no` in front of the verb, and the verb keeps every
+	// form it had: `no comió`, `¿no corre?`.
+	auxiliaries: [{ kind: 'negative', template: 'no {v}' }],
 	frames: [
 		// A date and a clock, standing where an adverbial stands.
 		{
@@ -1180,6 +1253,9 @@ export const ES: SentenceLanguageData = {
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],
 			weight: 6
-		}
+		},
+		// A reaction, with no subject at all: `Era extraño.`, `Era muy agradable.`
+		{ parts: [{ slot: 'state', head: 'es', pastHead: 'era' }], weight: 8 },
+		{ parts: [{ slot: 'degree' }, { slot: 'state', head: 'es', pastHead: 'era' }], weight: 8 }
 	]
 };

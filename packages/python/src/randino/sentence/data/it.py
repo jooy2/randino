@@ -7,6 +7,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     ModifierGroup,
     PredicateTense,
+    SentenceAuxiliary,
     SentenceCalendar,
     SentenceFrame,
     SentenceJoin,
@@ -267,31 +268,45 @@ IT = SentenceLanguageData(
             field="express",
             subject=("creature", "person"),
             condition="content",
-            words=words("""
-                ride sorride canticchia ridacchia fischietta esulta annuisce applaude
-                fa_l'occhiolino scoppia_a_ridere sorride_a_trentadue_denti
-            """),
+            words=words("ride sorride ridacchia scoppia_a_ridere sorride_a_trentadue_denti"),
             past=PredicateTense(
                 words=words("""
-                    rise sorrise canticchiò ridacchiò fischiettò esultò annuì applaudì
-                    fece_l'occhiolino scoppiò_a_ridere sorrise_a_trentadue_denti
+                    rise sorrise ridacchiò scoppiò_a_ridere sorrise_a_trentadue_denti
                 """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="content",
+            words=words("canticchia fischietta esulta annuisce applaude fa_l'occhiolino"),
+            past=PredicateTense(
+                words=words("canticchiò fischiettò esultò annuì applaudì fece_l'occhiolino"),
             ),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             condition="restless",
+            words=words("piange singhiozza geme piagnucola sbuffa cammina_avanti_e_indietro"),
+            past=PredicateTense(
+                words=words("""
+                    pianse singhiozzò gemette piagnucolò sbuffò camminò_avanti_e_indietro
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="restless",
             words=words("""
-                piange sospira borbotta singhiozza geme brontola piagnucola sbuffa balbetta
-                fa_una_smorfia scuote_la_testa aggrotta_la_fronte mugugna si_morde_il_labbro
-                si_gratta_la_testa cammina_avanti_e_indietro
+                sospira borbotta brontola balbetta fa_una_smorfia scuote_la_testa aggrotta_la_fronte
+                mugugna si_morde_il_labbro si_gratta_la_testa
             """),
             past=PredicateTense(
                 words=words("""
-                    pianse sospirò borbottò singhiozzò gemette brontolò piagnucolò sbuffò balbettò
-                    fece_una_smorfia scosse_la_testa aggrottò_la_fronte mugugnò si_morse_il_labbro
-                    si_grattò_la_testa camminò_avanti_e_indietro
+                    sospirò borbottò brontolò balbettò fece_una_smorfia scosse_la_testa
+                    aggrottò_la_fronte mugugnò si_morse_il_labbro si_grattò_la_testa
                 """),
             ),
         ),
@@ -299,37 +314,56 @@ IT = SentenceLanguageData(
             field="express",
             subject=("creature", "person"),
             condition="tired",
-            words=words("""
-                sbadiglia si_stropiccia_gli_occhi si_stira si_massaggia_le_spalle sbatte_le_palpebre
-            """),
+            words=words("sbadiglia si_stira sbatte_le_palpebre"),
             past=PredicateTense(
-                words=words("""
-                    sbadigliò si_stropicciò_gli_occhi si_stirò si_massaggiò_le_spalle
-                    sbatté_le_palpebre
-                """),
+                words=words("sbadigliò si_stirò sbatté_le_palpebre"),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="tired",
+            words=words("si_stropiccia_gli_occhi si_massaggia_le_spalle"),
+            past=PredicateTense(
+                words=words("si_stropicciò_gli_occhi si_massaggiò_le_spalle"),
             ),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             condition="hungry",
-            words=words("deglutisce si_lecca_le_labbra si_strofina_la_pancia annusa_l'aria"),
+            words=words("deglutisce si_lecca_le_labbra annusa_l'aria"),
             past=PredicateTense(
-                words=words("deglutì si_leccò_le_labbra si_strofinò_la_pancia annusò_l'aria"),
+                words=words("deglutì si_leccò_le_labbra annusò_l'aria"),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="hungry",
+            words=words("si_strofina_la_pancia"),
+            past=PredicateTense(
+                words=words("si_strofinò_la_pancia"),
             ),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             words=words("""
-                grida esclama ansima si_stringe_nelle_spalle starnutisce arrossisce strilla
-                saluta_con_la_mano inclina_la_testa sgrana_gli_occhi sussulta
+                grida ansima starnutisce strilla inclina_la_testa sgrana_gli_occhi sussulta
             """),
             past=PredicateTense(
                 words=words("""
-                    gridò esclamò ansimò si_strinse_nelle_spalle starnutì arrossì strillò
-                    salutò_con_la_mano inclinò_la_testa sgranò_gli_occhi sussultò
+                    gridò ansimò starnutì strillò inclinò_la_testa sgranò_gli_occhi sussultò
                 """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            words=words("esclama si_stringe_nelle_spalle arrossisce saluta_con_la_mano"),
+            past=PredicateTense(
+                words=words("esclamò si_strinse_nelle_spalle arrossì salutò_con_la_mano"),
             ),
         ),
         VerbGroup(
@@ -1107,6 +1141,60 @@ IT = SentenceLanguageData(
                 caldo freddo dolente rigido morbido ruvido liscio pallido forte intorpidito pesante
             """),
         ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "look"),
+            words=words("strano sorprendente curioso"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("lose",),
+            words=words("terribile frustrante triste"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("eat", "cook", "drink"),
+            words=words("delizioso"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("meet", "talk"),
+            words=words("piacevole divertente"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rest", "sleep"),
+            words=words("piacevole rilassante"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("make", "tend", "sell"),
+            words=words("soddisfacente"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("go", "move", "play"),
+            words=words("divertente emozionante"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("search", "wait"),
+            words=words("noioso faticoso"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("think",),
+            words=words("strano bizzarro"),
+        ),
     ),
     modifiers=(
         ModifierGroup(
@@ -1304,6 +1392,7 @@ IT = SentenceLanguageData(
         "causal": words("""
             allora perciò così pertanto, di_conseguenza, per_questo per_tale_ragione,
         """),
+        "turn": words("all'improvviso, d'un_tratto, in_quel_momento, proprio_allora,"),
     },
     traits={
         "flier": words("""
@@ -1440,6 +1529,12 @@ IT = SentenceLanguageData(
             past=PredicateTense(
                 words=words("fu"),
             ),
+        ),
+    ),
+    auxiliaries=(
+        SentenceAuxiliary(
+            kind="negative",
+            template="non {v}",
         ),
     ),
     frames=(
@@ -1616,6 +1711,17 @@ IT = SentenceLanguageData(
                 SentencePart("money"),
             ),
             6,
+        ),
+        SentenceFrame(
+            (SentencePart("state", head="è", past_head="era"),),
+            8,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("degree"),
+                SentencePart("state", head="è", past_head="era"),
+            ),
+            8,
         ),
     ),
 )

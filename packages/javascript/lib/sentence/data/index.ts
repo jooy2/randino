@@ -214,6 +214,14 @@ export type StoryStep = {
 	needs?: readonly Condition[];
 	/** A step every telling of the story has. The rest are drawn as room allows. */
 	required?: boolean;
+	/**
+	 * Whether the step is told as not coming off: the hero looks and does not find
+	 * it, lies down and cannot sleep — `하지만 열쇠를 찾지 못했다`, `But she could
+	 * not sleep`. It changes nothing the field would have, leaves the hero uneasy,
+	 * and is never required, so a language with no way to say a thing did not
+	 * happen tells the story without it.
+	 */
+	fails?: boolean;
 	/** What a connective in front of this sentence may claim about the last one. */
 	link?: ConnectiveKind;
 	/** Kinds this sentence may be beside a statement. */
@@ -331,6 +339,7 @@ export const STORIES: readonly Story[] = [
 		steps: [
 			{ kind: 'state', condition: 'restless' },
 			{ kind: 'act', field: 'search', place: true, required: true },
+			{ kind: 'act', field: 'find', object: 'item', place: true, fails: true },
 			{ kind: 'act', field: 'look', object: 'prop', place: true, link: 'additive' },
 			{ kind: 'act', field: 'wait', place: true },
 			{ kind: 'act', field: 'go', destination: 'elsewhere', link: 'temporal' },
@@ -440,6 +449,7 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'act', field: 'express' },
 			{ kind: 'act', field: 'think' },
 			{ kind: 'state', condition: 'tired' },
+			{ kind: 'act', field: 'sleep', fails: true },
 			{ kind: 'act', field: 'sleep', required: true, link: 'temporal' },
 			{ kind: 'scene', field: 'change', link: 'temporal', kinds: ['trailing'] }
 		]
@@ -573,6 +583,7 @@ export const STORIES: readonly Story[] = [
 			},
 			{ kind: 'state', condition: 'restless', link: 'causal' },
 			{ kind: 'act', field: 'search', place: true, required: true, link: 'causal' },
+			{ kind: 'act', field: 'find', object: 'item', place: true, fails: true },
 			{ kind: 'act', field: 'wait', place: true },
 			{
 				kind: 'act',

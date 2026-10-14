@@ -7,6 +7,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     ModifierGroup,
     PredicateTense,
+    SentenceAuxiliary,
     SentenceFrame,
     SentenceJoin,
     SentenceLanguageData,
@@ -209,14 +210,21 @@ RU = SentenceLanguageData(
             subject=("creature", "person"),
             condition="content",
             words=words("""
-                смеётся улыбается напевает хихикает хохочет ухмыляется свистит ликует кивает
-                подмигивает сияет усмехается мурлычет
+                смеётся улыбается хихикает хохочет ухмыляется сияет усмехается мурлычет
             """),
             past=PredicateTense(
                 words=words("""
-                    смеялся улыбался напевал хихикал хохотал ухмылялся свистел ликовал кивал
-                    подмигивал сиял усмехался мурлыкал
+                    смеялся улыбался хихикал хохотал ухмылялся сиял усмехался мурлыкал
                 """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="content",
+            words=words("напевает свистит ликует кивает подмигивает"),
+            past=PredicateTense(
+                words=words("напевал свистел ликовал кивал подмигивал"),
             ),
         ),
         VerbGroup(
@@ -224,13 +232,24 @@ RU = SentenceLanguageData(
             subject=("creature", "person"),
             condition="restless",
             words=words("""
-                плачет вздыхает бормочет всхлипывает рыдает стонет ворчит хмурится фыркает морщится
-                хмыкает кряхтит охает ойкает дрожит вздрагивает ёжится бледнеет
+                плачет всхлипывает рыдает стонет фыркает дрожит вздрагивает ёжится бледнеет
             """),
             past=PredicateTense(
                 words=words("""
-                    плакал вздыхал бормотал всхлипывал рыдал стонал ворчал хмурился фыркал морщился
-                    хмыкал кряхтел охал ойкал дрожал вздрагивал ёжился бледнел
+                    плакал всхлипывал рыдал стонал фыркал дрожал вздрагивал ёжился бледнел
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="restless",
+            words=words("""
+                вздыхает бормочет ворчит хмурится морщится хмыкает кряхтит охает ойкает
+            """),
+            past=PredicateTense(
+                words=words("""
+                    вздыхал бормотал ворчал хмурился морщился хмыкал кряхтел охал ойкал
                 """),
             ),
         ),
@@ -255,15 +274,17 @@ RU = SentenceLanguageData(
         VerbGroup(
             field="express",
             subject=("creature", "person"),
-            words=words("""
-                кричит восклицает ахает чихает икает краснеет визжит лепечет шмыгает пыхтит
-                оглядывается
-            """),
+            words=words("кричит ахает чихает икает визжит шмыгает пыхтит оглядывается"),
             past=PredicateTense(
-                words=words("""
-                    кричал восклицал ахал чихал икал краснел визжал лепетал шмыгал пыхтел
-                    оглядывался
-                """),
+                words=words("кричал ахал чихал икал визжал шмыгал пыхтел оглядывался"),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            words=words("восклицает краснеет лепечет"),
+            past=PredicateTense(
+                words=words("восклицал краснел лепетал"),
             ),
         ),
         VerbGroup(
@@ -720,6 +741,71 @@ RU = SentenceLanguageData(
                 тяжёлый
             """),
         ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "arrive"),
+            words=words("здорово удачно"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "look"),
+            words=words("странно удивительно любопытно"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("lose",),
+            words=words("обидно жаль досадно"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("eat", "cook", "drink"),
+            words=words("вкусно"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("meet", "talk"),
+            words=words("приятно весело"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rest", "sleep"),
+            words=words("уютно спокойно"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("make", "tend", "sell"),
+            words=words("приятно"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rise", "go", "move", "play"),
+            words=words("весело свежо"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("search", "wait"),
+            words=words("скучно тоскливо"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("think",),
+            words=words("странно"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            words=words("тихо холодно тепло прохладно спокойно темно"),
+        ),
     ),
     modifiers=(
         ModifierGroup(
@@ -907,6 +993,7 @@ RU = SentenceLanguageData(
         """),
         "contrastive": words("но однако а зато всё_же напротив тем_не_менее впрочем и_всё_таки"),
         "causal": words("поэтому в_итоге значит следовательно оттого стало_быть по_этой_причине"),
+        "turn": words("внезапно в_этот_момент как_вдруг именно_тогда"),
     },
     traits={
         "flier": words("""
@@ -972,6 +1059,12 @@ RU = SentenceLanguageData(
     degrees=words("""
         очень довольно слишком весьма немного совсем крайне чрезвычайно ужасно слегка
     """),
+    auxiliaries=(
+        SentenceAuxiliary(
+            kind="negative",
+            template="не {v}",
+        ),
+    ),
     frames=(
         SentenceFrame(
             (
@@ -1052,6 +1145,17 @@ RU = SentenceLanguageData(
                 SentencePart("manner"),
             ),
             10,
+        ),
+        SentenceFrame(
+            (SentencePart("state", past_head="было"),),
+            8,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("degree"),
+                SentencePart("state", past_head="было"),
+            ),
+            8,
         ),
     ),
 )

@@ -74,8 +74,8 @@ The package declares `sideEffects: false`, so a bundler drops the pools nothing 
 | `randLocation`, `randCity`, `randDistrict`                    | 156 KB     |
 | `randWord`, `randAnimal` and the rest                         | 344 KB     |
 | `randNickname`                                                | 346 KB     |
-| `randSentence`                                                | 517 KB     |
-| Everything                                                    | 729 KB     |
+| `randSentence`                                                | 524 KB     |
+| Everything                                                    | 736 KB     |
 
 Measured by bundling the one import with esbuild, minified, and gzipping the result.
 

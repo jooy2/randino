@@ -74,8 +74,8 @@ pip install randino
 | `randLocation`, `randCity`, `randDistrict`                 | 156 KB     |
 | `randWord`와 테마별 함수들                                 | 344 KB     |
 | `randNickname`                                             | 346 KB     |
-| `randSentence`                                             | 517 KB     |
-| 전체                                                       | 729 KB     |
+| `randSentence`                                             | 524 KB     |
+| 전체                                                       | 736 KB     |
 
 가져올 함수 하나만 esbuild로 번들하고 minify한 뒤 gzip으로 잰 값입니다.
 

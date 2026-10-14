@@ -141,38 +141,64 @@ final SentenceLanguageData vi = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.content,
       words: words(r'''
-        cười mỉm_cười ngâm_nga cười_khúc_khích cười_toe_toét cười_phá_lên huýt_sáo reo_hò gật_đầu
-        vỗ_tay nháy_mắt hò_reo cười_ngặt_nghẽo hớn_hở cười_tươi
+        cười mỉm_cười cười_khúc_khích cười_toe_toét cười_phá_lên cười_ngặt_nghẽo hớn_hở cười_tươi
       '''),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.content,
+      words: words(r'ngâm_nga huýt_sáo reo_hò gật_đầu vỗ_tay nháy_mắt hò_reo'),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.restless,
       words: words(r'''
-        khóc thở_dài lầm_bầm nức_nở sụt_sịt rên_rỉ càu_nhàu lẩm_bẩm cau_mày nhăn_mặt lắc_đầu
-        rưng_rưng thút_thít bứt_rứt đi_đi_lại_lại cắn_môi gãi_đầu bồn_chồn
+        khóc nức_nở sụt_sịt rên_rỉ rưng_rưng thút_thít bứt_rứt đi_đi_lại_lại bồn_chồn
       '''),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.restless,
+      words: words(r'thở_dài lầm_bầm càu_nhàu lẩm_bẩm cau_mày nhăn_mặt lắc_đầu cắn_môi gãi_đầu'),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.tired,
-      words: words(r'ngáp dụi_mắt vươn_vai xoa_vai xoay_cổ chớp_mắt'),
+      words: words(r'ngáp vươn_vai chớp_mắt'),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.tired,
+      words: words(r'dụi_mắt xoa_vai xoay_cổ'),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.hungry,
-      words: words(r'nuốt_nước_bọt liếm_môi xoa_bụng hít_hà chảy_nước_miếng'),
+      words: words(r'nuốt_nước_bọt liếm_môi hít_hà chảy_nước_miếng'),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.hungry,
+      words: words(r'xoa_bụng'),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
-        la_lên cười_khẩy hét la_hét thở_hắt_ra nhún_vai đỏ_mặt vẫy_tay nghiêng_đầu tròn_mắt
-        ngoảnh_lại ngẩng_đầu giật_mình
+        la_lên hét la_hét thở_hắt_ra nghiêng_đầu tròn_mắt ngoảnh_lại ngẩng_đầu giật_mình
       '''),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      words: words(r'cười_khẩy nhún_vai đỏ_mặt vẫy_tay'),
     ),
     VerbGroup(
       field: VerbField.talk,
@@ -685,6 +711,83 @@ final SentenceLanguageData vi = SentenceLanguageData(
       subject: const <NounClass>[NounClass.body],
       words: words(r'ấm lạnh đau cứng mềm thô_ráp nhẵn xanh_xao khỏe tê nặng'),
     ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.find, VerbField.arrive],
+      words: words(r'may_mắn'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.find, VerbField.look],
+      words: words(r'lạ bất_ngờ thú_vị'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.lose],
+      words: words(r'đáng_tiếc buồn tệ'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.eat, VerbField.cook],
+      words: words(r'ngon'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.drink],
+      words: words(r'ngon mát'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.meet, VerbField.talk],
+      words: words(r'vui dễ_chịu'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.rest, VerbField.sleep],
+      words: words(r'thoải_mái dễ_chịu'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[
+        VerbField.make,
+        VerbField.tend,
+        VerbField.sell,
+        VerbField.hide,
+        VerbField.buy,
+      ],
+      words: words(r'mãn_nguyện tự_hào'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.rise, VerbField.go, VerbField.move, VerbField.play],
+      words: words(r'sảng_khoái vui'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.search, VerbField.wait],
+      words: words(r'chán mệt_mỏi'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.think, VerbField.look],
+      words: words(r'lạ khó_hiểu'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      words: words(r'yên_tĩnh lạnh ấm_áp mát_mẻ vắng_lặng'),
+    ),
   ],
   modifiers: <ModifierGroup>[
     ModifierGroup(
@@ -873,6 +976,7 @@ final SentenceLanguageData vi = SentenceLanguageData(
       r'nhưng tuy_vậy tuy_nhiên dù_vậy thế_mà trái_lại ngược_lại có_điều dẫu_vậy',
     ),
     ConnectiveKind.causal: words(r'thế_là vì_thế rốt_cuộc do_đó bởi_vậy cho_nên vì_vậy'),
+    ConnectiveKind.turn: words(r'bỗng bỗng_nhiên đúng_lúc_ấy ngay_lúc_đó'),
   },
   traits: <NounTrait, WordPool>{
     NounTrait.flier: words(r'''
@@ -1004,6 +1108,23 @@ final SentenceLanguageData vi = SentenceLanguageData(
     years: const LengthRange(2020, 2030),
     copula: StateGroup(subject: const <NounClass>[NounClass.event], words: <String>['là']),
   ),
+  auxiliaries: <SentenceAuxiliary>[
+    SentenceAuxiliary(
+      kind: AuxiliaryKind.negative,
+      template: 'không {v}',
+      moods: const <SentenceMood>[SentenceMood.statement],
+    ),
+    SentenceAuxiliary(kind: AuxiliaryKind.desire, template: 'muốn {v}'),
+    SentenceAuxiliary(kind: AuxiliaryKind.resolve, template: 'quyết định {v}'),
+    SentenceAuxiliary(kind: AuxiliaryKind.effort, template: 'cố {v}'),
+    SentenceAuxiliary(kind: AuxiliaryKind.begin, template: 'bắt đầu {v}'),
+    SentenceAuxiliary(
+      kind: AuxiliaryKind.progressive,
+      template: 'đang {v}',
+      tense: SentenceTense.present,
+    ),
+    SentenceAuxiliary(kind: AuxiliaryKind.attempt, template: '{v} thử'),
+  ],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.date, head: 'vào', tail: ','),
@@ -1176,5 +1297,10 @@ final SentenceLanguageData vi = SentenceLanguageData(
       SentencePart(SentenceSlot.verb),
       SentencePart(SentenceSlot.money),
     ], 5),
+    SentenceFrame(<SentencePart>[SentencePart(SentenceSlot.state, head: 'rất')], 8),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state),
+    ], 8),
   ],
 );

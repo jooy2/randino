@@ -930,6 +930,61 @@ A time adverbial follows the tense too. `yesterday` and `어제` only open a pas
 
 A word `include` named in its statement form is translated into the past the same way it is translated into a question: `include: '달린다'` with `tense: 'past'` writes `달렸다`, and `include: 'runs'` writes `ran`. `SentenceDetail.tense` reports which tense a result was written in.
 
+## What is said beside the verb {#auxiliaries}
+
+A verb is not always said on its own. Now and then a sentence says what somebody wanted, decided or tried, that something began or was going on, that it was done and over with, or that it did not happen at all, and it writes that beside the verb the way the language does.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', type: 'statement', count: 3 });
+// ['The sheriff did not sulk.', 'The imp started to lap up the latte.', 'The stork wants to circle overhead.']
+
+randSentence({ language: 'ko', type: 'statement', count: 3 });
+// ['자그마한 토란은 달지 않아요.', '겁많은 붕어가 사뿐히 목장에 들어오고 싶어 합니다.', '신비한 연필깎이가 삐걱거리지 않는다.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, type: {SentenceType.statement}, count: 3);
+// [The sheriff did not sulk., The imp started to lap up the latte., The stork wants to circle overhead.]
+
+randSentence(language: WordLanguage.ko, type: {SentenceType.statement}, count: 3);
+// [자그마한 토란은 달지 않아요., 겁많은 붕어가 사뿐히 목장에 들어오고 싶어 합니다., 신비한 연필깎이가 삐걱거리지 않는다.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", type="statement", count=3)
+# ['The sheriff did not sulk.', 'The imp started to lap up the latte.', 'The stork wants to circle overhead.']
+
+rand_sentence(language="ko", type="statement", count=3)
+# ['자그마한 토란은 달지 않아요.', '겁많은 붕어가 사뿐히 목장에 들어오고 싶어 합니다.', '신비한 연필깎이가 삐걱거리지 않는다.']
+```
+
+:::
+
+Each language writes it its own way, and declares only what its shapes can carry:
+
+| Language | How | Example |
+| --- | --- | --- |
+| `ko` | a second predicate after the verb's stem or its 해체 form, which carries the ending, the level and the tense | `먹지 않았다`, `먹고 싶어 해요`, `먹기 시작했다`, `먹고 있었다`, `먹어 버렸다` |
+| `ja` | the same, after the ます stem or the て form | `食べなかった`, `食べたがります`, `食べ始めた`, `食べている`, `食べてしまった` |
+| `en` | an auxiliary in front of the base form, which carries the tense | `did not eat`, `wanted to eat`, `began to eat`, `decided to eat`, `could not eat` |
+| `zh` `vi` | a word in front of the verb, which does not change | `没吃`, `想吃`, `开始吃`, `không ăn`, `muốn ăn` |
+| `es` `it` `ru` | the negative alone, in front of the verb | `no comió`, `non mangiò`, `не бежала` |
+| `de` | none: `nicht` goes wherever the rest of the clause is not, and the shapes are written around the verb in second place |  |
+
+What a sentence can take depends on what it is about. Only somebody wants, decides, tries or fails to: a soup cools and a bus runs, and neither of them wants to. A moment does not go on, so nobody is `beginning to arrive`. And a sentence that opens on `but` says what did not happen more often than not: `하지만 여우는 사과를 먹지 않았다`.
+
+A predicate you named with `include` is written as it is, with no auxiliary, because `include` promises the word. A story writes only the auxiliaries that still say the thing happened — it began, it was going on, it was tried out, it was done — because its next sentence builds on what this one did; a step that does not come off is the one exception, [below](#more-than-one-sentence). `SentenceDetail.phrases` reports the predicate with its auxiliary as one phrase: `먹고 싶어 했다`, `did not eat`.
+
 ## More than one sentence {#more-than-one-sentence}
 
 `sentences` puts more than one sentence in one result. They come back as a single string, `count` is still how many strings there are, and they tell one short story rather than being that many separate draws.
@@ -1005,7 +1060,7 @@ Not every sentence of a story is about the hero. Somebody else turns up in most 
 
 ```javascript
 randSentence({ language: 'ko', sentences: 4, story: 'errand', tense: 'past' });
-// ['낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.']
+// ['낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마 뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.']
 
 randSentence({ language: 'en', sentences: 4, story: 'meal', includeName: true });
 // ['Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.']
@@ -1017,7 +1072,7 @@ randSentence({ language: 'en', sentences: 4, story: 'meal', includeName: true })
 
 ```dart
 randSentence(language: WordLanguage.ko, sentences: 4, story: SentenceStory.errand, tense: SentenceTense.past);
-// [낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.]
+// [낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마 뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.]
 
 randSentence(language: WordLanguage.en, sentences: 4, story: SentenceStory.meal, includeName: true);
 // [Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.]
@@ -1029,7 +1084,7 @@ randSentence(language: WordLanguage.en, sentences: 4, story: SentenceStory.meal,
 
 ```python
 rand_sentence(language="ko", sentences=4, story="errand", tense="past")
-# ['낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.']
+# ['낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마 뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.']
 
 rand_sentence(language="en", sentences=4, story="meal", include_name=True)
 # ['Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.']
@@ -1041,6 +1096,12 @@ What a story puts on the page stays there. The thing the hero found is the thing
 
 The day only moves forward. A story that opened `at dawn` goes on `in the morning` or `at midday`, never back to the dawn, and the phases it names are a few hours apart rather than a whole day.
 
+Not every sentence of a paragraph is about somebody. Now and then one says what the moment was like after what was just done, with no subject at all: `열쇠를 찾았다. 정말 다행스러웠다.`, `The crusader snoozed. It was quite cozy.`, `静かだった。` What it says answers the sentence before it — relief after finding something, a taste after eating, warmth after meeting somebody — or, after the place changing, what the place is like: `조용했다`, `It was quiet`. A reaction never opens a result, never follows another one or a line somebody said, and the sentence after it names the hero again. Every language writes it its own way: Korean, Japanese, Chinese and Vietnamese with nothing in front of it, English `It was`, German `Es war`, Spanish and Italian `Era`, Russian `Было`.
+
+A step may also not come off. A hero who searches does not always find the thing at once, and one who lies down does not always fall asleep: `그런데 올림머리를 주워 담지 못했다`, `But the harpy could not drop off.` Such a step changes nothing the story knows except that the hero is uneasy, and the story goes on to the real thing afterwards. It is told only where the language can say a thing did not happen in the tense the story is in.
+
+And a paragraph does not go on in one length. After a long sentence the next one leans short, and after two short ones the next leans long, so five sentences of a story are not five sentences of one size.
+
 Two neighbouring steps are sometimes one sentence, with the second clause written without its subject: `사원에서 멈춰서고 천천히 집에 들어섰다`, `The broker heads back to the cottage and leans warily`, `記念館へ下りる。のんびり家に帰り着いてさらりともたれる。` A language declares how it joins two clauses — Korean's `-고` on the first verb, English's `and`, Japanese's `-て` — and German declares nothing, so it never joins. The joins come off the length budget like everything else, so a narrow range writes two short sentences where a wide one writes one long one.
 
 Only a person speaks: a story about an animal, a thing or a place is narrated all the way through. A line is never the first sentence, and one telling has at most two of them, answers included — four in a scene of speech, and up to five in `chat`, which is a conversation. Nobody speaks twice in a row, except that in a scene the hero may go on after being answered. A caller who named `type` gets those kinds and no voices at all.
@@ -1051,18 +1112,19 @@ A modifier is chosen for the noun it describes. A drink is `hot`, `clear` or `fr
 
 And it stays in the register it opened in. Prose about a line never becomes one, so a narrated paragraph never quotes. A quoted one is lines with prose between them: two people talking take turns, and one person saying four things in a row is a paragraph missing everything that happened while they said them. What that prose may not be is a third voice, so it tells rather than asks.
 
-A connective only claims what the two sentences can carry. Each one is tagged by what it says about the sentence in front of it, and three of the four can open any continuation: time passed, here is one more thing, this cuts against that. The fourth cannot. `so`, `therefore`, `그러므로` and `だから` say this sentence follows from the last one, which is only true when the two are about the same thing and this one is telling rather than asking. `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel is a consequence of nothing.
+A connective only claims what the two sentences can carry. Each one is tagged by what it says about the sentence in front of it, and three of the five can open any continuation: time passed, here is one more thing, this cuts against that. The other two cannot. `so`, `therefore`, `그래서` and `だから` say this sentence follows from the last one, which is only true when the two are about the same thing and this one is telling rather than asking: `그래서 금빛 하이볼이 식죠?` after a sentence about a pretzel is a consequence of nothing. And `just then`, `바로 그때` and `すると` say something new has just come along, which is only true of a sentence about somebody or something that was not there a sentence ago.
 
-| Claim           | English               | Korean               | Japanese             |
-| --------------- | --------------------- | -------------------- | -------------------- |
-| one more thing  | `and then`, `besides` | `그리고`, `게다가`   | `そして`, `また`     |
-| time passed     | `meanwhile`, `later`  | `이윽고`, `마침내`   | `やがて`, `その後`   |
-| against that    | `but`, `however`      | `하지만`, `그러나`   | `しかし`, `けれども` |
-| because of that | `so`, `therefore`     | `그래서`, `그러므로` | `だから`, `そこで`   |
+| Claim           | English                        | Korean                | Japanese             |
+| --------------- | ------------------------------ | --------------------- | -------------------- |
+| one more thing  | `and then`, `besides`          | `그리고`, `게다가`    | `そして`, `また`     |
+| time passed     | `meanwhile`, `later`           | `이윽고`, `마침내`    | `やがて`, `その後`   |
+| against that    | `but`, `however`               | `하지만`, `그러나`    | `しかし`, `けれども` |
+| because of that | `so`, `as a result`            | `그래서`, `결국`      | `だから`, `そこで`   |
+| something new   | `just then`, `all of a sudden` | `바로 그때`, `별안간` | `すると`, `その瞬間` |
 
-In a story the connective is the story's to choose. A step that follows from the one before it, eating after finding something to eat, may open on `so` or `그래서`; a step that merely comes next opens on `later`, `이윽고`, or on nothing at all.
+In a story the connective is the story's to choose. A step that follows from the one before it, eating after finding something to eat, may open on `so` or `그래서`; a setback — losing the thing, a step that does not come off — on `but` or `그런데`; somebody turning up, or the place changing, while the hero is about something, on `just then` or `바로 그때`; and a step that merely comes next on `later`, `이윽고`, or on nothing at all.
 
-A language declares only the kinds it can write. German has none for time passed: `dann` and `danach` are adverbs, and an adverb in the first position moves the finite verb, so the five coordinating conjunctions are all it can open a clause with.
+A language declares only the kinds it can write. German has none for time passed and none for something new: `dann`, `danach` and `plötzlich` are adverbs, and an adverb in the first position moves the finite verb, so the five coordinating conjunctions are all it can open a clause with.
 
 Nothing in a paragraph is said twice over. A kind the sentence before it already was is less likely each time it comes round again, so a run of questions ends by itself; a verb group is spent before it starts over, rather than closing three of four lines on the same word; a person is named and then left alone; a fresh subject usually comes from the topic's own theme rather than from anywhere in its class; and no two sentences of one result open on the same connective or interjection.
 

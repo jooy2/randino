@@ -368,24 +368,29 @@ final SentenceLanguageData en = SentenceLanguageData(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.content,
-      words: words(r'''
-        laughs smiles hums giggles chuckles grins whistles cheers beams claps nods winks chortles
-        brightens
-      '''),
+      words: words(r'laughs smiles grins beams brightens perks_up'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'''
-          laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle brighten
-        '''),
+        PredicateForm.question: words(r'laugh smile grin beam brighten perk_up'),
       },
       past: PredicateTense(
-        words: words(r'''
-          laughed smiled hummed giggled chuckled grinned whistled cheered beamed clapped nodded
-          winked chortled brightened
-        '''),
+        words: words(r'laughed smiled grinned beamed brightened perked_up'),
         forms: <PredicateForm, WordPool>{
-          PredicateForm.question: words(r'''
-            laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle brighten
-          '''),
+          PredicateForm.question: words(r'laugh smile grin beam brighten perk_up'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.content,
+      words: words(r'hums giggles chuckles whistles cheers claps nods winks chortles'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'hum giggle chuckle whistle cheer clap nod wink chortle'),
+      },
+      past: PredicateTense(
+        words: words(r'hummed giggled chuckled whistled cheered clapped nodded winked chortled'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(r'hum giggle chuckle whistle cheer clap nod wink chortle'),
         },
       ),
     ),
@@ -393,25 +398,37 @@ final SentenceLanguageData en = SentenceLanguageData(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.restless,
+      words: words(r'cries sobs whimpers snorts fidgets paces'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'cry sob whimper snort fidget pace'),
+      },
+      past: PredicateTense(
+        words: words(r'cried sobbed whimpered snorted fidgeted paced'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(r'cry sob whimper snort fidget pace'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.restless,
       words: words(r'''
-        cries sighs mutters sobs weeps groans grumbles whimpers snorts frowns sniffles fidgets paces
-        grimaces scowls pouts fumes sulks
+        sighs mutters weeps groans grumbles frowns sniffles grimaces scowls pouts fumes sulks
       '''),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'''
-          cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget pace grimace
-          scowl pout fume sulk
+          sigh mutter weep groan grumble frown sniffle grimace scowl pout fume sulk
         '''),
       },
       past: PredicateTense(
         words: words(r'''
-          cried sighed muttered sobbed wept groaned grumbled whimpered snorted frowned sniffled
-          fidgeted paced grimaced scowled pouted fumed sulked
+          sighed muttered wept groaned grumbled frowned sniffled grimaced scowled pouted fumed
+          sulked
         '''),
         forms: <PredicateForm, WordPool>{
           PredicateForm.question: words(r'''
-            cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget pace grimace
-            scowl pout fume sulk
+            sigh mutter weep groan grumble frown sniffle grimace scowl pout fume sulk
           '''),
         },
       ),
@@ -449,22 +466,26 @@ final SentenceLanguageData en = SentenceLanguageData(
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'''
-        shouts gasps shrugs blushes squints flinches exclaims looks_up looks_round
-      '''),
+      words: words(r'gasps squints flinches looks_up looks_round startles'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(
-          r'shout gasp shrug blush squint flinch exclaim look_up look_round',
-        ),
+        PredicateForm.question: words(r'gasp squint flinch look_up look_round startle'),
       },
       past: PredicateTense(
-        words: words(r'''
-          shouted gasped shrugged blushed squinted flinched exclaimed looked_up looked_round
-        '''),
+        words: words(r'gasped squinted flinched looked_up looked_round startled'),
         forms: <PredicateForm, WordPool>{
-          PredicateForm.question: words(
-            r'shout gasp shrug blush squint flinch exclaim look_up look_round',
-          ),
+          PredicateForm.question: words(r'gasp squint flinch look_up look_round startle'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      words: words(r'shouts shrugs blushes exclaims'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'shout shrug blush exclaim')},
+      past: PredicateTense(
+        words: words(r'shouted shrugged blushed exclaimed'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(r'shout shrug blush exclaim'),
         },
       ),
     ),
@@ -1674,6 +1695,83 @@ final SentenceLanguageData en = SentenceLanguageData(
       subject: const <NounClass>[NounClass.body],
       words: words(r'warm cold sore stiff steady strong weak numb tender rough smooth heavy'),
     ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.find, VerbField.arrive],
+      words: words(r'lucky fortunate wonderful'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.find, VerbField.look],
+      words: words(r'surprising amazing curious'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.lose],
+      words: words(r'awful frustrating maddening unlucky'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.eat, VerbField.cook],
+      words: words(r'delicious tasty filling'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.drink],
+      words: words(r'refreshing delicious soothing'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.meet, VerbField.talk],
+      words: words(r'nice pleasant lovely cheerful'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.rest, VerbField.sleep],
+      words: words(r'peaceful cozy restful'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[
+        VerbField.make,
+        VerbField.tend,
+        VerbField.sell,
+        VerbField.hide,
+        VerbField.buy,
+      ],
+      words: words(r'satisfying rewarding worthwhile'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.rise, VerbField.go, VerbField.move, VerbField.play],
+      words: words(r'refreshing fun lively'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.search, VerbField.wait],
+      words: words(r'tiring hopeless dull tedious'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.think, VerbField.look],
+      words: words(r'odd puzzling strange'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      words: words(r'quiet peaceful still silent chilly cold warm calm'),
+    ),
   ],
   modifiers: <ModifierGroup>[
     ModifierGroup(
@@ -1791,9 +1889,56 @@ final SentenceLanguageData en = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'''
-        beautiful mysterious strange new lovely familiar odd ordinary splendid humble
-      '''),
+      words: words(r'beautiful strange odd lovely'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[
+        NounClass.creature,
+        NounClass.person,
+        NounClass.plant,
+        NounClass.thing,
+        NounClass.place,
+        NounClass.idea,
+        NounClass.event,
+      ],
+      words: words(r'mysterious'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[
+        NounClass.person,
+        NounClass.thing,
+        NounClass.vehicle,
+        NounClass.place,
+        NounClass.idea,
+        NounClass.event,
+      ],
+      words: words(r'new'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[
+        NounClass.person,
+        NounClass.creature,
+        NounClass.place,
+        NounClass.thing,
+        NounClass.vehicle,
+        NounClass.idea,
+      ],
+      words: words(r'familiar ordinary'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[
+        NounClass.thing,
+        NounClass.place,
+        NounClass.event,
+        NounClass.vehicle,
+        NounClass.creature,
+        NounClass.plant,
+      ],
+      words: words(r'splendid'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.person, NounClass.place, NounClass.thing],
+      words: words(r'humble'),
     ),
   ],
   manners: <ModifierGroup>[
@@ -1941,6 +2086,9 @@ final SentenceLanguageData en = SentenceLanguageData(
     '''),
     ConnectiveKind.causal: words(
       r'so therefore in_the_end thus hence as_a_result for_that_reason consequently',
+    ),
+    ConnectiveKind.turn: words(
+      r'just_then at_that_moment out_of_nowhere right_then all_of_a_sudden',
     ),
   },
   traits: <NounTrait, WordPool>{
@@ -2108,6 +2256,82 @@ final SentenceLanguageData en = SentenceLanguageData(
       past: PredicateTense(words: <String>['was']),
     ),
   ),
+  auxiliaries: <SentenceAuxiliary>[
+    SentenceAuxiliary(
+      kind: AuxiliaryKind.negative,
+      template: '{a} {v}',
+      joint: 'question',
+      predicate: AuxiliaryPredicate(
+        words: words(r'does_not'),
+        past: PredicateTense(words: words(r'did_not')),
+      ),
+      moods: const <SentenceMood>[SentenceMood.statement],
+    ),
+    SentenceAuxiliary(
+      kind: AuxiliaryKind.unable,
+      template: '{a} {v}',
+      joint: 'question',
+      predicate: AuxiliaryPredicate(
+        words: words(r'cannot'),
+        past: PredicateTense(words: words(r'could_not')),
+      ),
+      moods: const <SentenceMood>[SentenceMood.statement],
+    ),
+    SentenceAuxiliary(
+      kind: AuxiliaryKind.desire,
+      template: '{a} {v}',
+      joint: 'question',
+      predicate: AuxiliaryPredicate(
+        words: words(r'wants_to'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'want_to')},
+        past: PredicateTense(
+          words: words(r'wanted_to'),
+          forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'want_to')},
+        ),
+      ),
+      unless: const <String>['wants'],
+    ),
+    SentenceAuxiliary(
+      kind: AuxiliaryKind.resolve,
+      template: '{a} {v}',
+      joint: 'question',
+      predicate: AuxiliaryPredicate(
+        words: words(r'decides_to'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'decide_to')},
+        past: PredicateTense(
+          words: words(r'decided_to'),
+          forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'decide_to')},
+        ),
+      ),
+    ),
+    SentenceAuxiliary(
+      kind: AuxiliaryKind.effort,
+      template: '{a} {v}',
+      joint: 'question',
+      predicate: AuxiliaryPredicate(
+        words: words(r'tries_to'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'try_to')},
+        past: PredicateTense(
+          words: words(r'tried_to'),
+          forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'try_to')},
+        ),
+      ),
+    ),
+    SentenceAuxiliary(
+      kind: AuxiliaryKind.begin,
+      template: '{a} {v}',
+      joint: 'question',
+      predicate: AuxiliaryPredicate(
+        words: words(r'begins_to starts_to'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'begin_to start_to')},
+        past: PredicateTense(
+          words: words(r'began_to started_to'),
+          forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'begin_to start_to')},
+        ),
+      ),
+      unless: const <String>['begins', 'starts'],
+    ),
+  ],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.date, head: 'on', tail: ','),
@@ -2225,6 +2449,24 @@ final SentenceLanguageData en = SentenceLanguageData(
       SentencePart(SentenceSlot.object, modifiable: true),
       SentencePart(SentenceSlot.place, head: 'in', modifiable: true),
     ], 3),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.place, head: 'in', tail: ',', modifiable: true),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 6),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.place, head: 'in', tail: ',', modifiable: true),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.object, modifiable: true),
+    ], 4),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.state, head: 'it is', pastHead: 'it was'),
+    ], 8),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state, head: 'it is', pastHead: 'it was'),
+    ], 8),
     SentenceFrame(
       <SentencePart>[
         SentencePart(SentenceSlot.subject, head: 'does', pastHead: 'did', modifiable: true),

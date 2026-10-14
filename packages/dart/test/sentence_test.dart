@@ -167,6 +167,94 @@ List<String> pastForms(PredicateTense? past) =>
         ? const <String>[]
         : <String>[...past.words, for (final pool in past.forms.values) ...endings(pool)];
 
+/// Every predicate a verb group or a state group can write, in either tense.
+List<String> everyFormOf(Object group) =>
+    group is VerbGroup
+        ? everyForm(group.words, group.forms, group.past)
+        : everyForm((group as StateGroup).words, group.forms, group.past);
+
+/// One way a predicate phrase reads: the predicate, and the auxiliary written
+/// around it.
+typedef Helped = ({String verb, String helper, SentenceAuxiliary? auxiliary});
+
+/// The ways a predicate phrase reads: as itself, and as a predicate with one of
+/// the language's auxiliaries written around it — `먹고 싶어 했다` is `먹` and
+/// `싶어 했다`, `没吃` is `吃`, `did not eat` is `eat` and `did not`. Every
+/// reading the templates allow, because which one the generator meant is not
+/// written down anywhere but in the phrase.
+List<Helped> helpedIn(WordLanguage language, SentenceSlot slot, String phrase) {
+  final out = <Helped>[(verb: phrase, helper: '', auxiliary: null)];
+
+  for (final auxiliary in sentenceData[language]!.auxiliaries) {
+    if (auxiliary.on != slot) continue;
+
+    final own = auxiliary.predicate;
+    final helpers = own == null ? <String>{''} : everyForm(own.words, own.forms, own.past).toSet();
+
+    final templates = <String>[
+      auxiliary.template,
+      if (auxiliary.pastTemplate != null) auxiliary.pastTemplate!,
+    ];
+
+    for (final template in templates) {
+      for (final helper in helpers) {
+        final halves = template.replaceFirst('{a}', helper).split('{v}');
+        final front = halves[0];
+        final back = halves[1];
+
+        if (phrase.length > front.length + back.length &&
+            phrase.startsWith(front) &&
+            phrase.endsWith(back)) {
+          out.add((
+            verb: phrase.substring(front.length, phrase.length - back.length),
+            helper: helper,
+            auxiliary: auxiliary,
+          ));
+        }
+      }
+    }
+  }
+
+  return out;
+}
+
+/// The entries of a group an auxiliary follows: the form it is joined by for a
+/// chained one, and the group's every form for a particle, which leaves the
+/// predicate as it was.
+List<String> jointsOf(Object group, SentenceAuxiliary auxiliary) {
+  if (auxiliary.predicate == null) return everyFormOf(group);
+
+  final joint = auxiliary.joint ?? 'words';
+  final words = group is VerbGroup ? group.words : (group as StateGroup).words;
+
+  if (joint == 'words') return words.toList(growable: false);
+
+  final joints = group is VerbGroup ? group.joints : (group as StateGroup).joints;
+  final forms = group is VerbGroup ? group.forms : (group as StateGroup).forms;
+
+  return endings(
+    joints[PredicateJoint.values.asNameMap()[joint]] ??
+        forms[PredicateForm.values.asNameMap()[joint]] ??
+        const <String>[],
+  );
+}
+
+/// Whether a group wrote this predicate phrase: as one of its forms, or as the
+/// form an auxiliary follows with that auxiliary around it.
+bool writes(WordLanguage language, Object group, SentenceSlot slot, String phrase) {
+  // A past that agrees with its subject is any of its agreed forms: `откинулась`.
+  final agreement = sentenceData[language]!.pastAgreement;
+
+  List<String> agreed(List<String> forms) =>
+      agreement == null ? forms : <String>[for (final word in forms) ...agreedBy(agreement, word)];
+
+  return helpedIn(language, slot, phrase).any(
+    (each) => agreed(
+      each.auxiliary == null ? everyFormOf(group) : jointsOf(group, each.auxiliary!),
+    ).contains(each.verb),
+  );
+}
+
 /// A word reshaped by ordered `[ending, replacement]` rules, for every gender.
 List<String> agreedBy(WordAgreement rules, String word) {
   final out = <String>[word];
@@ -596,6 +684,7 @@ void main() {
 
     test('every phrase is written out of the language`s own pools', () {
       for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
         final fixed = <SentenceSlot, Set<String>>{
           for (final slot in <SentenceSlot>[
             SentenceSlot.verb,
@@ -626,8 +715,18 @@ void main() {
             final pool = fixed[slot];
 
             if (pool != null) {
+              // A predicate may carry an auxiliary, and is then the form that
+              // auxiliary follows, from the same pools.
+              final helped =
+                  (slot == SentenceSlot.verb || slot == SentenceSlot.state) &&
+                  <String>[written, phrase].any(
+                    (each) => <Object>[
+                      ...(slot == SentenceSlot.verb ? data.verbs : data.states),
+                    ].any((group) => writes(language, group, slot, each)),
+                  );
+
               expect(
-                pool.contains(written) || pool.contains(phrase),
+                pool.contains(written) || pool.contains(phrase) || helped,
                 isTrue,
                 reason: '$language: $phrase is not in the ${slot.name} pools (${detail.sentence})',
               );
@@ -751,7 +850,7 @@ void main() {
               subjectAt < 0 ? const <String>{} : nounsIn(language, detail.phrases[subjectAt]);
           final groups = data.verbs.where(
             (group) =>
-                everyForm(group.words, group.forms).contains(detail.phrases[at]) &&
+                writes(language, group, SentenceSlot.verb, detail.phrases[at]) &&
                 (group.object != null) == transitive,
           );
 
@@ -1073,9 +1172,10 @@ void main() {
       // write `die schlanke Wolke` — so a range only the longer one can reach is
       // a range a name cannot be in. Drawn rather than asked for, it is one more
       // thing to decide against the room, and deciding it before the range was
-      // even known left [_nameFits] unreachable.
+      // even known left [_nameFits] unreachable. Korean is not among them: its
+      // multi-word predicates and adverbials are spaced the way they are written,
+      // and a named sentence reaches the top of its range.
       const asks = <(WordLanguage, int)>[
-        (WordLanguage.ko, 54),
         (WordLanguage.zh, 33),
         (WordLanguage.ja, 58),
         (WordLanguage.de, 92),
@@ -1949,7 +2049,17 @@ void main() {
               for (final entry in tails.entries)
                 if (entry.value.contains(noun)) entry.key,
           ];
-          final after = detail.sentence.substring(detail.sentence.indexOf(phrase) + phrase.length);
+          // Found where the phrases before it leave off, because the place's noun
+          // may be inside one of them too.
+          var from = 0;
+
+          for (final before in detail.phrases.take(at)) {
+            from = detail.sentence.indexOf(before, from) + before.length;
+          }
+
+          final after = detail.sentence.substring(
+            detail.sentence.indexOf(phrase, from) + phrase.length,
+          );
 
           if (named.isNotEmpty) listed += 1;
 
@@ -2802,9 +2912,32 @@ void main() {
             final written =
                 i == 0 ? phrase.substring(0, 1).toLowerCase() + phrase.substring(1) : phrase;
             final pool = expected[slot]!;
+            // An auxiliary that carries the sentence's form is the one asked in it,
+            // and a particle leaves the predicate in the form it would have had.
+            final helped = <String>[written, phrase].any(
+              (each) => helpedIn(language, slot, each).any((reading) {
+                final auxiliary = reading.auxiliary;
+
+                if (auxiliary == null) return false;
+
+                final own = auxiliary.predicate;
+
+                return own == null
+                    ? pool.contains(reading.verb)
+                    : formsOf(
+                          own.words,
+                          own.forms,
+                          SentenceStyle.plain,
+                          SentenceType.question,
+                        ).contains(reading.helper) &&
+                        <Object>[
+                          ...(slot == SentenceSlot.verb ? data.verbs : data.states),
+                        ].any((group) => jointsOf(group, auxiliary).contains(reading.verb));
+              }),
+            );
 
             expect(
-              pool.contains(written) || pool.contains(phrase),
+              pool.contains(written) || pool.contains(phrase) || helped,
               isTrue,
               reason: '$language: "$phrase" is not the $slot form a question asks for',
             );
@@ -3050,6 +3183,40 @@ void main() {
           }
         }
       }
+
+      // A language with no form of its own writes exactly the same sentence at
+      // every level, which is what its grammar actually does with politeness in
+      // the third person.
+      for (final language in wordLanguages) {
+        if (closes.containsKey(language)) continue;
+
+        final pools = poolFor(language, SentenceSlot.verb);
+
+        for (final style in SentenceStyle.values) {
+          for (final detail in randSentenceDetails(
+            language: language,
+            style: style,
+            type: statementOnly,
+            includeName: false,
+            tense: SentenceTense.present,
+            count: 40,
+          )) {
+            final at = detail.slots.indexOf(SentenceSlot.verb);
+
+            if (at < 0) continue;
+
+            expect(
+              helpedIn(
+                language,
+                SentenceSlot.verb,
+                detail.phrases[at],
+              ).any((reading) => pools.contains(reading.verb)),
+              isTrue,
+              reason: '$language $style: ${detail.sentence}',
+            );
+          }
+        }
+      }
     });
 
     test('no plain Japanese predicate closes the way a polite one does', () {
@@ -3134,13 +3301,568 @@ void main() {
 
                 if (slot != SentenceSlot.verb && slot != SentenceSlot.state) continue;
 
+                // An auxiliary carries the level and the mood where it is a
+                // predicate of its own, and the predicate in front of it the form it
+                // follows.
+                final helped = helpedIn(language, slot, detail.phrases[i]).any((reading) {
+                  final auxiliary = reading.auxiliary;
+                  final own = auxiliary?.predicate;
+
+                  return own != null &&
+                      formsOf(own.words, own.forms, style, type).contains(reading.helper) &&
+                      <Object>[
+                        ...(slot == SentenceSlot.verb ? data.verbs : data.states),
+                      ].any((group) => jointsOf(group, auxiliary!).contains(reading.verb));
+                });
+
                 expect(
-                  pools[slot]!.contains(detail.phrases[i]),
+                  pools[slot]!.contains(detail.phrases[i]) || helped,
                   isTrue,
-                  reason: '$language $style $type: "${detail.phrases[i]}" is not a $style $slot',
+                  reason:
+                      '$language $style $type: "${detail.phrases[i]}" is not a $style $slot '
+                      '(${detail.sentence})',
                 );
               }
             }
+          }
+        }
+      }
+    });
+
+    test('every pool a group writes is as long as the words it restates, in either tense', () {
+      // Index alignment is what translates a required word, and what keeps a
+      // verb's past the same verb. Korean spells its past out of its 해체 forms,
+      // and a form written in two words — `배를 문질러` — once split into two
+      // stems and put every past after it one verb out of step: `배를다`.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+
+        for (final group in <Object>[...data.verbs, ...data.states]) {
+          final words = group is VerbGroup ? group.words : (group as StateGroup).words;
+          final forms = group is VerbGroup ? group.forms : (group as StateGroup).forms;
+          final joints = group is VerbGroup ? group.joints : (group as StateGroup).joints;
+          final past = group is VerbGroup ? group.past : (group as StateGroup).past;
+          final pools = <String, WordPool>{
+            for (final entry in forms.entries) entry.key.name: entry.value,
+            for (final entry in joints.entries) entry.key.name: entry.value,
+            if (past != null) 'past': past.words,
+            if (past != null)
+              for (final entry in past.forms.entries) 'past ${entry.key.name}': entry.value,
+          };
+
+          pools.forEach((form, pool) {
+            expect(pool, hasLength(words.length), reason: '$language $form: ${words.first}');
+          });
+        }
+      }
+    });
+
+    test(
+      'a Korean predicate is spaced where Korean spaces it, and carries no object of its own',
+      () {
+        // `입을 다시다` is two words, and `입을다시다` is one that does not exist. And
+        // a verb that already has its object takes no second one: `팽이버섯을 값을
+        // 치렀다` is a mushroom paid twice.
+        final data = sentenceData[WordLanguage.ko]!;
+        final runs = RegExp('[을를](?=[가-힣])');
+        final carries = RegExp('[을를] ');
+
+        for (final group in <Object>[...data.verbs, ...data.states]) {
+          final words = group is VerbGroup ? group.words : (group as StateGroup).words;
+
+          for (final word in words) {
+            expect(
+              runs.hasMatch(word),
+              isFalse,
+              reason: "ko: '$word' runs its object into its verb",
+            );
+
+            if (group is VerbGroup && group.object != null) {
+              expect(
+                carries.hasMatch(word),
+                isFalse,
+                reason: "ko: '$word' takes an object and carries one",
+              );
+            }
+          }
+        }
+      },
+    );
+
+    test('an auxiliary is written around a predicate the way the language writes it', () {
+      // The kinds that still say the thing happened — the only ones a story
+      // writes — and the ones only somebody can do.
+      const happens = <AuxiliaryKind>[
+        AuxiliaryKind.begin,
+        AuxiliaryKind.progressive,
+        AuxiliaryKind.attempt,
+        AuxiliaryKind.completive,
+      ];
+      const willed = <AuxiliaryKind>[
+        AuxiliaryKind.unable,
+        AuxiliaryKind.desire,
+        AuxiliaryKind.resolve,
+        AuxiliaryKind.effort,
+        AuxiliaryKind.attempt,
+      ];
+      const denying = <AuxiliaryKind>[AuxiliaryKind.negative, AuxiliaryKind.unable];
+
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final auxiliaries = data.auxiliaries;
+
+        // Every one of them has somewhere to put the predicate, and a chained one
+        // an auxiliary of its own and a form of the predicate to follow.
+        for (final auxiliary in auxiliaries) {
+          for (final template in <String>[
+            auxiliary.template,
+            if (auxiliary.pastTemplate != null) auxiliary.pastTemplate!,
+          ]) {
+            expect(template.split('{v}'), hasLength(2), reason: '$language: $template');
+            expect(
+              template.contains('{a}'),
+              auxiliary.predicate != null,
+              reason: '$language: $template',
+            );
+          }
+
+          if (auxiliary.predicate != null) {
+            final groups = <Object>[
+              ...(auxiliary.on == SentenceSlot.verb ? data.verbs : data.states),
+            ];
+
+            expect(
+              groups.any((group) => jointsOf(group, auxiliary).isNotEmpty),
+              isTrue,
+              reason: '$language ${auxiliary.kind}: no group writes the form it follows',
+            );
+          }
+        }
+
+        if (auxiliaries.isEmpty) continue;
+
+        var seen = 0;
+
+        // A predicate with an auxiliary around it, read the way `writes` reads one.
+        List<Helped> helped(SentenceDetail detail) => <Helped>[
+          for (var i = 0; i < detail.phrases.length; i += 1)
+            if (detail.slots[i] == SentenceSlot.verb || detail.slots[i] == SentenceSlot.state)
+              ...() {
+                final slot = detail.slots[i];
+                final phrase = detail.phrases[i];
+                final groups = <Object>[...(slot == SentenceSlot.verb ? data.verbs : data.states)];
+
+                return helpedIn(language, slot, phrase).where(
+                  (reading) =>
+                      reading.auxiliary != null &&
+                      groups.any(
+                        (group) => jointsOf(group, reading.auxiliary!).contains(reading.verb),
+                      ) &&
+                      !groups.any((group) => everyFormOf(group).contains(phrase)),
+                );
+              }(),
+        ];
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          includeName: false,
+          count: 300,
+        )) {
+          for (final reading in helped(detail)) {
+            seen += 1;
+
+            final kind = reading.auxiliary!.kind;
+            final theme = detail.theme;
+
+            // Only somebody wants, decides, tries or fails to: a soup cools and a
+            // bus runs, and neither of them wants to.
+            if (willed.contains(kind) && theme != null) {
+              expect(
+                const <NounClass>[NounClass.person, NounClass.creature],
+                contains(themeClass[theme]),
+                reason: '$language: $theme cannot $kind (${detail.sentence})',
+              );
+            }
+          }
+        }
+
+        expect(seen, greaterThan(0), reason: '$language never wrote an auxiliary');
+
+        // A story builds on what each of its sentences did, so it writes only the
+        // ones that say the thing happened — and denies one only where a step of
+        // it does not come off: the hero looks and does not find, lies down and
+        // cannot sleep.
+        final failing = <VerbField>{
+          for (final story in stories)
+            for (final step in story.steps)
+              if (step.fails) ...step.fields,
+        };
+
+        bool failed(SentenceDetail detail) => <String>[
+          for (var i = 0; i < detail.phrases.length; i += 1)
+            if (detail.slots[i] == SentenceSlot.verb) detail.phrases[i],
+        ].any(
+          (phrase) => data.verbs.any(
+            (group) =>
+                failing.contains(group.field) && writes(language, group, SentenceSlot.verb, phrase),
+          ),
+        );
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          sentences: 4,
+          includeName: false,
+          count: 80,
+        )) {
+          if (detail.story == null) continue;
+
+          for (final reading in helped(detail)) {
+            final kind = reading.auxiliary!.kind;
+
+            expect(
+              happens.contains(kind) || (denying.contains(kind) && failed(detail)),
+              isTrue,
+              reason: '$language: a story said $kind (${detail.sentence})',
+            );
+          }
+        }
+      }
+    });
+
+    test('a reaction says what the moment was like, after what it answers, and never first', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final impersonal = data.states.where((group) => group.impersonal).toList();
+        final shaped = data.frames.any(
+          (frame) =>
+              !frame.parts.any(
+                (part) => part.slot == SentenceSlot.subject || part.slot == SentenceSlot.quantity,
+              ),
+        );
+
+        // A language has the shape with no subject and the groups that go in it,
+        // or neither; and such a group describes nobody, so nothing else draws it.
+        expect(impersonal.isNotEmpty, shaped, reason: '$language');
+
+        for (final group in impersonal) {
+          expect(group.subject, isEmpty, reason: '$language: ${group.words.first}');
+        }
+
+        if (impersonal.isEmpty) continue;
+
+        final personal =
+            inflected(language, <String>[
+              for (final group in data.states)
+                if (!group.impersonal) ...everyFormOf(group),
+            ]).toSet();
+        // What each reaction answers: the fields of the groups it is in, or null
+        // where one of them fits after anything.
+        final answers = <String, Set<VerbField>?>{};
+
+        for (final group in impersonal) {
+          for (final word in everyFormOf(group)) {
+            final after = group.after;
+
+            answers[word] =
+                after == null || (answers.containsKey(word) && answers[word] == null)
+                    ? null
+                    : <VerbField>{...?answers[word], ...after};
+          }
+        }
+
+        String lower(String word) =>
+            word.isEmpty ? word : word.substring(0, 1).toLowerCase() + word.substring(1);
+        // A verb in the past with the language's own mark beside it: `触摸了`,
+        // `đã ăn`.
+        final markHead = data.pastMark?.head == null ? '' : data.pastMark!.head! + data.space;
+        final markTail = data.pastMark?.tail ?? '';
+
+        String unmarked(String verb) =>
+            verb.startsWith(markHead) &&
+                    verb.endsWith(markTail) &&
+                    verb.length >= markHead.length + markTail.length
+                ? verb.substring(markHead.length, verb.length - markTail.length)
+                : verb;
+
+        var seen = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          sentences: 5,
+          includeName: false,
+          count: 150,
+        )) {
+          final at = sentenceOf(detail);
+
+          String? reaction(int i) {
+            final slots = <SentenceSlot>[
+              for (var j = 0; j < detail.slots.length; j += 1)
+                if (at[j] == i) detail.slots[j],
+            ];
+            final phrases = <String>[
+              for (var j = 0; j < detail.phrases.length; j += 1)
+                if (at[j] == i) detail.phrases[j],
+            ];
+            final index = slots.indexOf(SentenceSlot.state);
+
+            if (index < 0 ||
+                slots.any((slot) => slot != SentenceSlot.state && slot != SentenceSlot.degree)) {
+              return null;
+            }
+
+            final state = lower(phrases[index]);
+
+            return personal.contains(state) || !answers.containsKey(state) ? null : state;
+          }
+
+          for (var i = 0; i < detail.sentences.length; i += 1) {
+            final word = reaction(i);
+
+            if (word == null) continue;
+
+            seen += 1;
+            expect(i, greaterThan(0), reason: '$language: a result opened on a reaction');
+            expect(
+              reaction(i - 1),
+              isNull,
+              reason: '$language: two reactions (${detail.sentence})',
+            );
+
+            // One that answers something answers what the sentence before did.
+            final after = answers[word];
+
+            if (after == null) continue;
+
+            final verbs = <String>[
+              for (var j = 0; j < detail.phrases.length; j += 1)
+                if (at[j] == i - 1 && detail.slots[j] == SentenceSlot.verb) detail.phrases[j],
+            ];
+
+            expect(
+              verbs.any(
+                (verb) => data.verbs.any(
+                  (group) =>
+                      after.contains(group.field) &&
+                      <String>[verb, lower(verb)]
+                          .expand((each) => <String>[each, unmarked(each)])
+                          .any((each) => writes(language, group, SentenceSlot.verb, each)),
+                ),
+              ),
+              isTrue,
+              reason: "$language: '$word' answers nothing before it (${detail.sentence})",
+            );
+          }
+        }
+
+        expect(seen, greaterThan(0), reason: '$language never wrote a reaction');
+      }
+    });
+
+    test('a step that does not come off is told denied, and the story carries on', () {
+      // `잠들지 못했다` and then, later, `잠들었다`: the night is long, and it ends.
+      for (final language in <WordLanguage>[WordLanguage.ko, WordLanguage.en, WordLanguage.ja]) {
+        final data = sentenceData[language]!;
+        final sleeps = data.verbs.where((group) => group.field == VerbField.sleep).toList();
+
+        bool denied(String phrase) => helpedIn(language, SentenceSlot.verb, phrase).any(
+          (reading) =>
+              reading.auxiliary != null &&
+              (reading.auxiliary!.kind == AuxiliaryKind.negative ||
+                  reading.auxiliary!.kind == AuxiliaryKind.unable) &&
+              sleeps.any((group) => jointsOf(group, reading.auxiliary!).contains(reading.verb)),
+        );
+
+        bool sleeping(String phrase) =>
+            !denied(phrase) &&
+            sleeps.any((group) => writes(language, group, SentenceSlot.verb, phrase));
+
+        var seen = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          story: SentenceStory.evening,
+          sentences: 6,
+          includeName: false,
+          count: 80,
+        )) {
+          final verbs = <String>[
+            for (var i = 0; i < detail.phrases.length; i += 1)
+              if (detail.slots[i] == SentenceSlot.verb) detail.phrases[i],
+          ];
+          final at = verbs.indexWhere(denied);
+
+          if (at < 0) continue;
+
+          seen += 1;
+          expect(
+            verbs.skip(at + 1).any(sleeping),
+            isTrue,
+            reason: '$language: the hero never sleeps after all (${detail.sentence})',
+          );
+        }
+
+        expect(seen, greaterThan(0), reason: '$language never told a step that did not come off');
+      }
+    });
+
+    test('a `turn` connective opens a sentence about something that just came along', () {
+      // `그때 참새가 날아갔다`, `Just then the sky darkened`: something new, named,
+      // and at the moment the connective has already said.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final turns = <String>[
+          for (final word in data.connectives[ConnectiveKind.turn] ?? const <String>[])
+            (data.capitalize ? upperFirst(word) : word) + data.space,
+        ];
+
+        if (turns.isEmpty) continue;
+
+        var seen = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          sentences: 5,
+          includeName: false,
+          count: 150,
+        )) {
+          final at = sentenceOf(detail);
+
+          for (var i = 0; i < detail.sentences.length; i += 1) {
+            final sentence = detail.sentences[i];
+
+            if (!turns.any(sentence.startsWith)) continue;
+
+            seen += 1;
+
+            final slots = <SentenceSlot>[
+              for (var j = 0; j < detail.slots.length; j += 1)
+                if (at[j] == i) detail.slots[j],
+            ];
+            final subject =
+                <String>[
+                  for (var j = 0; j < detail.phrases.length; j += 1)
+                    if (at[j] == i && detail.slots[j] == SentenceSlot.subject) detail.phrases[j],
+                ].firstOrNull;
+
+            // The pronouns a topic is referred to by, and not a first or second
+            // person: Vietnamese `bạn` is `you` and a friend alike.
+            final topical = <String>[for (final pool in data.pronouns.values) ...pool];
+
+            expect(
+              subject != null &&
+                  !<String>[...topical, ...topical.map(upperFirst)].contains(subject),
+              isTrue,
+              reason: '$language: a turn names nothing new ($sentence)',
+            );
+            expect(
+              slots,
+              isNot(contains(SentenceSlot.time)),
+              reason: '$language: a turn says when twice ($sentence)',
+            );
+          }
+        }
+
+        expect(seen, greaterThan(0), reason: '$language never wrote a turn');
+      }
+    });
+
+    test('a connective claims one thing, and is no other word of the language', () {
+      // A word in two pools is read as either: `그때` is a time a sentence names
+      // and a turn it opens on, and a check on one of them cannot tell which it
+      // was.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final seen = <String, String>{};
+        final pools = <(String, List<String>)>[
+          ('time', timesOf(data)),
+          ('manner', <String>[for (final group in data.manners) ...group.words]),
+          for (final entry in data.connectives.entries) (entry.key.name, entry.value),
+        ];
+
+        for (final (kind, pool) in pools) {
+          for (final word in pool.toSet()) {
+            // A time may be a manner too, which nothing reads the other way round;
+            // a connective is checked against everything before it.
+            if (kind != 'time' && kind != 'manner') {
+              expect(
+                !seen.containsKey(word) || seen[word] == kind,
+                isTrue,
+                reason: "$language: '$word' is ${seen[word]} and $kind",
+              );
+            }
+
+            seen.putIfAbsent(word, () => kind);
+          }
+        }
+      }
+    });
+
+    test('a connective is no prefix of a word a sentence can open on', () {
+      // Japanese and Chinese write nothing after a connective, so one that is the
+      // start of a word a phrase can open on reads as a connective where there is
+      // none: `突然` was a turn and `突然の` a modifier.
+      for (final language in <WordLanguage>[WordLanguage.ja, WordLanguage.zh]) {
+        final openings = <String>[
+          ...modifiersFor(language),
+          ...poolFor(language, SentenceSlot.subject),
+          ...poolFor(language, SentenceSlot.time),
+          ...poolFor(language, SentenceSlot.manner),
+          ...poolFor(language, SentenceSlot.degree),
+        ];
+
+        for (final connective in connectivesOf(language)) {
+          final longer =
+              openings
+                  .where((word) => word != connective && word.startsWith(connective))
+                  .firstOrNull;
+
+          expect(longer, isNull, reason: "$language: '$connective' opens '$longer'");
+        }
+      }
+    });
+
+    test('a sentence does not put one noun where it is and where it happens', () {
+      // `水星在水星上沉睡`, `공원에서 공원이 조용해졌다`.
+      for (final language in wordLanguages) {
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: const <SentenceSlot>{SentenceSlot.place, SentenceSlot.destination},
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          count: 200,
+        )) {
+          final known = <String>[
+            for (final slot in const <SentenceSlot>[
+              SentenceSlot.subject,
+              SentenceSlot.place,
+              SentenceSlot.destination,
+            ])
+              if (detail.slots.contains(slot))
+                ...<String?>[
+                  longest(nounsIn(language, detail.phrases[detail.slots.indexOf(slot)])),
+                ].nonNulls,
+          ];
+
+          expect(known.toSet(), hasLength(known.length), reason: '$language: ${detail.sentence}');
+        }
+      }
+    });
+
+    test('a time is never somewhere', () {
+      // A month, a dawn and a weekend are when, not what: `중순이 갯벌에서 저물었다`.
+      for (final language in wordLanguages) {
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: const <SentenceSlot>{SentenceSlot.place, SentenceSlot.destination},
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          count: 300,
+        )) {
+          if (detail.slots.contains(SentenceSlot.place) ||
+              detail.slots.contains(SentenceSlot.destination)) {
+            expect(detail.theme, isNot(WordTheme.time), reason: '$language: ${detail.sentence}');
           }
         }
       }
@@ -3440,7 +4162,7 @@ void main() {
             data.verbs.any(
               (group) =>
                   moneyFields.contains(group.field) &&
-                  everyForm(group.words, group.forms, group.past).contains(verb),
+                  writes(language, group, SentenceSlot.verb, verb),
             ),
             isTrue,
             reason: "$language: '$verb' does not handle money (${detail.sentence})",
@@ -3645,15 +4367,26 @@ void main() {
               if (slot == SentenceSlot.verb) {
                 final head = mark.head == null ? '' : mark.head! + data.space;
                 final tail = mark.tail ?? '';
+                final marked =
+                    written.startsWith(head) &&
+                    written.endsWith(tail) &&
+                    written.length >= head.length + tail.length;
+                final bare =
+                    marked ? written.substring(head.length, written.length - tail.length) : written;
+                // The mark goes around an auxiliary too — `đã không ăn` — except
+                // where the auxiliary has no room for it: `没吃`, never `没吃了`.
+                final readings = helpedIn(language, slot, bare)
+                    .where((reading) => marked || (reading.auxiliary?.dropsPastMark ?? false))
+                    .toList(growable: false);
 
                 expect(
-                  written.startsWith(head) && written.endsWith(tail),
-                  isTrue,
+                  readings,
+                  isNotEmpty,
                   reason: '$language: "$phrase" carries no past mark (${detail.sentence})',
                 );
                 expect(
-                  present,
-                  contains(written.substring(head.length, written.length - tail.length)),
+                  readings.any((reading) => present.contains(reading.verb)),
+                  isTrue,
                   reason: '$language: "$phrase" is not a verb the pools hold (${detail.sentence})',
                 );
               }
@@ -3664,16 +4397,32 @@ void main() {
             final usable = slot == SentenceSlot.state && !statesChange ? present : past;
             final inflectedForms =
                 data.predicateAgrees ? inflected(language, usable.toList()) : usable.toList();
+            // An auxiliary that carries the tense is the one in the past, and a
+            // particle leaves the predicate in the past it would have been in.
+            final helped = <String>[written, phrase].any(
+              (each) => helpedIn(language, slot, each).any((reading) {
+                final auxiliary = reading.auxiliary;
+
+                if (auxiliary == null) return false;
+
+                final own = auxiliary.predicate;
+
+                return own == null
+                    ? inflectedForms.contains(reading.verb)
+                    : pastForms(own.past).contains(reading.helper);
+              }),
+            );
 
             expect(
               inflectedForms.contains(written) ||
                   inflectedForms.contains(phrase) ||
-                  present.contains(written),
+                  present.contains(written) ||
+                  helped,
               isTrue,
               reason: '$language: "$phrase" is not a past $slot (${detail.sentence})',
             );
 
-            if (slot == SentenceSlot.verb && verbsChange) {
+            if (slot == SentenceSlot.verb && verbsChange && !helped) {
               expect(
                 !present.contains(written) || past.contains(written),
                 isTrue,
@@ -4074,7 +4823,16 @@ void main() {
               verb == 0 ? phrase.substring(0, 1).toLowerCase() + phrase.substring(1) : phrase;
 
           expect(
-            going.contains(written) || going.contains(phrase),
+            going.contains(written) ||
+                going.contains(phrase) ||
+                data.verbs.any(
+                  (group) =>
+                      group.requires == SentenceSlot.destination &&
+                      <String>[
+                        written,
+                        phrase,
+                      ].any((each) => writes(language, group, SentenceSlot.verb, each)),
+                ),
             isTrue,
             reason: '$language: "$phrase" goes nowhere, and has a destination (${detail.sentence})',
           );
@@ -4225,10 +4983,19 @@ void main() {
     test('a sentence that opens on `later` does not also say when', () {
       for (final language in <WordLanguage>[WordLanguage.ko, WordLanguage.en, WordLanguage.ja]) {
         final data = sentenceData[language]!;
-        final temporal = <String>[
-          for (final word in data.connectives[ConnectiveKind.temporal] ?? const <String>[])
-            data.capitalize ? upperFirst(word) : word,
-        ];
+        String written(String word) => data.capitalize ? upperFirst(word) : word;
+        // The ones that say when: time passing, and something new coming along
+        // just then. Read against every connective, longest first, because
+        // Japanese writes no space after one and `一方で` opens on `一方`.
+        final dating = <String>{
+          for (final word in <String>[
+            ...?data.connectives[ConnectiveKind.temporal],
+            ...?data.connectives[ConnectiveKind.turn],
+          ])
+            written(word),
+        };
+        final openers =
+            connectivesOf(language).map(written).toList()..sort((a, b) => b.length - a.length);
         final times = poolFor(language, SentenceSlot.time);
         var opened = 0;
 
@@ -4244,8 +5011,10 @@ void main() {
 
           for (var at = 0; at < detail.sentences.length; at += 1) {
             final sentence = detail.sentences[at];
+            final opener =
+                openers.where((word) => sentence.startsWith('$word${data.space}')).firstOrNull;
 
-            if (!temporal.any((word) => sentence.startsWith('$word${data.space}'))) continue;
+            if (opener == null || !dating.contains(opener)) continue;
 
             opened += 1;
 

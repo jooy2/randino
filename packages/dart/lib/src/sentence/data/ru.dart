@@ -205,30 +205,36 @@ final SentenceLanguageData ru = SentenceLanguageData(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.content,
-      words: words(r'''
-        смеётся улыбается напевает хихикает хохочет ухмыляется свистит ликует кивает подмигивает
-        сияет усмехается мурлычет
-      '''),
+      words: words(r'смеётся улыбается хихикает хохочет ухмыляется сияет усмехается мурлычет'),
       past: PredicateTense(
-        words: words(r'''
-          смеялся улыбался напевал хихикал хохотал ухмылялся свистел ликовал кивал подмигивал сиял
-          усмехался мурлыкал
-        '''),
+        words: words(r'смеялся улыбался хихикал хохотал ухмылялся сиял усмехался мурлыкал'),
       ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.content,
+      words: words(r'напевает свистит ликует кивает подмигивает'),
+      past: PredicateTense(words: words(r'напевал свистел ликовал кивал подмигивал')),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.restless,
       words: words(r'''
-        плачет вздыхает бормочет всхлипывает рыдает стонет ворчит хмурится фыркает морщится хмыкает
-        кряхтит охает ойкает дрожит вздрагивает ёжится бледнеет
+        плачет всхлипывает рыдает стонет фыркает дрожит вздрагивает ёжится бледнеет
       '''),
       past: PredicateTense(
-        words: words(r'''
-          плакал вздыхал бормотал всхлипывал рыдал стонал ворчал хмурился фыркал морщился хмыкал
-          кряхтел охал ойкал дрожал вздрагивал ёжился бледнел
-        '''),
+        words: words(r'плакал всхлипывал рыдал стонал фыркал дрожал вздрагивал ёжился бледнел'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      condition: Condition.restless,
+      words: words(r'вздыхает бормочет ворчит хмурится морщится хмыкает кряхтит охает ойкает'),
+      past: PredicateTense(
+        words: words(r'вздыхал бормотал ворчал хмурился морщился хмыкал кряхтел охал ойкал'),
       ),
     ),
     VerbGroup(
@@ -248,14 +254,16 @@ final SentenceLanguageData ru = SentenceLanguageData(
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'''
-        кричит восклицает ахает чихает икает краснеет визжит лепечет шмыгает пыхтит оглядывается
-      '''),
+      words: words(r'кричит ахает чихает икает визжит шмыгает пыхтит оглядывается'),
       past: PredicateTense(
-        words: words(r'''
-          кричал восклицал ахал чихал икал краснел визжал лепетал шмыгал пыхтел оглядывался
-        '''),
+        words: words(r'кричал ахал чихал икал визжал шмыгал пыхтел оглядывался'),
       ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.person],
+      words: words(r'восклицает краснеет лепечет'),
+      past: PredicateTense(words: words(r'восклицал краснел лепетал')),
     ),
     VerbGroup(
       field: VerbField.talk,
@@ -694,6 +702,71 @@ final SentenceLanguageData ru = SentenceLanguageData(
         тёплый холодный больной жёсткий мягкий шершавый гладкий бледный сильный онемевший тяжёлый
       '''),
     ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.find, VerbField.arrive],
+      words: words(r'здорово удачно'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.find, VerbField.look],
+      words: words(r'странно удивительно любопытно'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.lose],
+      words: words(r'обидно жаль досадно'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.eat, VerbField.cook, VerbField.drink],
+      words: words(r'вкусно'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.meet, VerbField.talk],
+      words: words(r'приятно весело'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.rest, VerbField.sleep],
+      words: words(r'уютно спокойно'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.make, VerbField.tend, VerbField.sell],
+      words: words(r'приятно'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.rise, VerbField.go, VerbField.move, VerbField.play],
+      words: words(r'весело свежо'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.search, VerbField.wait],
+      words: words(r'скучно тоскливо'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      after: const <VerbField>[VerbField.think],
+      words: words(r'странно'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[],
+      impersonal: true,
+      words: words(r'тихо холодно тепло прохладно спокойно темно'),
+    ),
   ],
   modifiers: <ModifierGroup>[
     ModifierGroup(
@@ -890,6 +963,7 @@ final SentenceLanguageData ru = SentenceLanguageData(
     ConnectiveKind.causal: words(
       r'поэтому в_итоге значит следовательно оттого стало_быть по_этой_причине',
     ),
+    ConnectiveKind.turn: words(r'внезапно в_этот_момент как_вдруг именно_тогда'),
   },
   traits: <NounTrait, WordPool>{
     NounTrait.flier: words(r'''
@@ -962,6 +1036,9 @@ final SentenceLanguageData ru = SentenceLanguageData(
     SentenceStyle.casual: words(r'я_дома наконец-то_дома! вот_я_и_дома снова_дома ну_вот_и_дома'),
   },
   degrees: words(r'очень довольно слишком весьма немного совсем крайне чрезвычайно ужасно слегка'),
+  auxiliaries: <SentenceAuxiliary>[
+    SentenceAuxiliary(kind: AuxiliaryKind.negative, template: 'не {v}'),
+  ],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
@@ -1013,5 +1090,10 @@ final SentenceLanguageData ru = SentenceLanguageData(
       SentencePart(SentenceSlot.verb),
       SentencePart(SentenceSlot.manner),
     ], 10),
+    SentenceFrame(<SentencePart>[SentencePart(SentenceSlot.state, pastHead: 'было')], 8),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state, pastHead: 'было'),
+    ], 8),
   ],
 );

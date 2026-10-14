@@ -229,6 +229,15 @@ class StoryStep:
     required: bool = False
     """A step every telling of the story has. The rest are drawn as room allows."""
 
+    fails: bool = False
+    """Whether the step is told as not coming off.
+
+    The hero looks and does not find it, lies down and cannot sleep — `하지만 열쇠를 찾지
+    못했다`, `But she could not sleep`. It changes nothing the field would have, leaves the
+    hero uneasy, and is never required, so a language with no way to say a thing did not
+    happen tells the story without it.
+    """
+
     link: ConnectiveKind | None = None
     """What a connective in front of this sentence may claim about the last one."""
 
@@ -351,6 +360,7 @@ STORIES: tuple[Story, ...] = (
         steps=(
             StoryStep("state", condition="restless"),
             StoryStep("act", fields=("search",), place=True, required=True),
+            StoryStep("act", fields=("find",), object="item", place=True, fails=True),
             StoryStep("act", fields=("look",), object="prop", place=True, link="additive"),
             StoryStep("act", fields=("wait",), place=True),
             StoryStep("act", fields=("go",), destination="elsewhere", link="temporal"),
@@ -468,6 +478,7 @@ STORIES: tuple[Story, ...] = (
             StoryStep("act", fields=("express",)),
             StoryStep("act", fields=("think",)),
             StoryStep("state", condition="tired"),
+            StoryStep("act", fields=("sleep",), fails=True),
             StoryStep("act", fields=("sleep",), required=True, link="temporal"),
             StoryStep("scene", fields=("change",), link="temporal", kinds=("trailing",)),
         ),
@@ -600,6 +611,7 @@ STORIES: tuple[Story, ...] = (
             ),
             StoryStep("state", condition="restless", link="causal"),
             StoryStep("act", fields=("search",), place=True, required=True, link="causal"),
+            StoryStep("act", fields=("find",), object="item", place=True, fails=True),
             StoryStep("act", fields=("wait",), place=True),
             StoryStep(
                 "act",

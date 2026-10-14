@@ -65,6 +65,12 @@ const REPLY_CHANCE: Record<VoiceMode, number> = { none: 0, some: 35, scene: 70 }
 // they are, where the step could be a line of their own instead.
 const ASK_CHANCE = 40;
 
+// How often something the hero did is followed by a reaction to it — `열쇠를
+// 찾았다. 정말 다행이었다.` — where the story can spare the step after it, and
+// the most one telling has: one in every `REACTION_SHARE` sentences.
+const REACTION_CHANCE = 35;
+const REACTION_SHARE = 4;
+
 // The fields a person may report in their own words — `“열쇠를 찾았어!”`, `“I
 // went to the market.”`, `“빵을 먹었어.”` — as against the ones nobody says aloud:
 // nobody reports having laughed or having looked. Told in the past, as a report
@@ -154,6 +160,15 @@ export type Beat = {
 	cue: ReplyCue | null;
 	/** Whether the sentence after this line answers it, which makes it said aloud. */
 	answered: boolean;
+	/**
+	 * Set for a reaction, which is not a step of the story either: a sentence
+	 * with no subject that says what the one before it was like — the field that
+	 * sentence's verb came from, or `'ambient'` after the place changing. `step` is
+	 * the one it reacts to, kept for bookkeeping the way a reply keeps the line's.
+	 */
+	reaction: VerbField | 'ambient' | null;
+	/** Whether this sentence tells its step as not coming off. */
+	fails: boolean;
 };
 
 export type Voice = 'line' | 'comment' | 'notice' | 'ask' | 'reply';
@@ -388,6 +403,16 @@ function after(
 	const state = new Set(memory.state);
 	const given = new Set(memory.given);
 	const said = new Set(memory.said);
+
+	// A step that does not come off changes nothing its field would have, and
+	// leaves the hero uneasy: the key still lost, the night still long.
+	if (step.fails) {
+		state.add('restless');
+		given.add('restless');
+		state.delete(OPPOSITES.restless!);
+
+		return { state, given, said };
+	}
 
 	// What the place or somebody else does changes nothing of the hero.
 	if (settled.field && step.kind !== 'scene' && step.kind !== 'other') {
@@ -640,6 +665,32 @@ function isAction(step: StoryStep): boolean {
 	return step.kind === 'act';
 }
 
+// The conditions a story is worse off for. A setback is one of these coming about.
+const SETBACKS: readonly Condition[] = ['restless', 'tired', 'hungry'];
+
+/**
+ * Whether a step is a setback: an action that leaves the hero uneasy, which is
+ * losing something, or a state that says one of `SETBACKS` straight after the
+ * story itself had made the opposite true.
+ */
+function setback(current: Settled): boolean {
+	if (current.step.fails) {
+		return true;
+	}
+
+	if (current.step.kind === 'act' && current.field) {
+		return (FIELD_RULES[current.field].gives ?? []).includes('restless');
+	}
+
+	if (current.step.kind === 'state' && current.condition && SETBACKS.includes(current.condition)) {
+		const opposite = OPPOSITES[current.condition]!;
+
+		return current.before.has(opposite) && current.given.has(opposite);
+	}
+
+	return false;
+}
+
 /**
  * The connectives a sentence may open on, by what it claims. A causal one is
  * kept only where the story has given it a reason: what this sentence needs, or
@@ -654,6 +705,14 @@ function linksFor(previous: Settled | null, current: Settled): readonly Connecti
 
 	if (!previous) {
 		return [];
+	}
+
+	// A setback cuts against what came before it, whatever the step asked for:
+	// losing what the hero carried, or the hero worn out, hungry or uneasy again
+	// just after the story had them otherwise — `그런데 열쇠를 잃어버렸다`, `But
+	// soon she was tired`.
+	if (setback(current)) {
+		return ['contrastive'];
 	}
 
 	if (asked === 'causal') {
@@ -677,6 +736,17 @@ function linksFor(previous: Settled | null, current: Settled): readonly Connecti
 			: ['additive', 'temporal'];
 	}
 
+	// Somebody else turning up, or the place changing, while the hero is about
+	// something, is something new coming along, and opens on what says so: `바로
+	// 그때 참새가 날아갔다`, `Just then the sky darkened`. One scene after another
+	// is a place described, which nothing interrupts.
+	if (
+		(current.step.kind === 'other' || current.step.kind === 'scene') &&
+		(previous.step.kind === 'act' || previous.step.kind === 'state')
+	) {
+		return ['turn'];
+	}
+
 	return asked ? [asked] : ['additive', 'temporal'];
 }
 
@@ -697,8 +767,15 @@ export function plan(
 	item: WordTheme | null,
 	count: number,
 	joinable: boolean,
-	spoken = true
+	spoken = true,
+	reactable = false,
+	denies = false
 ): Plan | null {
+	// A step that does not come off is told only where the language can say so.
+	if (!denies && story.steps.some((step) => step.fails)) {
+		story = { ...story, steps: story.steps.filter((step) => !step.fails) };
+	}
+
 	const required = story.steps.filter((step) => step.required);
 	// The prop is drawn once per telling, the way the item is drawn once per story.
 	const props = propThemesFor(data, story, hero);
@@ -816,7 +893,14 @@ export function plan(
 	const pairs: number[] = [];
 
 	for (let i = 0; i + 1 < settled!.length; i += 1) {
-		if (isAction(settled![i].step) && isAction(settled![i + 1].step)) {
+		// A step that does not come off is said on its own: as a first clause it
+		// would link on to the next rather than say it did not happen.
+		if (
+			isAction(settled![i].step) &&
+			isAction(settled![i + 1].step) &&
+			!settled![i].step.fails &&
+			!settled![i + 1].step.fails
+		) {
 			pairs.push(i);
 		}
 	}
@@ -902,23 +986,33 @@ export function plan(
 
 	settled = voices.settled;
 
+	const reactions = reactable
+		? reactionsFor(data, hero, item, prop, chosen, settled!, joined, voices.voice)
+		: { reaction: settled!.map(() => null), settled: null };
+
+	settled = reactions.settled ?? settled;
+
 	const beats: Beat[] = settled!.map((one, i) => ({
 		step: one.step,
 		field: one.field,
 		condition: one.condition,
 		before: one.before,
-		links: linksFor(i > 0 ? settled![i - 1] : null, one),
+		// A reaction stands bare: `정말 다행이었다`, with nothing in front of it to say
+		// how it follows, because what it follows is the whole of what it is about.
+		links: reactions.reaction[i] ? [] : linksFor(i > 0 ? settled![i - 1] : null, one),
 		// A kind beside the statement is the step's own, and `trailing` is kept for
 		// the sentence that closes the result — a paragraph that trails off in the
-		// middle has not trailed off.
-		kinds: (one.step.kinds ?? []).filter(
-			(kind) => kind !== 'trailing' || i === settled!.length - 1
-		),
+		// middle has not trailed off. A reaction may be exclaimed.
+		kinds: reactions.reaction[i]
+			? ['exclamation']
+			: (one.step.kinds ?? []).filter((kind) => kind !== 'trailing' || i === settled!.length - 1),
 		join: joined.has(i) ? 'first' : joined.has(i - 1) ? 'second' : null,
 		voice: voices.voice[i],
 		asked: voices.asked[i],
 		cue: voices.cue[i],
-		answered: voices.answered[i]
+		answered: voices.answered[i],
+		reaction: reactions.reaction[i],
+		fails: !reactions.reaction[i] && voices.voice[i] !== 'reply' && one.step.fails === true
 	}));
 
 	return { story, beats, prop };
@@ -999,6 +1093,7 @@ function voicesFor(
 	 * the language's own words where it has them, first person or not.
 	 */
 	const reportable = (one: Settled): boolean =>
+		!one.step.fails &&
 		data.speech !== undefined &&
 		one.step.kind === 'act' &&
 		one.field !== null &&
@@ -1017,6 +1112,11 @@ function voicesFor(
 	const voicesOf = (one: Settled): Voice[] => {
 		const step = one.step;
 		const out: Voice[] = [];
+
+		// What did not come off is narrated: `“열쇠를 찾았어!”` would say it did.
+		if (step.fails) {
+			return out;
+		}
 
 		if (step.kind === 'state' && one.condition !== null) {
 			if (data.speech) {
@@ -1176,6 +1276,108 @@ function voicesFor(
 	}
 
 	return { voice, asked, cue, answered, settled };
+}
+
+/**
+ * Whether the language can react to a sentence of this field: it has a shape
+ * with no subject, and a group that answers the field or fits after anything.
+ */
+function reacts(data: SentenceLanguageData, reaction: VerbField | 'ambient'): boolean {
+	return (
+		data.frames.some(
+			(frame) => !frame.parts.some((part) => part.slot === 'subject' || part.slot === 'quantity')
+		) &&
+		data.states.some(
+			(group) =>
+				group.impersonal &&
+				(!group.after || (reaction !== 'ambient' && group.after.includes(reaction)))
+		)
+	);
+}
+
+/**
+ * Which sentences of a telling are reactions to the one before.
+ *
+ * A reaction follows something the hero did, or the place changing, and takes
+ * the place of the step after it the way an answer does — where that step is
+ * not one the story needs, is a whole sentence nobody speaks, and the rest of
+ * the telling still walks without it. Never two in a row, never straight after
+ * a line, and no more than one in every `REACTION_SHARE` sentences.
+ */
+function reactionsFor(
+	data: SentenceLanguageData,
+	hero: NounClass,
+	item: WordTheme | null,
+	prop: WordTheme | null,
+	chosen: StoryStep[],
+	settled: Settled[],
+	joined: ReadonlySet<number>,
+	voice: readonly (Voice | null)[]
+): { reaction: (VerbField | 'ambient' | null)[]; settled: Settled[] | null } {
+	const reaction: (VerbField | 'ambient' | null)[] = settled.map(() => null);
+	const most = Math.max(1, Math.floor(settled.length / REACTION_SHARE));
+	const whole = (i: number) => !joined.has(i) && !joined.has(i - 1);
+	let made = 0;
+	let changed = false;
+
+	for (let i = 0; i + 1 < settled.length && made < most; i += 1) {
+		const one = settled[i];
+		const next = i + 1;
+		const answered =
+			one.step.kind === 'act' && one.field !== null
+				? one.field
+				: one.step.kind === 'scene'
+					? 'ambient'
+					: null;
+
+		// A reaction is the hero's, so it waits for a sentence about the hero: one
+		// after the opening scene would have nobody yet to be about.
+		const heard = settled
+			.slice(0, i + 1)
+			.some((each) => each.step.kind === 'act' || each.step.kind === 'state');
+
+		if (
+			answered === null ||
+			one.step.fails === true ||
+			!heard ||
+			voice[i] !== null ||
+			voice[next] !== null ||
+			reaction[i] !== null ||
+			!whole(next) ||
+			settled[next].step.required ||
+			!reacts(data, answered) ||
+			!chance(REACTION_CHANCE)
+		) {
+			continue;
+		}
+
+		const rest = walkFrom(data, chosen.slice(next + 1), hero, item, prop, settled[next].memory);
+
+		if (!rest) {
+			continue;
+		}
+
+		chosen[next] = one.step;
+		settled.splice(
+			next,
+			settled.length - next,
+			{
+				step: one.step,
+				field: null,
+				condition: null,
+				before: settled[next].before,
+				given: settled[next].given,
+				memory: settled[next].memory
+			},
+			...rest
+		);
+		reaction[next] = answered;
+		made += 1;
+		changed = true;
+		i = next;
+	}
+
+	return { reaction, settled: changed ? settled : null };
 }
 
 /** One story out of several, by weight. */

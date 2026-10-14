@@ -1,6 +1,11 @@
 import { conjugate, words } from '../../_internal/parse.js';
 import type { WordPool } from '../../word/data/types.js';
-import type { PredicateTense, SentenceLanguageData } from './types.js';
+import type {
+	PredicateForms,
+	PredicateJoints,
+	PredicateTense,
+	SentenceLanguageData
+} from './types.js';
 
 // Every Korean past form is one stem and one ending: `달렸` closes on `ㅆ`, and
 // so does every other past stem, so `다`, `니`, `구나`, `어요` and `습니다` attach
@@ -53,6 +58,14 @@ function dropL(stem: string): string {
 	return finalOf(stem) === FINAL_L ? closeOn(stem, 0) : stem;
 }
 
+/**
+ * A stem as `conjugate` reads it: one whitespace-separated entry, so a stem of two
+ * words — `배를 문질렀` — carries its space as the `_` that `words` turns back.
+ */
+function stemOf(stem: string): string {
+	return stem.replace(/ /g, '_');
+}
+
 /** Every alternative of one ending, attached to one base. */
 function attach(base: string, endings: string): string {
 	return endings
@@ -82,6 +95,7 @@ function koVerbs(entries: string): {
 		WordPool
 	>;
 	past: PredicateTense;
+	joints: PredicateJoints;
 } {
 	const pairs = words(entries).map((entry) => entry.split(':') as [string, string, string?]);
 	const stems = pairs.map(([stem]) => stem);
@@ -109,7 +123,10 @@ function koVerbs(entries: string): {
 			),
 			linking: stems.map((stem, i) => (leads[i] ? `${casual[i]}서|${stem}고` : `${stem}고`))
 		},
-		past: conjugate(casual.map((form) => closeOn(form, FINAL_SS)).join(' '), PAST)
+		past: conjugate(casual.map((form) => stemOf(closeOn(form, FINAL_SS))).join(' '), PAST),
+		// The stem as it is, which `-고 싶다`, `-지 않다` and `-기 시작하다` attach to:
+		// `놀고`, `걷지`, `굽기`. The 해체 form is the other joint, and it is `casual`.
+		joints: { stem: stems }
 	};
 }
 
@@ -133,6 +150,7 @@ function koStates(entries: string): {
 		WordPool
 	>;
 	past: PredicateTense;
+	joints: PredicateJoints;
 } {
 	const triples = words(entries).map((entry) => entry.split(':') as [string, string, string]);
 	const stems = triples.map(([stem]) => stem);
@@ -157,8 +175,25 @@ function koStates(entries: string): {
 				closed[i] ? `${base}습니까` : `${closeOn(base, FINAL_B)}니까`
 			)
 		},
-		past: conjugate(casual.map((form) => closeOn(form, FINAL_SS)).join(' '), PAST)
+		past: conjugate(casual.map((form) => stemOf(closeOn(form, FINAL_SS))).join(' '), PAST),
+		joints: { stem: stems }
 	};
+}
+
+/**
+ * An auxiliary as a predicate of its own: a verb or a state spelt the way any
+ * other is, with no linking form, because a clause that links carries none.
+ */
+function auxiliary(spelt: { words: WordPool; forms: PredicateForms; past: PredicateTense }): {
+	words: WordPool;
+	forms: PredicateForms;
+	past: PredicateTense;
+} {
+	const forms: PredicateForms = Object.fromEntries(
+		Object.entries(spelt.forms).filter(([form]) => form !== 'linking')
+	);
+
+	return { words: spelt.words, forms, past: spelt.past };
 }
 
 export const KO: SentenceLanguageData = {
@@ -179,8 +214,8 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			...koVerbs(
 				`
-				일어나:일어나:서 일어서:일어서:서 깨어나:깨어나:서 눈뜨:눈떠:서 잠깨:잠깨:서 기지개켜:기지개켜:서 몸을일으키:몸을일으켜:서 정신차리:정신차려:서
-				눈을뜨:눈을떠:서 잠에서깨:잠에서깨:서 깨:깨:서 정신들:정신들어:서 몸을펴:몸을펴:서 기운차리:기운차려:서
+				일어나:일어나:서 일어서:일어서:서 깨어나:깨어나:서 눈뜨:눈떠:서 잠깨:잠깨:서 기지개_켜:기지개_켜:서 몸을_일으키:몸을_일으켜:서 정신_차리:정신_차려:서
+				눈을_뜨:눈을_떠:서 잠에서_깨:잠에서_깨:서 깨:깨:서 정신_들:정신_들어:서 몸을_펴:몸을_펴:서 기운_차리:기운_차려:서
 			`
 			)
 		},
@@ -204,7 +239,7 @@ export const KO: SentenceLanguageData = {
 			// Running somewhere is for legs: a fish and a snake go, and do not run.
 			subjectWithout: ['swimmer', 'crawler'],
 			...koVerbs(
-				`달려가:달려가:서 걸어가:걸어가:서 뛰어가:뛰어가:서 서둘러가:서둘러가:서 뛰쳐가:뛰쳐가:서 내달려가:내달려가:서`
+				`달려가:달려가:서 걸어가:걸어가:서 뛰어가:뛰어가:서 서둘러_가:서둘러_가:서 뛰쳐가:뛰쳐가:서 내달려가:내달려가:서`
 			)
 		},
 		{
@@ -212,8 +247,8 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			...koVerbs(
 				`
-				떠나:떠나:서 나서:나서:서 출발하:출발해:서 길을떠나:길을떠나:서 길을나서:길을나서:서 자리를뜨:자리를떠:서 발길을돌리:발길을돌려:서 걸음을옮기:걸음을옮겨:서
-				작별하:작별해:서 발을떼:발을떼:서 채비하:채비해:서 짐을싸:짐을싸:서
+				떠나:떠나:서 나서:나서:서 출발하:출발해:서 길을_떠나:길을_떠나:서 길을_나서:길을_나서:서 자리를_뜨:자리를_떠:서 발길을_돌리:발길을_돌려:서 걸음을_옮기:걸음을_옮겨:서
+				작별하:작별해:서 발을_떼:발을_떼:서 채비하:채비해:서 짐을_싸:짐을_싸:서
 			`
 			)
 		},
@@ -224,7 +259,7 @@ export const KO: SentenceLanguageData = {
 			...koVerbs(
 				`
 				들어오:들어와:서 닿:닿아:서 이르:이르러:서 다다르:다다라:서 들어서:들어서:서 찾아오:찾아와:서 다가오:다가와:서 건너오:건너와:서 도달하:도달해:서 당도하:당도해:서
-				발을들이:발을들여:서 들이닥치:들이닥쳐:서
+				발을_들이:발을_들여:서 들이닥치:들이닥쳐:서
 			`
 			)
 		},
@@ -233,7 +268,7 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			...koVerbs(
 				`
-				돌아오:돌아와:서 도착하:도착해:서 돌아가:돌아가:서 귀가하:귀가해:서 복귀하:복귀해:서 되돌아오:되돌아와:서 되돌아가:되돌아가:서 집에오:집에와:서
+				돌아오:돌아와:서 도착하:도착해:서 돌아가:돌아가:서 귀가하:귀가해:서 복귀하:복귀해:서 되돌아오:되돌아와:서 되돌아가:되돌아가:서 집에_오:집에_와:서
 				귀환하:귀환해:서 돌아들:돌아들어:서
 			`
 			)
@@ -246,8 +281,8 @@ export const KO: SentenceLanguageData = {
 			...koVerbs(
 				`
 				달리:달려 걷:걸어 뛰:뛰어 서성이:서성여 지나가:지나가 어슬렁대:어슬렁대 뛰어다니:뛰어다녀 거닐:거닐어 산책하:산책해 돌아다니:돌아다녀 뛰어나가:뛰어나가 걸어다니:걸어다녀
-				껑충뛰:껑충뛰어 성큼성큼걷:성큼성큼걸어 종종걸음치:종종걸음쳐 활보하:활보해 질주하:질주해 배회하:배회해 총총거리:총총거려 내달리:내달려 뛰쳐나가:뛰쳐나가 발을구르:발을굴러
-				내닫:내달아 어정거리:어정거려 휘적휘적걷:휘적휘적걸어 타박타박걷:타박타박걸어 뒷걸음질치:뒷걸음질쳐 앞장서:앞장서 발을내딛:발을내디뎌 종종거리:종종거려 어정대:어정대
+				껑충_뛰:껑충_뛰어 성큼성큼_걷:성큼성큼_걸어 종종걸음치:종종걸음쳐 활보하:활보해 질주하:질주해 배회하:배회해 총총거리:총총거려 내달리:내달려 뛰쳐나가:뛰쳐나가 발을_구르:발을_굴러
+				내닫:내달아 어정거리:어정거려 휘적휘적_걷:휘적휘적_걸어 타박타박_걷:타박타박_걸어 뒷걸음질치:뒷걸음질쳐 앞장서:앞장서 발을_내딛:발을_내디뎌 종종거리:종종거려 어정대:어정대
 			`
 			)
 		},
@@ -258,7 +293,7 @@ export const KO: SentenceLanguageData = {
 			...koVerbs(
 				`
 				맴돌:맴돌아 오가:오가 움직이:움직여 물러나:물러나 떠돌:떠돌아 돌아서:돌아서 다가서:다가서 비켜서:비켜서
-				스치:스쳐 지나치:지나쳐 비켜나:비켜나 몸을돌리:몸을돌려 자리를옮기:자리를옮겨 오르내리:오르내려
+				스치:스쳐 지나치:지나쳐 비켜나:비켜나 몸을_돌리:몸을_돌려 자리를_옮기:자리를_옮겨 오르내리:오르내려
 			`
 			)
 		},
@@ -268,7 +303,7 @@ export const KO: SentenceLanguageData = {
 			// A fish's, a whale's and a mermaid's; a lion does not swim here.
 			subjectTraits: ['swimmer'],
 			...koVerbs(
-				`헤엄치:헤엄쳐 유영하:유영해 자맥질하:자맥질해 헤엄쳐다니:헤엄쳐다녀 물장구치:물장구쳐 잠수하:잠수해 떠다니:떠다녀 물살을가르:물살을갈라 물속을누비:물속을누벼`
+				`헤엄치:헤엄쳐 유영하:유영해 자맥질하:자맥질해 헤엄쳐다니:헤엄쳐다녀 물장구치:물장구쳐 잠수하:잠수해 떠다니:떠다녀 물살을_가르:물살을_갈라 물속을_누비:물속을_누벼`
 			)
 		},
 		{
@@ -277,7 +312,7 @@ export const KO: SentenceLanguageData = {
 			// A snake's, a snail's and a beetle's.
 			subjectTraits: ['crawler'],
 			...koVerbs(
-				`기어가:기어가 기어다니:기어다녀 꿈틀거리:꿈틀거려 기어오르:기어올라 기어나오:기어나와 기:기어 스멀거리:스멀거려 굼실거리:굼실거려 기어들:기어들어 몸을비틀:몸을비틀어`
+				`기어가:기어가 기어다니:기어다녀 꿈틀거리:꿈틀거려 기어오르:기어올라 기어나오:기어나와 기:기어 스멀거리:스멀거려 굼실거리:굼실거려 기어들:기어들어 몸을_비틀:몸을_비틀어`
 			)
 		},
 		{
@@ -288,7 +323,7 @@ export const KO: SentenceLanguageData = {
 			...koVerbs(
 				`
 				날아오르:날아올라 날:날아 날아다니:날아다녀 날갯짓하:날갯짓해 날아가:날아가 날아내리:날아내려 활공하:활공해 퍼덕이:퍼덕여 솟구치:솟구쳐 내려앉:내려앉아
-				날아들:날아들어 비상하:비상해 선회하:선회해 활강하:활강해 날개를펴:날개를펴 하늘을가르:하늘을갈라
+				날아들:날아들어 비상하:비상해 선회하:선회해 활강하:활강해 날개를_펴:날개를_펴 하늘을_가르:하늘을_갈라
 			`
 			)
 		},
@@ -296,36 +331,47 @@ export const KO: SentenceLanguageData = {
 			field: 'wait',
 			subject: ['creature', 'person'],
 			...koVerbs(
-				`기다리:기다려 두리번거리:두리번거려 숨:숨어 뒤척이:뒤척여 머뭇거리:머뭇거려 기웃거리:기웃거려 멈추:멈춰 멈춰서:멈춰서 망설이:망설여 주저하:주저해 숨죽이:숨죽여 귀기울이:귀기울여 눈치보:눈치봐 우물쭈물하:우물쭈물해 대기하:대기해 쭈뼛거리:쭈뼛거려 곁눈질하:곁눈질해`
+				`기다리:기다려 두리번거리:두리번거려 숨:숨어 뒤척이:뒤척여 머뭇거리:머뭇거려 기웃거리:기웃거려 멈추:멈춰 멈춰서:멈춰서 망설이:망설여 주저하:주저해 숨죽이:숨죽여 귀_기울이:귀_기울여 눈치_보:눈치_봐 우물쭈물하:우물쭈물해 대기하:대기해 쭈뼛거리:쭈뼛거려 곁눈질하:곁눈질해`
 			)
 		},
 		{
 			field: 'rest',
 			subject: ['creature', 'person'],
 			...koVerbs(
-				`쉬:쉬어 앉:앉아:서 눕:누워:서 웅크리:웅크려 드러눕:드러누워:서 걸터앉:걸터앉아:서 기대:기대:서 주저앉:주저앉아:서 쭈그리:쭈그려:서 엎드리:엎드려:서 한숨돌리:한숨돌려 휴식하:휴식해 늘어지:늘어져 숨을고르:숨을골라 자리잡:자리잡아:서 다리를뻗:다리를뻗어`
+				`쉬:쉬어 앉:앉아:서 눕:누워:서 웅크리:웅크려 드러눕:드러누워:서 걸터앉:걸터앉아:서 기대:기대:서 주저앉:주저앉아:서 쭈그리:쭈그려:서 엎드리:엎드려:서 한숨_돌리:한숨_돌려 휴식하:휴식해 늘어지:늘어져 숨을_고르:숨을_골라 자리잡:자리잡아:서 다리를_뻗:다리를_뻗어`
 			)
 		},
 		{
 			field: 'sleep',
 			subject: ['creature', 'person'],
 			...koVerbs(
-				`잠자:잠자 잠들:잠들어 졸:졸아 꾸벅이:꾸벅여 잠에빠지:잠에빠져 곯아떨어지:곯아떨어져 눈을붙이:눈을붙여 낮잠자:낮잠자 선잠들:선잠들어 잠을청하:잠을청해 코를골:코를골아 꿈나라로가:꿈나라로가`
+				`잠자:잠자 잠들:잠들어 졸:졸아 꾸벅이:꾸벅여 잠에_빠지:잠에_빠져 곯아떨어지:곯아떨어져 눈을_붙이:눈을_붙여 낮잠자:낮잠자 선잠_들:선잠_들어 잠을_청하:잠을_청해 코를_골:코를_골아 꿈나라로_가:꿈나라로_가`
 			)
 		},
 		// What somebody shows, split by what it shows: a story draws the group that
 		// matches what is true of its hero, so the hero laughs after the meal and
 		// sighs after losing the key. The last group shows nothing in particular and
 		// is what a story falls back on.
+		// What anything with a face can show. A fox laughs in a story and a sea
+		// cucumber does not clear its throat in any: what takes hands, shoulders or
+		// words is a person's alone, in the groups after these.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
 			...koVerbs(
+				`웃:웃어 미소_짓:미소_지어 웃음짓:웃음지어 기뻐하:기뻐해 방긋_웃:방긋_웃어 활짝_웃:활짝_웃어 신나하:신나해 들뜨:들떠`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
+			...koVerbs(
 				`
-				웃:웃어 미소짓:미소지어 콧노래하:콧노래해 킥킥거리:킥킥거려 깔깔대:깔깔대 환호하:환호해 히죽거리:히죽거려 흥얼거리:흥얼거려 웃음짓:웃음지어 손뼉치:손뼉쳐
-				감탄하:감탄해 안도하:안도해 고개를끄덕이:고개를끄덕여 싱글벙글하:싱글벙글해 방긋웃:방긋웃어 활짝웃:활짝웃어 빙긋거리:빙긋거려 기뻐하:기뻐해 함박웃음짓:함박웃음지어
-				콧노래를부르:콧노래를불러 어깨를들썩이:어깨를들썩여
+				킥킥거리:킥킥거려 깔깔대:깔깔대 환호하:환호해 히죽거리:히죽거려 흥얼거리:흥얼거려 손뼉치:손뼉쳐
+				감탄하:감탄해 안도하:안도해 고개를_끄덕이:고개를_끄덕여 싱글벙글하:싱글벙글해 빙긋거리:빙긋거려 함박웃음_짓:함박웃음_지어
+				콧노래를_부르:콧노래를_불러 어깨를_들썩이:어깨를_들썩여
 			`
 			)
 		},
@@ -334,10 +380,18 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'restless',
 			...koVerbs(
+				`씩씩거리:씩씩거려 발을_구르:발을_굴러 안절부절못하:안절부절못해 울:울어 흐느끼:흐느껴 훌쩍이:훌쩍여 성내:성내 눈을_흘기:눈을_흘겨`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
+			...koVerbs(
 				`
-				한숨짓:한숨지어 중얼거리:중얼거려 투덜거리:투덜거려 혼잣말하:혼잣말해 탄식하:탄식해 고개를젓:고개를저어 짜증내:짜증내 씩씩거리:씩씩거려 입을삐죽이:입을삐죽여
-				발을구르:발을굴러 안절부절못하:안절부절못해 손톱을물어뜯:손톱을물어뜯어 입술을깨물:입술을깨물어 눈살을찌푸리:눈살을찌푸려 머리를긁:머리를긁어 볼멘소리하:볼멘소리해
-				울:울어 흐느끼:흐느껴 훌쩍이:훌쩍여 눈물짓:눈물지어 화내:화내 성내:성내 눈을흘기:눈을흘겨 코웃음치:코웃음쳐 한숨을내쉬:한숨을내쉬어 이마를짚:이마를짚어
+				한숨짓:한숨지어 중얼거리:중얼거려 투덜거리:투덜거려 혼잣말하:혼잣말해 탄식하:탄식해 고개를_젓:고개를_저어 짜증내:짜증내 입을_삐죽이:입을_삐죽여
+				손톱을_물어뜯:손톱을_물어뜯어 입술을_깨물:입술을_깨물어 눈살을_찌푸리:눈살을_찌푸려 머리를_긁:머리를_긁어 볼멘소리를_하:볼멘소리를_해
+				눈물짓:눈물지어 화내:화내 코웃음치:코웃음쳐 한숨을_내쉬:한숨을_내쉬어 이마를_짚:이마를_짚어
 			`
 			)
 		},
@@ -346,7 +400,15 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'tired',
 			...koVerbs(
-				`하품하:하품해 눈을비비:눈을비벼 어깨를주무르:어깨를주물러 목을돌리:목을돌려 허리를두드리:허리를두드려 눈을깜빡이:눈을깜빡여 고개를떨구:고개를떨궈 하품을참:하품을참아`
+				`하품하:하품해 눈을_비비:눈을_비벼 눈을_깜빡이:눈을_깜빡여 고개를_떨구:고개를_떨궈 하품을_참:하품을_참아 꾸벅거리:꾸벅거려`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'tired',
+			...koVerbs(
+				`어깨를_주무르:어깨를_주물러 목을_돌리:목을_돌려 허리를_두드리:허리를_두드려 기지개_켜:기지개_켜`
 			)
 		},
 		{
@@ -354,17 +416,30 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'hungry',
 			...koVerbs(
-				`침을삼키:침을삼켜 군침을흘리:군침을흘려 배를문지르:배를문질러 입맛을다시:입맛을다셔 코를킁킁거리:코를킁킁거려 배를움켜쥐:배를움켜쥐어 입을다시:입을다셔`
+				`침을_삼키:침을_삼켜 군침을_흘리:군침을_흘려 코를_킁킁거리:코를_킁킁거려 입을_다시:입을_다셔 입맛을_다시:입맛을_다셔`
 			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'hungry',
+			...koVerbs(`배를_문지르:배를_문질러 배를_움켜쥐:배를_움켜쥐어`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...koVerbs(
 				`
-				소리치:소리쳐 외치:외쳐 놀라:놀라 어리둥절하:어리둥절해 헛기침하:헛기침해 어깨를으쓱하:어깨를으쓱해
-				고개를갸웃하:고개를갸웃해 눈을크게뜨:눈을크게떠 숨을들이켜:숨을들이켜 멈칫하:멈칫해 기지개켜:기지개켜 심호흡하:심호흡해 뒤돌아보:뒤돌아봐 고개를들:고개를들어
+				소리치:소리쳐 놀라:놀라 어리둥절하:어리둥절해 고개를_갸웃하:고개를_갸웃해 눈을_크게_뜨:눈을_크게_떠 멈칫하:멈칫해
+				뒤돌아보:뒤돌아봐 고개를_들:고개를_들어 움찔하:움찔해 몸을_떨:몸을_떨어
 			`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			...koVerbs(
+				`외치:외쳐 헛기침하:헛기침해 어깨를_으쓱하:어깨를_으쓱해 숨을_들이켜:숨을_들이켜 심호흡하:심호흡해 기지개_켜:기지개_켜`
 			)
 		},
 		{
@@ -372,9 +447,9 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			...koVerbs(
 				`
-				이야기하:이야기해 수다떨:수다떨어 대화하:대화해 말하:말해 담소하:담소해 잡담하:잡담해 떠들:떠들어 속삭이:속삭여 재잘거리:재잘거려 얘기하:얘기해 수군거리:수군거려
-				이야기를나누:이야기를나눠 말을건네:말을건네
-				인사하:인사해 소곤거리:소곤거려 되묻:되물어 대답하:대답해 설명하:설명해 말을붙이:말을붙여 화답하:화답해 중얼대:중얼대
+				이야기하:이야기해 수다_떨:수다_떨어 대화하:대화해 말하:말해 담소하:담소해 잡담하:잡담해 떠들:떠들어 속삭이:속삭여 재잘거리:재잘거려 얘기하:얘기해 수군거리:수군거려
+				이야기를_나누:이야기를_나눠 말을_건네:말을_건네
+				인사하:인사해 소곤거리:소곤거려 되묻:되물어 대답하:대답해 설명하:설명해 말을_붙이:말을_붙여 화답하:화답해 중얼대:중얼대
 			`
 			)
 		},
@@ -384,8 +459,8 @@ export const KO: SentenceLanguageData = {
 			...koVerbs(
 				`
 				춤추:춤춰 노래하:노래해 뒹굴:뒹굴어 뛰놀:뛰놀아 장난치:장난쳐 뛰어오르:뛰어올라 폴짝거리:폴짝거려 구르:굴러 놀:놀아 뛰어놀:뛰어놀아 까불:까불어 재롱부리:재롱부려
-				깡충거리:깡충거려 숨바꼭질하:숨바꼭질해 신나하:신나해 물장난치:물장난쳐 공놀이하:공놀이해 노닐:노닐어 재주넘:재주넘어 빙글빙글돌:빙글빙글돌아
-				물놀이하:물놀이해 술래잡기하:술래잡기해 그네타:그네타 미끄럼타:미끄럼타 팽이치:팽이쳐 연날리:연날려 딱지치:딱지쳐 공차:공차 줄넘기하:줄넘기해
+				깡충거리:깡충거려 숨바꼭질하:숨바꼭질해 신나하:신나해 물장난_치:물장난_쳐 공놀이하:공놀이해 노닐:노닐어 재주를_넘:재주를_넘어 빙글빙글_돌:빙글빙글_돌아
+				물놀이하:물놀이해 술래잡기하:술래잡기해 그네_타:그네_타 미끄럼_타:미끄럼_타 팽이_치:팽이_쳐 연_날리:연_날려 딱지_치:딱지_쳐 공_차:공_차 줄넘기하:줄넘기해
 			`
 			)
 		},
@@ -394,7 +469,7 @@ export const KO: SentenceLanguageData = {
 			subject: ['person', 'creature'],
 			object: ['idea', 'event', 'place'],
 			...koVerbs(
-				`꿈꾸:꿈꿔 기억하:기억해 잊:잊어 상상하:상상해 헤아리:헤아려 떠올리:떠올려 그리워하:그리워해 궁금해하:궁금해해 생각하:생각해 되새기:되새겨 고민하:고민해 곱씹:곱씹어 걱정하:걱정해 궁리하:궁리해 회상하:회상해 추억하:추억해 믿:믿어 기대하:기대해 이해하:이해해 깨닫:깨달아 잊어버리:잊어버려 동경하:동경해 예감하:예감해 떠올려보:떠올려봐`
+				`꿈꾸:꿈꿔 기억하:기억해 잊:잊어 상상하:상상해 헤아리:헤아려 떠올리:떠올려 그리워하:그리워해 궁금해하:궁금해해 생각하:생각해 되새기:되새겨 고민하:고민해 곱씹:곱씹어 걱정하:걱정해 궁리하:궁리해 회상하:회상해 추억하:추억해 믿:믿어 기대하:기대해 이해하:이해해 깨닫:깨달아 잊어버리:잊어버려 동경하:동경해 예감하:예감해 `
 			)
 		},
 		{
@@ -419,7 +494,7 @@ export const KO: SentenceLanguageData = {
 				'drink'
 			],
 			...koVerbs(
-				`보:봐 바라보:바라봐 살피:살펴 들여다보:들여다봐 구경하:구경해 만지:만져 쓰다듬:쓰다듬어 지켜보:지켜봐 쳐다보:쳐다봐 훑어보:훑어봐 노려보:노려봐 응시하:응시해 관찰하:관찰해 뜯어보:뜯어봐 눈여겨보:눈여겨봐 어루만지:어루만져 만져보:만져봐 내려다보:내려다봐 올려다보:올려다봐 두드리:두드려 냄새맡:냄새맡아 감상하:감상해`
+				`보:봐 바라보:바라봐 살피:살펴 들여다보:들여다봐 구경하:구경해 만지:만져 쓰다듬:쓰다듬어 지켜보:지켜봐 쳐다보:쳐다봐 훑어보:훑어봐 노려보:노려봐 응시하:응시해 관찰하:관찰해 뜯어보:뜯어봐 눈여겨보:눈여겨봐 어루만지:어루만져 내려다보:내려다봐 올려다보:올려다봐 두드리:두드려 냄새_맡:냄새_맡아 감상하:감상해`
 			)
 		},
 		{
@@ -427,9 +502,9 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			...koVerbs(
 				`
-				찾아다니:찾아다녀 헤매:헤매 둘러보:둘러봐 살펴보:살펴봐 뒤지:뒤져 뒤적이:뒤적여 수색하:수색해 탐색하:탐색해 물색하:물색해 더듬:더듬어 샅샅이뒤지:샅샅이뒤져 파헤치:파헤쳐
-				탐험하:탐험해 살펴다니:살펴다녀 찾아헤매:찾아헤매
-				뒤져보:뒤져봐 찾아보:찾아봐 헤집:헤집어 훑:훑어 두리번대:두리번대
+				찾아다니:찾아다녀 헤매:헤매 둘러보:둘러봐 살펴보:살펴봐 뒤지:뒤져 뒤적이:뒤적여 수색하:수색해 탐색하:탐색해 물색하:물색해 더듬:더듬어 샅샅이_뒤지:샅샅이_뒤져 파헤치:파헤쳐
+				탐험하:탐험해 살펴다니:살펴다녀 찾아_헤매:찾아_헤매
+				찾아보:찾아봐 헤집:헤집어 훑:훑어 두리번대:두리번대
 			`
 			)
 		},
@@ -456,8 +531,8 @@ export const KO: SentenceLanguageData = {
 			],
 			...koVerbs(
 				`
-				찾:찾아:서 발견하:발견해 줍:주워:서 찾아내:찾아내:서 건지:건져:서 집어들:집어들어:서 알아보:알아봐:서 캐내:캐내:서 손에넣:손에넣어:서 주워들:주워들어:서 되찾:되찾아:서
-				알아채:알아채:서 캐:캐:서 골라내:골라내:서 주워담:주워담아:서
+				찾:찾아:서 발견하:발견해 줍:주워:서 찾아내:찾아내:서 건지:건져:서 집어_들:집어_들어:서 알아보:알아봐:서 캐내:캐내:서 손에_넣:손에_넣어:서 주워_들:주워_들어:서 되찾:되찾아:서
+				알아채:알아채:서 캐:캐:서 골라내:골라내:서 주워_담:주워_담아:서
 			`
 			)
 		},
@@ -483,7 +558,7 @@ export const KO: SentenceLanguageData = {
 				'drink'
 			],
 			...koVerbs(
-				`챙기:챙겨:서 고르:골라:서 집:집어:서 얻:얻어:서 받:받아:서 꺼내:꺼내:서 움켜쥐:움켜쥐어 잡:잡아:서 쥐:쥐어:서 들:들어:서 가지:가져:서 붙잡:붙잡아:서 붙들:붙들어:서 낚아채:낚아채:서 집어올리:집어올려:서 건네받:건네받아:서 추리:추려:서 골라잡:골라잡아:서 챙겨들:챙겨들어:서 물:물어:서`
+				`챙기:챙겨:서 고르:골라:서 집:집어:서 얻:얻어:서 받:받아:서 꺼내:꺼내:서 움켜쥐:움켜쥐어 잡:잡아:서 쥐:쥐어:서 들:들어:서 가지:가져:서 붙잡:붙잡아:서 붙들:붙들어:서 낚아채:낚아채:서 집어_올리:집어_올려:서 건네받:건네받아:서 추리:추려:서 골라잡:골라잡아:서 챙겨_들:챙겨_들어:서 물:물어:서`
 			)
 		},
 		{
@@ -508,7 +583,7 @@ export const KO: SentenceLanguageData = {
 				'drink'
 			],
 			...koVerbs(
-				`옮기:옮겨 나르:날라 가져오:가져와:서 들고오:들고와:서 안고오:안고와:서 짊어지:짊어져:서 둘러메:둘러메:서 들고가:들고가:서 가져가:가져가:서 끌고가:끌고가:서 끌:끌어 밀:밀어 운반하:운반해 들어올리:들어올려 안:안아 품:품어 실어나르:실어날라 날라오:날라와:서`
+				`옮기:옮겨 나르:날라 가져오:가져와:서 들고_오:들고_와:서 안고_오:안고_와:서 짊어지:짊어져:서 둘러메:둘러메:서 들고_가:들고_가:서 가져가:가져가:서 끌고_가:끌고_가:서 끌:끌어 밀:밀어 운반하:운반해 들어올리:들어올려 안:안아 품:품어 실어나르:실어날라 날라_오:날라_와:서`
 			)
 		},
 		{
@@ -558,7 +633,7 @@ export const KO: SentenceLanguageData = {
 				'drink'
 			],
 			...koVerbs(
-				`잃어버리:잃어버려 떨어뜨리:떨어뜨려 놓치:놓쳐 잃:잃어 흘리:흘려 빠뜨리:빠뜨려 두고오:두고와 놓고오:놓고와 분실하:분실해 떨구:떨궈 놓아버리:놓아버려 흘려버리:흘려버려`
+				`잃어버리:잃어버려 떨어뜨리:떨어뜨려 놓치:놓쳐 잃:잃어 흘리:흘려 빠뜨리:빠뜨려 두고_오:두고_와 놓고_오:놓고_와 분실하:분실해 떨구:떨궈 놓아버리:놓아버려 흘려버리:흘려버려`
 			)
 		},
 		{
@@ -567,7 +642,7 @@ export const KO: SentenceLanguageData = {
 			object: ['person'],
 			...koVerbs(
 				`
-				만나:만나 마주치:마주쳐 마주하:마주해 조우하:조우해 맞이하:맞이해 반기:반겨 방문하:방문해 마주보:마주봐 만나보:만나봐 부딪치:부딪쳐
+				만나:만나 마주치:마주쳐 마주하:마주해 조우하:조우해 맞이하:맞이해 반기:반겨 방문하:방문해 마주보:마주봐 부딪치:부딪쳐
 				마중하:마중해 배웅하:배웅해 마주앉:마주앉아 상봉하:상봉해
 			`
 			)
@@ -580,7 +655,7 @@ export const KO: SentenceLanguageData = {
 			objectThemes: ['object', 'tool', 'clothing', 'product', 'toy', 'furniture', 'gem', 'vehicle'],
 			...koVerbs(
 				`
-				만들:만들어 짓:지어 빚:빚어 그리:그려 엮:엮어 만들어내:만들어내 완성하:완성해 꾸미:꾸며 빚어내:빚어내 손수만들:손수만들어 창작하:창작해 그려내:그려내 장식하:장식해
+				만들:만들어 짓:지어 빚:빚어 그리:그려 엮:엮어 만들어내:만들어내 완성하:완성해 꾸미:꾸며 빚어내:빚어내 손수_만들:손수_만들어 창작하:창작해 그려내:그려내 장식하:장식해
 				세우:세워 쌓:쌓아 새기:새겨 이어붙이:이어붙여 짜:짜 뜨:떠 매듭짓:매듭지어
 			`
 			)
@@ -622,7 +697,7 @@ export const KO: SentenceLanguageData = {
 				'vehicle'
 			],
 			...koVerbs(
-				`팔:팔아 넘기:넘겨 건네:건네 내놓:내놓아 판매하:판매해 처분하:처분해 팔아치우:팔아치워 내다팔:내다팔아 팔아넘기:팔아넘겨 넘겨주:넘겨줘 건네주:건네줘 거래하:거래해 진열하:진열해 늘어놓:늘어놓아 값을매기:값을매겨`
+				`팔:팔아 넘기:넘겨 건네:건네 내놓:내놓아 판매하:판매해 처분하:처분해 팔아치우:팔아치워 내다_팔:내다_팔아 팔아넘기:팔아넘겨 넘겨주:넘겨줘 건네주:건네줘 거래하:거래해 진열하:진열해 늘어놓:늘어놓아`
 			)
 		},
 		{
@@ -647,7 +722,7 @@ export const KO: SentenceLanguageData = {
 				'drink'
 			],
 			...koVerbs(
-				`사:사:서 사오:사와:서 구하:구해:서 장만하:장만해:서 사들이:사들여:서 구입하:구입해:서 구매하:구매해:서 주문하:주문해:서 골라사:골라사:서 값을치르:값을치러:서 마련하:마련해:서 사가지고오:사가지고와:서 흥정하:흥정해:서 사두:사둬:서 사모으:사모아:서`
+				`사:사:서 사오:사와:서 구하:구해:서 장만하:장만해:서 사들이:사들여:서 구입하:구입해:서 구매하:구매해:서 주문하:주문해:서 골라_사:골라_사:서 마련하:마련해:서 사_가지고_오:사_가지고_와:서 흥정하:흥정해:서 사두:사둬:서 사_모으:사_모아:서`
 			)
 		},
 		{
@@ -656,7 +731,7 @@ export const KO: SentenceLanguageData = {
 			object: ['edible'],
 			objectThemes: ['food', 'vegetable', 'ingredient'],
 			...koVerbs(
-				`굽:구워:서 데우:데워:서 끓이:끓여:서 요리하:요리해:서 썰:썰어:서 담:담아:서 볶:볶아:서 삶:삶아:서 찌:쪄:서 튀기:튀겨:서 조리하:조리해:서 익히:익혀:서 데치:데쳐:서 졸이:졸여:서 다지:다져:서 버무리:버무려:서 양념하:양념해:서 간을맞추:간을맞춰:서 차리:차려:서 젓:저어:서 뒤집:뒤집어:서 푸:퍼:서 덜:덜어:서`
+				`굽:구워:서 데우:데워:서 끓이:끓여:서 요리하:요리해:서 썰:썰어:서 담:담아:서 볶:볶아:서 삶:삶아:서 찌:쪄:서 튀기:튀겨:서 조리하:조리해:서 익히:익혀:서 데치:데쳐:서 졸이:졸여:서 다지:다져:서 버무리:버무려:서 양념하:양념해:서 차리:차려:서 젓:저어:서 뒤집:뒤집어:서 푸:퍼:서 덜:덜어:서`
 			)
 		},
 		{
@@ -665,7 +740,7 @@ export const KO: SentenceLanguageData = {
 			object: ['edible'],
 			objectThemes: ['food', 'fruit', 'vegetable'],
 			...koVerbs(
-				`먹:먹어 씹:씹어 삼키:삼켜 맛보:맛봐 베어먹:베어먹어 먹어치우:먹어치워 먹어보:먹어봐 깨물:깨물어 갉아먹:갉아먹어 뜯어먹:뜯어먹어 집어먹:집어먹어 주워먹:주워먹어 우물거리:우물거려 오물거리:오물거려 핥:핥아 야금야금먹:야금야금먹어 허겁지겁먹:허겁지겁먹어 꿀꺽삼키:꿀꺽삼켜 해치우:해치워 씹어삼키:씹어삼켜 비우:비워`
+				`먹:먹어 씹:씹어 삼키:삼켜 맛보:맛봐 베어_먹:베어_먹어 먹어치우:먹어치워 깨물:깨물어 갉아먹:갉아먹어 뜯어먹:뜯어먹어 집어먹:집어먹어 주워먹:주워먹어 우물거리:우물거려 오물거리:오물거려 핥:핥아 야금야금_먹:야금야금_먹어 허겁지겁_먹:허겁지겁_먹어 꿀꺽_삼키:꿀꺽_삼켜 해치우:해치워 씹어_삼키:씹어_삼켜 비우:비워`
 			)
 		},
 		{
@@ -675,9 +750,9 @@ export const KO: SentenceLanguageData = {
 			objectThemes: ['drink'],
 			...koVerbs(
 				`
-				마시:마셔 들이키:들이켜 홀짝이:홀짝여 음미하:음미해 마셔보:마셔봐 벌컥벌컥마시:벌컥벌컥마셔 꿀꺽꿀꺽마시:꿀꺽꿀꺽마셔 한모금마시:한모금마셔 들이마시:들이마셔
-				마셔버리:마셔버려 홀짝거리:홀짝거려 다마시:다마셔 한잔하:한잔해 맛보:맛봐
-				목을축이:목을축여 삼키:삼켜 들이켜:들이켜 축이:축여
+				마시:마셔 들이키:들이켜 홀짝이:홀짝여 음미하:음미해 벌컥벌컥_마시:벌컥벌컥_마셔 꿀꺽꿀꺽_마시:꿀꺽꿀꺽_마셔 한_모금_마시:한_모금_마셔 들이마시:들이마셔
+				홀짝거리:홀짝거려 다_마시:다_마셔 한잔하:한잔해 맛보:맛봐
+				삼키:삼켜 들이켜:들이켜
 			`
 			)
 		},
@@ -688,7 +763,7 @@ export const KO: SentenceLanguageData = {
 			field: 'change',
 			subject: ['place'],
 			...koVerbs(
-				`조용해지:조용해져 어두워지:어두워져 밝아오:밝아와 고요해지:고요해져 붐비:붐벼 물들:물들어 환해지:환해져 잠잠해지:잠잠해져 북적이:북적여 소란해지:소란해져 한산해지:한산해져 텅비:텅비어 가득차:가득차 술렁이:술렁여 깨어나:깨어나 잠들:잠들어 어둑해지:어둑해져 훤해지:훤해져 젖:젖어 마르:말라 얼어붙:얼어붙어 반짝이:반짝여 달라지:달라져 활기를띠:활기를띠어 고요에잠기:고요에잠겨 안개에잠기:안개에잠겨`
+				`조용해지:조용해져 어두워지:어두워져 밝아오:밝아와 고요해지:고요해져 붐비:붐벼 물들:물들어 환해지:환해져 잠잠해지:잠잠해져 북적이:북적여 소란해지:소란해져 한산해지:한산해져 텅_비:텅_비어 가득_차:가득_차 술렁이:술렁여 깨어나:깨어나 잠들:잠들어 어둑해지:어둑해져 훤해지:훤해져 젖:젖어 마르:말라 얼어붙:얼어붙어 반짝이:반짝여 달라지:달라져 활기를_띠:활기를_띠어 고요에_잠기:고요에_잠겨 안개에_잠기:안개에_잠겨`
 			)
 		},
 		{
@@ -729,7 +804,7 @@ export const KO: SentenceLanguageData = {
 			// What a match does: it is held, gets going, closes.
 			subjectThemes: ['sport'],
 			...koVerbs(
-				`열리:열려 벌어지:벌어져 펼쳐지:펼쳐져 무르익:무르익어 막을내리:막을내려 치러지:치러져 재개되:재개돼 달아오르:달아올라`
+				`열리:열려 벌어지:벌어져 펼쳐지:펼쳐져 무르익:무르익어 막을_내리:막을_내려 치러지:치러져 재개되:재개돼 달아오르:달아올라`
 			)
 		},
 		{
@@ -772,7 +847,7 @@ export const KO: SentenceLanguageData = {
 			field: 'move',
 			subject: ['vehicle'],
 			...koVerbs(
-				`달리:달려 멈추:멈춰 지나가:지나가 돌아오:돌아와 출발하:출발해 미끄러지:미끄러져 떠나:떠나 도착하:도착해 움직이:움직여 굴러가:굴러가 나아가:나아가 지나치:지나쳐 서:서 속도를내:속도를내 속도를줄이:속도를줄여 흔들리:흔들려 덜컹거리:덜컹거려 방향을바꾸:방향을바꿔 후진하:후진해 질주하:질주해 돌아가:돌아가 들어오:들어와 다가오:다가와 멀어지:멀어져 정차하:정차해`
+				`달리:달려 멈추:멈춰 지나가:지나가 돌아오:돌아와 출발하:출발해 미끄러지:미끄러져 떠나:떠나 도착하:도착해 움직이:움직여 굴러가:굴러가 나아가:나아가 지나치:지나쳐 서:서 속도를_내:속도를_내 속도를_줄이:속도를_줄여 흔들리:흔들려 덜컹거리:덜컹거려 방향을_바꾸:방향을_바꿔 후진하:후진해 질주하:질주해 돌아가:돌아가 들어오:들어와 다가오:다가와 멀어지:멀어져 정차하:정차해`
 			)
 		},
 		{
@@ -786,7 +861,7 @@ export const KO: SentenceLanguageData = {
 			field: 'change',
 			subject: ['plant'],
 			...koVerbs(
-				`자라:자라 시들:시들어 피어나:피어나 흔들리:흔들려 뿌리내리:뿌리내려 피:피어 지:져 움트:움터 싹트:싹터 우거지:우거져 무성해지:무성해져 마르:말라 물들:물들어 살랑이:살랑여 나부끼:나부껴 자라나:자라나 뻗어나가:뻗어나가 열매맺:열매맺어 꽃피우:꽃피워 푸르러지:푸르러져 시들어가:시들어가 고개숙이:고개숙여 돋아나:돋아나 향기를풍기:향기를풍겨 흐드러지:흐드러져 만발하:만발해`
+				`자라:자라 시들:시들어 피어나:피어나 흔들리:흔들려 뿌리내리:뿌리내려 피:피어 지:져 움트:움터 싹트:싹터 우거지:우거져 무성해지:무성해져 마르:말라 물들:물들어 살랑이:살랑여 나부끼:나부껴 자라나:자라나 뻗어나가:뻗어나가 열매_맺:열매_맺어 꽃피우:꽃피워 푸르러지:푸르러져 시들어가:시들어가 고개_숙이:고개_숙여 돋아나:돋아나 향기를_풍기:향기를_풍겨 흐드러지:흐드러져 만발하:만발해`
 			)
 		},
 		{
@@ -802,7 +877,7 @@ export const KO: SentenceLanguageData = {
 			// What a dish or a drink does once it is served: an apple neither boils nor steams.
 			subjectThemes: ['food', 'drink'],
 			...koVerbs(
-				`식:식어 끓:끓어 상하:상해 남:남아 데워지:데워져 따뜻해지:따뜻해져 차가워지:차가워져 시원해지:시원해져 뜨거워지:뜨거워져 미지근해지:미지근해져 김이나:김이나 향을풍기:향을풍겨 냄새를풍기:냄새를풍겨 줄어들:줄어들어 바닥나:바닥나 동나:동나 남아돌:남아돌아 차려지:차려져 나오:나와`
+				`식:식어 끓:끓어 상하:상해 남:남아 데워지:데워져 따뜻해지:따뜻해져 차가워지:차가워져 시원해지:시원해져 뜨거워지:뜨거워져 미지근해지:미지근해져 김이_나:김이_나 향을_풍기:향을_풍겨 냄새를_풍기:냄새를_풍겨 줄어들:줄어들어 바닥나:바닥나 동나:동나 남아돌:남아돌아 차려지:차려져 나오:나와`
 			)
 		},
 		{
@@ -811,7 +886,7 @@ export const KO: SentenceLanguageData = {
 			// Ripening and melting are what food does; a drink cools, boils and spoils.
 			subjectThemes: ['food'],
 			...koVerbs(
-				`익:익어 녹:녹아 굳:굳어 타:타 눋:눌어 부풀:부풀어 바삭해지:바삭해져 눅눅해지:눅눅해져 딱딱해지:딱딱해져 말랑해지:말랑해져 무르:물러 익어가:익어가 곰팡이피:곰팡이피어`
+				`익:익어 녹:녹아 굳:굳어 타:타 눋:눌어 부풀:부풀어 바삭해지:바삭해져 눅눅해지:눅눅해져 딱딱해지:딱딱해져 말랑해지:말랑해져 무르:물러 익어가:익어가 곰팡이_피:곰팡이_피어`
 			)
 		},
 		{
@@ -820,7 +895,7 @@ export const KO: SentenceLanguageData = {
 			// What a drink does and a dish does not: it spills, fizzes, sloshes, freezes.
 			subjectThemes: ['drink'],
 			...koVerbs(
-				`넘치:넘쳐 쏟아지:쏟아져 흘러넘치:흘러넘쳐 김이오르:김이올라 거품이일:거품이일어 출렁이:출렁여 찰랑이:찰랑여 얼:얼어 식어가:식어가`
+				`넘치:넘쳐 쏟아지:쏟아져 흘러넘치:흘러넘쳐 김이_오르:김이_올라 거품이_일:거품이_일어 출렁이:출렁여 찰랑이:찰랑여 얼:얼어 식어가:식어가`
 			)
 		},
 		{
@@ -1039,6 +1114,96 @@ export const KO: SentenceLanguageData = {
 			...koStates(
 				`따뜻하:따뜻해:따뜻한 차갑:차가워:차가운 아프:아파:아픈 뻣뻣하:뻣뻣해:뻣뻣한 시리:시려:시린 부드럽:부드러워:부드러운 거칠:거칠어:거친 저리:저려:저린 묵직하:묵직해:묵직한`
 			)
+		},
+		// A reaction says what the moment was like with nobody to say it of:
+		// `정말 다행스러웠다`, `맛있었다`, `조용했다`. Korean leaves the one who felt it
+		// unsaid, the way it leaves a known subject unsaid. Each group answers what
+		// the sentence before did, and the last fits after anything.
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'arrive'],
+			...koStates(`다행스럽:다행스러워:다행스러운 홀가분하:홀가분해:홀가분한`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'look'],
+			...koStates(`신기하:신기해:신기한 놀랍:놀라워:놀라운 반갑:반가워:반가운`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['lose'],
+			...koStates(
+				`아깝:아까워:아까운 속상하:속상해:속상한 난감하:난감해:난감한 허전하:허전해:허전한 막막하:막막해:막막한`
+			)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['eat', 'cook'],
+			...koStates(
+				`맛있:맛있어:맛있는 든든하:든든해:든든한 고소하:고소해:고소한 달콤하:달콤해:달콤한`
+			)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['drink'],
+			...koStates(
+				`시원하:시원해:시원한 개운하:개운해:개운한 맛있:맛있어:맛있는 향긋하:향긋해:향긋한`
+			)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['meet', 'talk'],
+			...koStates(`반갑:반가워:반가운 즐겁:즐거워:즐거운 유쾌하:유쾌해:유쾌한 정겹:정겨워:정겨운`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rest', 'sleep'],
+			...koStates(
+				`편안하:편안해:편안한 포근하:포근해:포근한 아늑하:아늑해:아늑한 나른하:나른해:나른한`
+			)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['make', 'tend', 'sell', 'hide', 'buy'],
+			...koStates(
+				`뿌듯하:뿌듯해:뿌듯한 개운하:개운해:개운한 홀가분하:홀가분해:홀가분한 흐뭇하:흐뭇해:흐뭇한`
+			)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rise', 'go', 'move', 'play'],
+			...koStates(`상쾌하:상쾌해:상쾌한 신나:신나:신나는 즐겁:즐거워:즐거운 가뿐하:가뿐해:가뿐한`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['search', 'wait'],
+			...koStates(
+				`막막하:막막해:막막한 지루하:지루해:지루한 답답하:답답해:답답한 초조하:초조해:초조한`
+			)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['think', 'look'],
+			...koStates(`이상하:이상해:이상한 묘하:묘해:묘한 아련하:아련해:아련한`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			...koStates(`
+				조용하:조용해:조용한 고요하:고요해:고요한 평화롭:평화로워:평화로운 한가롭:한가로워:한가로운 적막하:적막해:적막한
+				쌀쌀하:쌀쌀해:쌀쌀한 춥:추워:추운 덥:더워:더운 따뜻하:따뜻해:따뜻한 포근하:포근해:포근한 서늘하:서늘해:서늘한
+			`)
 		}
 	],
 	// Attributive forms, grouped by what they can sit in front of. A nickname's
@@ -1047,9 +1212,9 @@ export const KO: SentenceLanguageData = {
 		{
 			subject: ['creature', 'person'],
 			words: words(`
-				용감한 씩씩한 다정한 부지런한 게으른 수줍은 영리한 어린 늙은 작은 커다란 조용한 명랑한 느긋한 재빠른 호기심어린 명민한 의젓한 천진한
+				용감한 씩씩한 다정한 부지런한 게으른 수줍은 영리한 어린 늙은 작은 커다란 조용한 명랑한 느긋한 재빠른 호기심_어린 명민한 의젓한 천진한
 				착한 순박한 얌전한 활발한 발랄한 당돌한 대담한 신중한 무뚝뚝한 장난스러운 자그마한 여윈 건강한 지친 고집센 다부진 늘씬한 우직한
-				어수룩한 사려깊은 늠름한 상냥한 슬기로운 엉뚱한 새침한
+				어수룩한 사려_깊은 늠름한 상냥한 슬기로운 엉뚱한 새침한
 			`)
 		},
 		{
@@ -1071,7 +1236,7 @@ export const KO: SentenceLanguageData = {
 			themes: ['food'],
 			words: words(`
 				달콤한 매콤한 따뜻한 신선한 바삭한 고소한 향긋한 뜨거운 짭짤한 말랑한 촉촉한 새콤한 먹음직한 담백한
-				부드러운 쫄깃한 폭신한 노릇한 진한 알싸한 시큼한 달달한 구수한 큼직한 갓구운 잘익은 푸짐한 소박한 정갈한 따끈한 눅진한 바삭바삭한 말끔한
+				부드러운 쫄깃한 폭신한 노릇한 진한 알싸한 시큼한 달달한 구수한 큼직한 갓_구운 잘_익은 푸짐한 소박한 정갈한 따끈한 눅진한 바삭바삭한 말끔한
 			`)
 		},
 		{
@@ -1079,8 +1244,8 @@ export const KO: SentenceLanguageData = {
 			// Fruit and vegetables as they come from the field: a plum and a carrot alike.
 			themes: ['fruit', 'vegetable'],
 			words: words(`
-				신선한 싱싱한 탐스러운 큼직한 자그마한 향긋한 먹음직한 못생긴 갓딴
-				촉촉한 매끈한 알찬 통통한 무른 시든 빛깔좋은 윤기나는 묵직한 달큰한
+				신선한 싱싱한 탐스러운 큼직한 자그마한 향긋한 먹음직한 못생긴 갓_딴
+				촉촉한 매끈한 알찬 통통한 무른 시든 빛깔_좋은 윤기_나는 묵직한 달큰한
 			`)
 		},
 		{
@@ -1088,7 +1253,7 @@ export const KO: SentenceLanguageData = {
 			// What sits in the cupboard: kept, aged, dried, plentiful or dear.
 			themes: ['ingredient'],
 			words: words(`
-				신선한 귀한 묵은 질좋은 오래된 남은 비싼 값싼 넉넉한 아껴둔
+				신선한 귀한 묵은 질_좋은 오래된 남은 비싼 값싼 넉넉한 아껴둔
 				흔한 소중한 향긋한 고소한 숙성된 진한
 			`)
 		},
@@ -1097,14 +1262,14 @@ export const KO: SentenceLanguageData = {
 			themes: ['drink'],
 			words: words(`
 				달콤한 따뜻한 차가운 시원한 뜨거운 향긋한 신선한 새콤한 진한 씁쓸한
-				미지근한 시큼한 달달한 은은한 알싸한 부드러운 맑은 탁한 거품나는 김이나는 상큼한 텁텁한 청량한 뜨끈한
+				미지근한 시큼한 달달한 은은한 알싸한 부드러운 맑은 탁한 거품_나는 김이_나는 상큼한 텁텁한 청량한 뜨끈한
 			`)
 		},
 		{
 			subject: ['thing', 'vehicle'],
 			words: words(`
 				낡은 새로운 작은 커다란 가벼운 무거운 반짝이는 매끈한 투명한 단단한 예쁜 소중한 오래된 반듯한
-				녹슨 닳은 해진 튼튼한 널찍한 길쭉한 납작한 둥근 뾰족한 두꺼운 얇은 화려한 소박한 정교한 투박한 값비싼 흔한 진귀한 먼지쌓인 반들반들한
+				녹슨 닳은 해진 튼튼한 널찍한 길쭉한 납작한 둥근 뾰족한 두꺼운 얇은 화려한 소박한 정교한 투박한 값비싼 흔한 진귀한 먼지_쌓인 반들반들한
 			`)
 		},
 		{
@@ -1117,15 +1282,15 @@ export const KO: SentenceLanguageData = {
 		{
 			subject: ['place'],
 			words: words(`
-				고요한 넓은 어두운 밝은 낯선 오래된 아늑한 한적한 북적이는 조용한 외딴 먼 가까운 텅빈 쓸쓸한 환한
-				널찍한 비좁은 눅눅한 메마른 서늘한 포근한 황량한 울창한 험한 가파른 평평한 나지막한 드높은 정겨운 낯익은 인적드문 후미진 으슥한 깨끗한 지저분한
+				고요한 넓은 어두운 밝은 낯선 오래된 아늑한 한적한 북적이는 조용한 외딴 먼 가까운 텅_빈 쓸쓸한 환한
+				널찍한 비좁은 눅눅한 메마른 서늘한 포근한 황량한 울창한 험한 가파른 평평한 나지막한 드높은 정겨운 낯익은 인적_드문 후미진 으슥한 깨끗한 지저분한
 			`)
 		},
 		{
 			subject: ['plant'],
 			words: words(`
 				푸른 무성한 향기로운 어린 시든 커다란 작은 여린 싱싱한
-				싱그러운 우거진 앙상한 가시돋친 활짝핀 갓피어난 키큰 흐드러진 청초한 소담한 연둣빛 새파란 노랗게핀 탐스러운 앙증맞은
+				싱그러운 우거진 앙상한 가시_돋친 활짝_핀 갓_피어난 키_큰 흐드러진 청초한 소담한 연둣빛 새파란 노랗게_핀 탐스러운 앙증맞은
 			`)
 		},
 		{
@@ -1149,22 +1314,52 @@ export const KO: SentenceLanguageData = {
 				부드러운 거친 매끈한 앙상한 통통한 길쭉한 조그만 따스한 시린 뻣뻣한 나른한 상처난
 			`)
 		},
+		// The words that fit more than one kind of thing, each beside the kinds it
+		// does fit. A seashell is rare and a tax adviser is not, a village is lonely
+		// and a sea cucumber is not, and an old jar is one thing an old demon is not.
 		{
-			subject: [
-				'creature',
-				'person',
-				'plant',
-				'thing',
-				'vehicle',
-				'place',
-				'event',
-				'idea',
-				'body'
-			],
-			words: words(`
-				아름다운 신비한 낯선 새로운
-				신비로운 낯익은 어여쁜 정겨운 쓸쓸한 눈부신 희귀한 이상한 고요한 오래된
-			`)
+			subject: ['creature', 'person', 'plant', 'thing', 'vehicle', 'place', 'idea', 'body'],
+			words: words(`아름다운 이상한`)
+		},
+		{
+			subject: ['creature', 'person', 'thing', 'vehicle', 'place', 'idea'],
+			words: words(`낯선 낯익은`)
+		},
+		{
+			subject: ['creature', 'plant', 'thing', 'place', 'idea', 'event'],
+			words: words(`신비한 신비로운`)
+		},
+		{
+			subject: ['thing', 'vehicle', 'place', 'idea', 'event'],
+			words: words(`새로운`)
+		},
+		{
+			subject: ['person', 'creature', 'plant', 'thing'],
+			words: words(`어여쁜`)
+		},
+		{
+			subject: ['person', 'place', 'thing', 'event'],
+			words: words(`정겨운`)
+		},
+		{
+			subject: ['person', 'place', 'event', 'idea', 'plant'],
+			words: words(`쓸쓸한`)
+		},
+		{
+			subject: ['thing', 'place', 'event', 'plant', 'idea'],
+			words: words(`눈부신`)
+		},
+		{
+			subject: ['creature', 'plant', 'thing', 'idea'],
+			words: words(`희귀한`)
+		},
+		{
+			subject: ['place', 'event'],
+			words: words(`고요한`)
+		},
+		{
+			subject: ['thing', 'vehicle', 'place', 'idea', 'plant'],
+			words: words(`오래된`)
 		}
 	],
 	// How something is done, by what can do it that way. A fox may act 부지런히
@@ -1177,7 +1372,7 @@ export const KO: SentenceLanguageData = {
 			words: words(`
 				조용히 천천히 빠르게 가만히 슬며시 홀로 잠시 갑자기 조심스레 힘차게 살며시 묵묵히 느긋하게 곧장 슬쩍 냉큼 차분히 은근히 대뜸
 				나직이 느릿느릿 재빨리 가볍게 얌전히 무심히 덤덤히 살짝 부리나케 천연덕스럽게 조심조심 가만가만 후다닥 냅다 용케 애써 마지못해
-				간신히 겨우 힘겹게 기어이 짐짓 다급히 급히 서둘러 넌지시 흔쾌히 선뜻 태연히 홀연히 소리없이 조용조용 연신 한참 한동안 신나게
+				간신히 겨우 힘겹게 기어이 짐짓 다급히 급히 서둘러 넌지시 흔쾌히 선뜻 태연히 홀연히 소리_없이 조용조용 연신 한참 한동안 신나게
 				즐겁게 기쁘게 활기차게 당당하게 의젓하게 늠름하게
 			`)
 		},
@@ -1238,7 +1433,7 @@ export const KO: SentenceLanguageData = {
 				`
 				조용히 천천히 서서히 문득 다시 잠시 갑자기 여전히 은은히 살며시 가만히 슬며시 조금씩 차츰 점점  고요히
 				불현듯 금세 한참 오래도록 한동안 잔뜩 부쩍 흠뻑 그득히 자욱이
-				나직이 잔잔히 아득히 그윽이 곱게 소복이 촉촉이 나른하게 느슨하게 묵직하게 가볍게 조용조용 소리없이
+				나직이 잔잔히 아득히 그윽이 곱게 소복이 촉촉이 나른하게 느슨하게 묵직하게 가볍게 조용조용 소리_없이
 				흐릿하게 뚜렷하게 선명하게 희미하게 스르르 사르르 스멀스멀 뭉게뭉게 넘실넘실 일렁일렁 반짝반짝 하늘하늘 살랑살랑 나풀나풀 몽글몽글 우수수
 			`
 			)
@@ -1247,24 +1442,24 @@ export const KO: SentenceLanguageData = {
 	// Sorted by what a paragraph has to know: the phases of a day in order, what
 	// fits any tense, and what names one.
 	times: {
-		day: words(`새벽에 이른아침에 아침에 한낮에 오후에 해질녘에 초저녁에 저녁에 밤에 한밤중에`),
+		day: words(`새벽에 이른_아침에 아침에 한낮에 오후에 해질녘에 초저녁에 저녁에 밤에 한밤중에`),
 		any: words(`
 			봄에 여름에 가을에 겨울에 주말에 휴일에 명절에 장마철에 이른봄에 늦가을에 새해에
 			초봄에 늦봄에 초여름에 한여름에 늦여름에 초가을에 한겨울에 늦겨울에 환절기에 꽃샘추위에 단풍철에 수확철에
-			연휴에 방학에 축제날에 장날에 보름날에 그믐날에 비오는날에 눈오는날에 바람부는날에 맑은날에 흐린날에 안개낀날에 첫눈오는날에
+			연휴에 방학에 축제_날에 장날에 보름날에 그믐날에 비_오는_날에 눈_오는_날에 바람_부는_날에 맑은_날에 흐린_날에 안개_낀_날에 첫눈_오는_날에
 		`),
 		past: words(`
-			어제 지난주에 오래전에 한때 그날 그때 며칠전에 지난밤에
-			그저께 엊그제 지지난주에 지난달에 작년에 재작년에 예전에 옛날에 그해에 그무렵에 이튿날 얼마전에 조금전에 한참전에
-			그날밤에 그날아침에 지난봄에 지난여름에 지난가을에 지난겨울에
+			어제 지난주에 오래전에 한때 그날 그때 며칠_전에 지난밤에
+			그저께 엊그제 지지난주에 지난달에 작년에 재작년에 예전에 옛날에 그해에 그_무렵에 이튿날 얼마_전에 조금_전에 한참_전에
+			그날_밤에 그날_아침에 지난봄에 지난여름에 지난가을에 지난겨울에
 		`),
 		present: words(`
-			오늘 방금 이제 내일 다음주에
-			지금 이따가 모레 올해 내년에 이번주에 이번달에 이번주말에 오늘밤에 오늘아침에 잠시후에 조금뒤에 머지않아 다음달에
+			오늘 방금 이제 내일 다음_주에
+			지금 이따가 모레 올해 내년에 이번_주에 이번_달에 이번_주말에 오늘_밤에 오늘_아침에 잠시_후에 조금_뒤에 머지않아 다음_달에
 		`),
 		habitual: words(`
 			요즘 가끔 매일 자주 이따금
-			늘 항상 종종 때때로 간혹 드물게 좀처럼 날마다 해마다 철마다 주말마다 아침마다 밤마다 하루종일 온종일 근래에 평소에 대개 보통
+			늘 항상 종종 때때로 간혹 드물게 날마다 해마다 철마다 주말마다 아침마다 밤마다 하루_종일 온종일 근래에 평소에 대개 보통
 		`)
 	},
 	homes: words(`집`),
@@ -1275,17 +1470,19 @@ export const KO: SentenceLanguageData = {
 	// What a sentence opens on when it follows another. Written whole, so a
 	// language that wants a comma after its connective writes the comma.
 	connectives: {
-		additive: words(`그리고 게다가 그러고는 또 또한 아울러 더구나 나아가 그런가하면`),
+		additive: words(`그리고 게다가 그러고는 또 또한 아울러 더구나 나아가 그런가_하면`),
 		temporal: words(`
-			이윽고 곧 그러자 이내 어느새 마침내 그제야 한편 그러고나서 잠시후 얼마뒤
-			그러는사이 곧이어 뒤이어 그런다음 그러더니 어느덧 드디어 그무렵 잠시뒤 한참뒤 그때부터
+			이윽고 곧 그러자 이내 어느새 마침내 그제야 한편 그러고_나서 잠시_후 얼마_뒤
+			그러는_사이 곧이어 뒤이어 그런_다음 그러더니 어느덧 드디어 그_무렵 잠시_뒤 한참_뒤 그때부터
 		`),
 		contrastive: words(
 			`하지만 그런데 그러나 다만 오히려 그래도 그렇지만 반면에 도리어 그럼에도 그런데도`
 		),
 		// `그러므로`, `따라서` and `그리하여` are what a proof or a sermon says, and
 		// `그러니까` is somebody insisting; a story says `그래서`.
-		causal: words(`그래서 결국 그러니 그러기에 그런탓에 그바람에 그덕에`)
+		causal: words(`그래서 결국 그러니 그러기에 그런_탓에 그_바람에 그_덕에`),
+		// Something new coming along: somebody else, the weather, the place changing.
+		turn: words(`그_순간 바로_그때 별안간 난데없이 그런데_그때`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -1330,7 +1527,7 @@ export const KO: SentenceLanguageData = {
 	},
 	interjections: words(`
 		아, 오, 와, 어머, 이런, 저런, 세상에, 아이고, 참, 어이쿠, 아이참, 어라, 우와, 이야,
-		아하, 오호, 오오, 허허, 어머나, 아뿔싸, 맙소사, 이럴수가, 웬걸, 아차, 옳지, 후유, 에구, 어이구, 저기,
+		아하, 오호, 오오, 허허, 어머나, 아뿔싸, 맙소사, 이럴_수가, 웬걸, 아차, 옳지, 후유, 에구, 어이구, 저기,
 	`),
 	// Korean leaves the subject out as readily as it writes 그것, and the empty
 	// entry is how the data says so.
@@ -1460,6 +1657,78 @@ export const KO: SentenceLanguageData = {
 			past: conjugate(`이었`, PAST)
 		}
 	},
+	// A Korean auxiliary is a second predicate after the first one's stem or its
+	// 해체 form, and it carries every ending the sentence needs — the level, the
+	// mood and the tense: `먹고 싶어 했어요`, `먹지 않습니다`, `먹어 버렸니`.
+	// `싶어 하다` rather than `싶다`, because `싶다` is what the speaker wants, and
+	// these sentences are about somebody else.
+	auxiliaries: [
+		{
+			kind: 'negative',
+			template: '{v}지 {a}',
+			joint: 'stem',
+			predicate: auxiliary(koVerbs(`않:않아`)),
+			unless: ['못한다']
+		},
+		{
+			kind: 'negative',
+			on: 'state',
+			template: '{v}지 {a}',
+			joint: 'stem',
+			predicate: auxiliary(koStates(`않:않아:않은`))
+		},
+		{
+			kind: 'unable',
+			template: '{v}지 {a}',
+			joint: 'stem',
+			predicate: auxiliary(koVerbs(`못하:못해`)),
+			unless: ['못한다']
+		},
+		{
+			kind: 'desire',
+			template: '{v}고 {a}',
+			joint: 'stem',
+			predicate: auxiliary(koVerbs(`싶어_하:싶어_해`))
+		},
+		{
+			kind: 'resolve',
+			template: '{v}기로 {a}',
+			joint: 'stem',
+			predicate: auxiliary(koVerbs(`하:해`))
+		},
+		{
+			kind: 'begin',
+			template: '{v}기 {a}',
+			joint: 'stem',
+			predicate: auxiliary(koVerbs(`시작하:시작해`)),
+			unless: ['시작한다', '시작된다']
+		},
+		{
+			kind: 'progressive',
+			template: '{v}고 {a}',
+			joint: 'stem',
+			predicate: auxiliary(koStates(`있:있어:있는`))
+		},
+		// `-어 보다` and `-어 버리다` in the past alone: `먹어 봐` and `먹어 버려` are
+		// what somebody is told to do, and a sentence that drops its subject reads as
+		// one.
+		{
+			kind: 'attempt',
+			template: '{v} {a}',
+			joint: 'casual',
+			predicate: auxiliary(koVerbs(`보:봐`)),
+			tense: 'past',
+			unless: ['본다']
+		},
+		{
+			kind: 'completive',
+			template: '{v} {a}',
+			joint: 'casual',
+			predicate: auxiliary(koVerbs(`버리:버려`)),
+			tense: 'past',
+			unless: ['버린다']
+		}
+	],
 	frames: [
 		// A date and a clock, standing where an adverbial stands.
 		{
@@ -1640,6 +1909,66 @@ export const KO: SentenceLanguageData = {
 			],
 			weight: 3
 		},
+		// Where it happens, in front of who did it — `공원에서 여우가 사과를 먹었다` —
+		// and the topic marker on a doer, which is how Korean speaks of somebody it
+		// already knows: `여우는 아침에 사과를 먹었다`.
+		{
+			parts: [
+				{ slot: 'place', tail: '에서', modifiable: true },
+				{ slot: 'subject', tail: '가', tailAlt: '이', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 6
+		},
+		{
+			parts: [
+				{ slot: 'place', tail: '에서', modifiable: true },
+				{ slot: 'subject', tail: '가', tailAlt: '이', modifiable: true },
+				{ slot: 'object', tail: '를', tailAlt: '을', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 4
+		},
+		{
+			parts: [{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true }, { slot: 'verb' }],
+			weight: 6
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true },
+				{ slot: 'object', tail: '를', tailAlt: '을', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 7
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true },
+				{ slot: 'time' },
+				{ slot: 'verb' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true },
+				{ slot: 'time' },
+				{ slot: 'object', tail: '를', tailAlt: '을', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 3
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true },
+				{ slot: 'manner' },
+				{ slot: 'verb' }
+			],
+			weight: 3
+		},
+		// A reaction, with no subject at all: `정말 다행스러웠다`, `조용했다`.
+		{ parts: [{ slot: 'state' }], weight: 6 },
+		{ parts: [{ slot: 'degree' }, { slot: 'state' }], weight: 10 },
 		// Korean asks with a different ending on the same predicate, so the shapes
 		// are the statement's and `forms.question` does the rest.
 		{

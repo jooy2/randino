@@ -1,6 +1,11 @@
 import { words } from '../../_internal/parse.js';
 import type { WordPool } from '../../word/data/types.js';
-import type { PredicateTense, SentenceLanguageData } from './types.js';
+import type {
+	PredicateForms,
+	PredicateJoints,
+	PredicateTense,
+	SentenceLanguageData
+} from './types.js';
 
 // The godan endings: the kana a ます form puts in place of the last one, and the
 // endings of the た and て forms.
@@ -54,6 +59,51 @@ function conjugated(entry: string): [stem: string, past: string, linking: string
 	return [base(1) + stem, base(1) + past, base(1) + linking];
 }
 
+// The kana a negative puts in place of a godan verb's last one: `走る` is
+// `走らない`, `書く` is `書かない`, and `買う` is `買わない`.
+const GODAN_NEGATIVE: Readonly<Record<string, string>> = {
+	う: 'わ',
+	つ: 'た',
+	る: 'ら',
+	む: 'ま',
+	ぶ: 'ば',
+	ぬ: 'な',
+	く: 'か',
+	ぐ: 'が',
+	す: 'さ'
+};
+
+/**
+ * The stem a verb's negative is built on, read the way `conjugated` reads the
+ * rest: `起きる:i` is `起き`, `する` is `し`, `来る` is `来`, and a godan verb
+ * moves its last kana to the `a` row. `ある`, whose negative is `ない` alone, is
+ * in no pool here.
+ */
+function negativeOf(entry: string): string {
+	const [word, kind] = entry.split(':');
+	const base = (cut: number) => word.slice(0, word.length - cut);
+
+	if (kind === 'i') {
+		return base(1);
+	}
+
+	if (kind !== 'g') {
+		if (word.endsWith('する')) {
+			return `${base(2)}し`;
+		}
+
+		if (word.endsWith('来る')) {
+			return `${base(2)}来`;
+		}
+
+		if (word.endsWith('くる')) {
+			return `${base(2)}こ`;
+		}
+	}
+
+	return base(1) + GODAN_NEGATIVE[word.slice(-1)];
+}
+
 // The four forms a Japanese verb group is written in, all out of its dictionary
 // form: the dictionary form a plain statement ends on, its ます form, the past on
 // た, and the past on ました. The て form that links a first clause to the one
@@ -62,6 +112,7 @@ function tensed(entries: string): {
 	words: WordPool;
 	forms: { polite: WordPool; linking: WordPool };
 	past: PredicateTense;
+	joints: PredicateJoints;
 } {
 	const listed = words(entries);
 	const verbs = listed.map(conjugated);
@@ -75,8 +126,26 @@ function tensed(entries: string): {
 		past: {
 			words: verbs.map(([, past]) => past),
 			forms: { polite: verbs.map(([stem]) => `${stem}ました`) }
-		}
+		},
+		// The ます stem, which `たがる` and `始める` attach to, and the stem `ない` does.
+		joints: { stem: verbs.map(([stem]) => stem), negative: listed.map(negativeOf) }
 	};
+}
+
+/**
+ * An auxiliary as a predicate of its own, spelt the way any verb or adjective
+ * is, with no て form, because a clause that links carries none.
+ */
+function auxiliary(spelt: { words: WordPool; forms: PredicateForms; past: PredicateTense }): {
+	words: WordPool;
+	forms: PredicateForms;
+	past: PredicateTense;
+} {
+	const forms: PredicateForms = Object.fromEntries(
+		Object.entries(spelt.forms).filter(([form]) => form !== 'linking')
+	);
+
+	return { words: spelt.words, forms, past: spelt.past };
 }
 
 // The same for an adjective, which has no て form a sentence here would use. A
@@ -216,40 +285,70 @@ export const JA: SentenceLanguageData = {
 			)
 		},
 		// What somebody shows, split by what it shows — see the Korean data.
+		// What anything with a face can show. A fox laughs in a story and a sea
+		// cucumber does not shrug in any: what takes hands, shoulders or words is a
+		// person's alone, in the groups beside these.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
+			...tensed(`笑う 微笑む にっこりする ほほえむ`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
 			...tensed(
-				`笑う 微笑む くすくす笑う にっこりする 口笛を吹く 歓声を上げる:i うなずく 手を叩く ウインクする 鼻歌を歌う にやりとする 手を振る ほほえむ`
+				`くすくす笑う 口笛を吹く 歓声を上げる:i うなずく 手を叩く ウインクする 鼻歌を歌う にやりとする 手を振る`
 			)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'restless',
+			...tensed(`泣く うめく 泣きじゃくる:g そわそわする`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
 			...tensed(
-				`泣く つぶやく ため息をつく 泣きじゃくる:g うめく ぼやく 顔をしかめる:i 鼻をすする:g 独り言を言う 涙ぐむ 首を振る 舌打ちする 眉をひそめる:i そわそわする 唇をかむ 頭をかく`
+				`つぶやく ため息をつく ぼやく 顔をしかめる:i 鼻をすする:g 独り言を言う 涙ぐむ 首を振る 舌打ちする 眉をひそめる:i 唇をかむ 頭をかく`
 			)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'tired',
-			...tensed(`あくびする 目をこする:g 伸びをする 肩を回す 首を回す まばたきする`)
+			...tensed(`あくびする 伸びをする まばたきする`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'tired',
+			...tensed(`目をこする:g 肩を回す 首を回す`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'hungry',
-			...tensed(`つばを飲み込む お腹をさする:g 舌なめずりする 鼻をひくつかせる:i`)
+			...tensed(`つばを飲み込む 舌なめずりする 鼻をひくつかせる:i`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'hungry',
+			...tensed(`お腹をさする:g`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
-			...tensed(
-				`叫ぶ 声を上げる:i はっとする 肩をすくめる:i 首をかしげる:i 目を丸くする 息をのむ 振り返る 顔を上げる:i`
-			)
+			...tensed(`叫ぶ はっとする 首をかしげる:i 目を丸くする 息をのむ 振り返る 顔を上げる:i`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			...tensed(`声を上げる:i 肩をすくめる:i`)
 		},
 		{
 			field: 'talk',
@@ -649,7 +748,52 @@ export const JA: SentenceLanguageData = {
 		{
 			subject: ['body'],
 			...described(`温かい 冷たい 痛い 硬い しなやかだ 青白い 力強い 細い`)
-		}
+		},
+		// A reaction says what the moment was like, with nobody to say it of:
+		// `よかった`, `おいしかった`, `静かだった`. Each group answers what the
+		// sentence before did, and the last fits after anything.
+		{ subject: [], impersonal: true, after: ['find', 'arrive'], ...described(`よい 幸運だ`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'look'],
+			...described(`不思議だ 珍しい 意外だ`)
+		},
+		{ subject: [], impersonal: true, after: ['lose'], ...described(`残念だ 悲しい 惜しい 心細い`) },
+		{ subject: [], impersonal: true, after: ['eat', 'cook'], ...described(`おいしい うまい`) },
+		{ subject: [], impersonal: true, after: ['drink'], ...described(`おいしい 爽やかだ`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['meet', 'talk'],
+			...described(`嬉しい 楽しい 和やかだ`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rest', 'sleep'],
+			...described(`心地よい 穏やかだ 快適だ`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['make', 'tend', 'sell', 'hide', 'buy'],
+			...described(`満足だ 誇らしい すがすがしい`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rise', 'go', 'move', 'play'],
+			...described(`爽やかだ 楽しい 気持ちよい`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['search', 'wait'],
+			...described(`退屈だ 心細い もどかしい`)
+		},
+		{ subject: [], impersonal: true, after: ['think', 'look'], ...described(`不思議だ 妙だ`) },
+		{ subject: [], impersonal: true, ...described(`静かだ 穏やかだ 寒い 暖かい 涼しい のどかだ`) }
 	],
 	// Attributive forms: an i-adjective as it is, a na-adjective on な.
 	modifiers: [
@@ -822,7 +966,9 @@ export const JA: SentenceLanguageData = {
 		contrastive: words(
 			`しかし ところが けれども それでも だが でも とはいえ それなのに 逆に 一方で`
 		),
-		causal: words(`だから そこで それで したがって ゆえに その結果 そのため`)
+		causal: words(`だから そこで それで したがって ゆえに その結果 そのため`),
+		// Something new coming along: somebody else, the weather, the place changing.
+		turn: words(`すると ちょうどその時 その瞬間 そこへ`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -961,6 +1107,54 @@ export const JA: SentenceLanguageData = {
 			past: { words: words(`だった`), forms: { polite: words(`でした`) } }
 		}
 	},
+	// A Japanese auxiliary follows the verb's own stem or its て form and
+	// conjugates the way any verb or adjective does: `食べてしまった`,
+	// `食べたがります`, `食べなかった`. `たがる` rather than `たい`, because `たい` is
+	// what the speaker wants, and these sentences are about somebody else.
+	auxiliaries: [
+		{ kind: 'negative', template: '{v}{a}', joint: 'negative', predicate: described(`ない`) },
+		{
+			kind: 'desire',
+			template: '{v}{a}',
+			joint: 'stem',
+			predicate: auxiliary(tensed(`たがる`)),
+			unless: ['たがる']
+		},
+		{
+			kind: 'begin',
+			template: '{v}{a}',
+			joint: 'stem',
+			predicate: auxiliary(tensed(`始める:i`)),
+			unless: ['始める', '出す']
+		},
+		{
+			kind: 'progressive',
+			template: '{v}{a}',
+			joint: 'linking',
+			predicate: auxiliary(tensed(`いる:i`)),
+			unless: ['いる']
+		},
+		{
+			kind: 'attempt',
+			template: '{v}{a}',
+			joint: 'linking',
+			predicate: auxiliary(tensed(`みる:i`)),
+			unless: ['みる', '見る']
+		},
+		{
+			kind: 'completive',
+			template: '{v}{a}',
+			joint: 'linking',
+			predicate: auxiliary(tensed(`しまう`)),
+			unless: ['しまう']
+		},
+		{
+			kind: 'resolve',
+			template: '{v}ことに{a}',
+			joint: 'words',
+			predicate: auxiliary(tensed(`する`))
+		}
+	],
 	frames: [
 		// A date and a clock, standing where an adverbial stands.
 		{
@@ -1129,6 +1323,49 @@ export const JA: SentenceLanguageData = {
 		},
 		// Japanese asks with か after the predicate, which is a tag rather than a
 		// phrase — no slot could carry it, and the word order does not move.
+		// Where it happens, in front of who did it — `公園で狐がりんごを食べた` — and
+		// the topic marker on a doer, which is how Japanese speaks of somebody it
+		// already knows: `狐は朝にりんごを食べた`.
+		{
+			parts: [
+				{ slot: 'place', tail: 'で', modifiable: true },
+				{ slot: 'subject', tail: 'が', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 6
+		},
+		{
+			parts: [
+				{ slot: 'place', tail: 'で', modifiable: true },
+				{ slot: 'subject', tail: 'が', modifiable: true },
+				{ slot: 'object', tail: 'を', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 4
+		},
+		{
+			parts: [{ slot: 'subject', tail: 'は', modifiable: true }, { slot: 'verb' }],
+			weight: 6
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: 'は', modifiable: true },
+				{ slot: 'object', tail: 'を', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 6
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: 'は', modifiable: true },
+				{ slot: 'time' },
+				{ slot: 'verb' }
+			],
+			weight: 4
+		},
+		// A reaction, with no subject at all: `本当によかった`, `静かだった`.
+		{ parts: [{ slot: 'state' }], weight: 6 },
+		{ parts: [{ slot: 'degree' }, { slot: 'state' }], weight: 10 },
 		{
 			parts: [{ slot: 'subject', tail: 'が', modifiable: true }, { slot: 'verb' }],
 			weight: 20,

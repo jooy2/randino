@@ -187,13 +187,24 @@ export const IT: SentenceLanguageData = {
 			)
 		},
 		// What somebody shows, split by what it shows — see the Korean data.
+		// What anything with a face can show, and beside each group what takes hands,
+		// shoulders or words and is a person's alone.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
 			...tensed(
-				`ride sorride canticchia ridacchia fischietta esulta annuisce applaude fa_l'occhiolino scoppia_a_ridere sorride_a_trentadue_denti`,
-				`rise sorrise canticchiò ridacchiò fischiettò esultò annuì applaudì fece_l'occhiolino scoppiò_a_ridere sorrise_a_trentadue_denti`
+				`ride sorride ridacchia scoppia_a_ridere sorride_a_trentadue_denti`,
+				`rise sorrise ridacchiò scoppiò_a_ridere sorrise_a_trentadue_denti`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
+			...tensed(
+				`canticchia fischietta esulta annuisce applaude fa_l'occhiolino`,
+				`canticchiò fischiettò esultò annuì applaudì fece_l'occhiolino`
 			)
 		},
 		{
@@ -201,17 +212,32 @@ export const IT: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'restless',
 			...tensed(
-				`piange sospira borbotta singhiozza geme brontola piagnucola sbuffa balbetta fa_una_smorfia scuote_la_testa aggrotta_la_fronte mugugna si_morde_il_labbro si_gratta_la_testa cammina_avanti_e_indietro`,
-				`pianse sospirò borbottò singhiozzò gemette brontolò piagnucolò sbuffò balbettò fece_una_smorfia scosse_la_testa aggrottò_la_fronte mugugnò si_morse_il_labbro si_grattò_la_testa camminò_avanti_e_indietro`
+				`piange singhiozza geme piagnucola sbuffa cammina_avanti_e_indietro`,
+				`pianse singhiozzò gemette piagnucolò sbuffò camminò_avanti_e_indietro`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
+			...tensed(
+				`sospira borbotta brontola balbetta fa_una_smorfia scuote_la_testa aggrotta_la_fronte mugugna si_morde_il_labbro si_gratta_la_testa`,
+				`sospirò borbottò brontolò balbettò fece_una_smorfia scosse_la_testa aggrottò_la_fronte mugugnò si_morse_il_labbro si_grattò_la_testa`
 			)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'tired',
+			...tensed(`sbadiglia si_stira sbatte_le_palpebre`, `sbadigliò si_stirò sbatté_le_palpebre`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'tired',
 			...tensed(
-				`sbadiglia si_stropiccia_gli_occhi si_stira si_massaggia_le_spalle sbatte_le_palpebre`,
-				`sbadigliò si_stropicciò_gli_occhi si_stirò si_massaggiò_le_spalle sbatté_le_palpebre`
+				`si_stropiccia_gli_occhi si_massaggia_le_spalle`,
+				`si_stropicciò_gli_occhi si_massaggiò_le_spalle`
 			)
 		},
 		{
@@ -219,16 +245,30 @@ export const IT: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'hungry',
 			...tensed(
-				`deglutisce si_lecca_le_labbra si_strofina_la_pancia annusa_l'aria`,
-				`deglutì si_leccò_le_labbra si_strofinò_la_pancia annusò_l'aria`
+				`deglutisce si_lecca_le_labbra annusa_l'aria`,
+				`deglutì si_leccò_le_labbra annusò_l'aria`
 			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'hungry',
+			...tensed(`si_strofina_la_pancia`, `si_strofinò_la_pancia`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`grida esclama ansima si_stringe_nelle_spalle starnutisce arrossisce strilla saluta_con_la_mano inclina_la_testa sgrana_gli_occhi sussulta`,
-				`gridò esclamò ansimò si_strinse_nelle_spalle starnutì arrossì strillò salutò_con_la_mano inclinò_la_testa sgranò_gli_occhi sussultò`
+				`grida ansima starnutisce strilla inclina_la_testa sgrana_gli_occhi sussulta`,
+				`gridò ansimò starnutì strillò inclinò_la_testa sgranò_gli_occhi sussultò`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			...tensed(
+				`esclama si_stringe_nelle_spalle arrossisce saluta_con_la_mano`,
+				`esclamò si_strinse_nelle_spalle arrossì salutò_con_la_mano`
 			)
 		},
 		{
@@ -692,7 +732,43 @@ export const IT: SentenceLanguageData = {
 			words: words(
 				`caldo freddo dolente rigido morbido ruvido liscio pallido forte intorpidito pesante`
 			)
-		}
+		},
+		// A reaction says what the moment was like, with nobody to say it of: `Era
+		// strano`, `Era delizioso`. Each group answers what the sentence before did.
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'look'],
+			words: words(`strano sorprendente curioso`)
+		},
+		{ subject: [], impersonal: true, after: ['lose'], words: words(`terribile frustrante triste`) },
+		{ subject: [], impersonal: true, after: ['eat', 'cook', 'drink'], words: words(`delizioso`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['meet', 'talk'],
+			words: words(`piacevole divertente`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rest', 'sleep'],
+			words: words(`piacevole rilassante`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['make', 'tend', 'sell'],
+			words: words(`soddisfacente`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['go', 'move', 'play'],
+			words: words(`divertente emozionante`)
+		},
+		{ subject: [], impersonal: true, after: ['search', 'wait'], words: words(`noioso faticoso`) },
+		{ subject: [], impersonal: true, after: ['think'], words: words(`strano bizzarro`) }
 	],
 	// Masculine singular, the form `agreement` reshapes, after the noun.
 	modifiers: [
@@ -878,7 +954,9 @@ export const IT: SentenceLanguageData = {
 		contrastive: words(
 			`ma tuttavia, eppure invece, ciò_nonostante, al_contrario, nondimeno, con_tutto_ciò,`
 		),
-		causal: words(`allora perciò così pertanto, di_conseguenza, per_questo per_tale_ragione,`)
+		causal: words(`allora perciò così pertanto, di_conseguenza, per_questo per_tale_ragione,`),
+		// Something new coming along: somebody else, the weather, the place changing.
+		turn: words(`all'improvviso, d'un_tratto, in_quel_momento, proprio_allora,`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -1037,6 +1115,9 @@ export const IT: SentenceLanguageData = {
 	// preposition opens goes without one — `in giardino` rather than `in la
 	// foresta`, which is not Italian at all. `verso` is the exception, and it is
 	// what a destination is written with.
+	// An Italian negative is `non` in front of the verb, and the verb keeps every
+	// form it had: `non mangiò`, `non corre?`.
+	auxiliaries: [{ kind: 'negative', template: 'non {v}' }],
 	frames: [
 		// A date and a clock, standing where an adverbial stands.
 		{
@@ -1202,6 +1283,9 @@ export const IT: SentenceLanguageData = {
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],
 			weight: 6
-		}
+		},
+		// A reaction, with no subject at all: `È strano.`, `Era molto piacevole.`
+		{ parts: [{ slot: 'state', head: 'è', pastHead: 'era' }], weight: 8 },
+		{ parts: [{ slot: 'degree' }, { slot: 'state', head: 'è', pastHead: 'era' }], weight: 8 }
 	]
 };

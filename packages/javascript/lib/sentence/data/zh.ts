@@ -114,38 +114,65 @@ export const ZH: SentenceLanguageData = {
 			)
 		},
 		// What somebody shows, split by what it shows — see the Korean data.
+		// What anything with a face can show, and beside each group what takes hands,
+		// shoulders or words and is a person's alone.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
-			words: words(
-				`微笑 哼歌 大笑 咯咯笑 傻笑 欢呼 点头 拍手 眨眼 咧嘴笑 眉开眼笑 笑出声 轻笑 哼着小曲`
-			)
+			words: words(`微笑 大笑 咯咯笑 傻笑 眉开眼笑 笑出声 轻笑`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
+			words: words(`哼歌 欢呼 点头 拍手 眨眼 咧嘴笑 哼着小曲`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'restless',
-			words: words(
-				`哭泣 叹气 咕哝 抽泣 呜咽 抱怨 嘀咕 皱眉 摇头 自言自语 流泪 踱步 咬嘴唇 挠头 撇嘴 坐立不安 唉声叹气 发牢骚`
-			)
+			words: words(`哭泣 抽泣 呜咽 流泪 踱步 坐立不安`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
+			words: words(`叹气 咕哝 抱怨 嘀咕 皱眉 摇头 自言自语 咬嘴唇 挠头 撇嘴 唉声叹气 发牢骚`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'tired',
-			words: words(`打哈欠 揉眼睛 伸懒腰 揉肩膀 转脖子 捶背`)
+			words: words(`打哈欠 伸懒腰`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'tired',
+			words: words(`揉眼睛 揉肩膀 转脖子 捶背`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'hungry',
-			words: words(`咽口水 舔嘴唇 摸肚子 吸鼻子 流口水`)
+			words: words(`咽口水 舔嘴唇 吸鼻子 流口水`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'hungry',
+			words: words(`摸肚子`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
-			words: words(`喊叫 倒吸一口气 耸肩 挥手 脸红 尖叫 叫喊 歪头 瞪大眼睛 回头 抬头 一愣`)
+			words: words(`喊叫 倒吸一口气 尖叫 叫喊 歪头 瞪大眼睛 回头 抬头 一愣`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			words: words(`耸肩 挥手 脸红`)
 		},
 		{
 			field: 'talk',
@@ -309,7 +336,7 @@ export const ZH: SentenceLanguageData = {
 			field: 'change',
 			subject: ['place'],
 			words: words(
-				`安静下来 变暗 变亮 热闹起来 沉寂 亮起来 苏醒 醒来 入睡 沉睡 静下来 热闹 喧闹起来 冷清下来 空了 空下来 挤满人 人来人往 闪烁 发亮 发光 结冰 融化 变湿 变干 被雾笼罩 变了样 焕然一新 忙碌起来 沸腾起来 暗下来 明亮起来 生机勃勃 热闹非凡`
+				`安静下来 变暗 变亮 热闹起来 沉寂 亮起来 苏醒 醒来 入睡 沉睡 静下来 热闹 喧闹起来 冷清下来 空下来 挤满人 人来人往 闪烁 发亮 发光 结冰 融化 变湿 变干 被雾笼罩 变了样 焕然一新 忙碌起来 沸腾起来 暗下来 明亮起来 生机勃勃 热闹非凡`
 			)
 		},
 		{
@@ -538,7 +565,32 @@ export const ZH: SentenceLanguageData = {
 		{
 			subject: ['body'],
 			words: words(`温暖 冰凉 酸痛 僵硬 柔软 粗糙 光滑 苍白 有力 麻木 沉重`)
-		}
+		},
+		// A reaction says what the moment was like, with nobody to say it of:
+		// `很幸运`, `真好吃`, `很安静`. Each group answers what the sentence before did,
+		// and the last fits after anything.
+		{ subject: [], impersonal: true, after: ['find', 'arrive'], words: words(`幸运 庆幸`) },
+		{ subject: [], impersonal: true, after: ['find', 'look'], words: words(`神奇 意外 稀奇`) },
+		{ subject: [], impersonal: true, after: ['lose'], words: words(`可惜 遗憾 糟糕`) },
+		{ subject: [], impersonal: true, after: ['eat', 'cook'], words: words(`好吃 香`) },
+		{ subject: [], impersonal: true, after: ['drink'], words: words(`好喝 爽口 清凉`) },
+		{ subject: [], impersonal: true, after: ['meet', 'talk'], words: words(`开心 愉快 高兴`) },
+		{ subject: [], impersonal: true, after: ['rest', 'sleep'], words: words(`舒服 惬意 安稳`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['make', 'tend', 'sell', 'hide', 'buy'],
+			words: words(`满足 踏实 自豪`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rise', 'go', 'move', 'play'],
+			words: words(`舒畅 痛快 开心`)
+		},
+		{ subject: [], impersonal: true, after: ['search', 'wait'], words: words(`无聊 着急 焦急`) },
+		{ subject: [], impersonal: true, after: ['think', 'look'], words: words(`奇怪 古怪 微妙`) },
+		{ subject: [], impersonal: true, words: words(`安静 平静 冷 暖和 凉快 寂静`) }
 	],
 	// Attributive, with 的 where an adjective of two syllables needs it in front of
 	// its noun and none where one of a single syllable does not.
@@ -703,7 +755,9 @@ export const ZH: SentenceLanguageData = {
 		additive: words(`而且 此外 并且 再者 另外 还有`),
 		temporal: words(`然后 后来 接着 同时 终于 随后 不久 那时 转眼间 过了一会儿 稍后 紧接着 不多时`),
 		contrastive: words(`但是 不过 可是 然而 反倒 相反 尽管如此 话说回来 只是`),
-		causal: words(`所以 于是 因此 结果 因而 故而 由此`)
+		causal: words(`所以 于是 因此 结果 因而 故而 由此`),
+		// Something new coming along: somebody else, the weather, the place changing.
+		turn: words(`这时 就在这时 正在这时 冷不防`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -832,6 +886,103 @@ export const ZH: SentenceLanguageData = {
 	// Chinese puts its verb after the subject and everything that frames the
 	// action — the place phrase included — in front of it. A destination is the
 	// one phrase that follows the verb, because the verb is what points at it.
+	// A Chinese auxiliary is a word in front of the verb that does not change, and
+	// the verb keeps its own form. `没` is the past's negative and takes no `了`
+	// after it, and neither does a verb that is only wanted or begun. A verb that
+	// already says how it ended — `找到`, `吃完`, `站起来` — is no verb to be in the
+	// middle of, or to begin.
+	auxiliaries: [
+		{ kind: 'negative', template: '没{v}', tense: 'past', dropsPastMark: true },
+		{ kind: 'desire', template: '想{v}', dropsPastMark: true },
+		{ kind: 'resolve', template: '决定{v}', dropsPastMark: true },
+		{
+			kind: 'begin',
+			template: '开始{v}',
+			dropsPastMark: true,
+			unless: [
+				'到',
+				'完',
+				'好',
+				'起来',
+				'下来',
+				'进',
+				'过去',
+				'上',
+				'开',
+				'掉',
+				'走',
+				'回',
+				'回来',
+				'过',
+				'下',
+				'出来',
+				'上去',
+				'着',
+				'住',
+				'出',
+				'了',
+				'下去'
+			]
+		},
+		{
+			kind: 'progressive',
+			template: '在{v}',
+			tense: 'present',
+			unless: [
+				'到',
+				'完',
+				'好',
+				'起来',
+				'下来',
+				'进',
+				'过去',
+				'上',
+				'开',
+				'掉',
+				'走',
+				'回',
+				'回来',
+				'过',
+				'下',
+				'出来',
+				'上去',
+				'着',
+				'住',
+				'出',
+				'了',
+				'下去'
+			]
+		},
+		{
+			kind: 'attempt',
+			template: '试着{v}',
+			dropsPastMark: true,
+			unless: [
+				'到',
+				'完',
+				'好',
+				'起来',
+				'下来',
+				'进',
+				'过去',
+				'上',
+				'开',
+				'掉',
+				'走',
+				'回',
+				'回来',
+				'过',
+				'下',
+				'出来',
+				'上去',
+				'着',
+				'住',
+				'出',
+				'了',
+				'下去'
+			]
+		}
+	],
 	frames: [
 		// A date and a clock, standing where an adverbial stands.
 		{
@@ -1044,6 +1195,9 @@ export const ZH: SentenceLanguageData = {
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],
 			weight: 5
-		}
+		},
+		// A reaction, with no subject at all: `很安静。`, `非常好吃。`
+		{ parts: [{ slot: 'state', head: '很' }], weight: 8 },
+		{ parts: [{ slot: 'degree' }, { slot: 'state' }], weight: 8 }
 	]
 };

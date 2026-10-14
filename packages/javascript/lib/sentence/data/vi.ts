@@ -120,40 +120,69 @@ export const VI: SentenceLanguageData = {
 			)
 		},
 		// What somebody shows, split by what it shows — see the Korean data.
+		// What anything with a face can show, and beside each group what takes hands,
+		// shoulders or words and is a person's alone.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
 			words: words(
-				`cười mỉm_cười ngâm_nga cười_khúc_khích cười_toe_toét cười_phá_lên huýt_sáo reo_hò gật_đầu vỗ_tay nháy_mắt hò_reo cười_ngặt_nghẽo hớn_hở cười_tươi`
+				`cười mỉm_cười cười_khúc_khích cười_toe_toét cười_phá_lên cười_ngặt_nghẽo hớn_hở cười_tươi`
 			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
+			words: words(`ngâm_nga huýt_sáo reo_hò gật_đầu vỗ_tay nháy_mắt hò_reo`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'restless',
-			words: words(
-				`khóc thở_dài lầm_bầm nức_nở sụt_sịt rên_rỉ càu_nhàu lẩm_bẩm cau_mày nhăn_mặt lắc_đầu rưng_rưng thút_thít bứt_rứt đi_đi_lại_lại cắn_môi gãi_đầu bồn_chồn`
-			)
+			words: words(`khóc nức_nở sụt_sịt rên_rỉ rưng_rưng thút_thít bứt_rứt đi_đi_lại_lại bồn_chồn`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
+			words: words(`thở_dài lầm_bầm càu_nhàu lẩm_bẩm cau_mày nhăn_mặt lắc_đầu cắn_môi gãi_đầu`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'tired',
-			words: words(`ngáp dụi_mắt vươn_vai xoa_vai xoay_cổ chớp_mắt`)
+			words: words(`ngáp vươn_vai chớp_mắt`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'tired',
+			words: words(`dụi_mắt xoa_vai xoay_cổ`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'hungry',
-			words: words(`nuốt_nước_bọt liếm_môi xoa_bụng hít_hà chảy_nước_miếng`)
+			words: words(`nuốt_nước_bọt liếm_môi hít_hà chảy_nước_miếng`)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'hungry',
+			words: words(`xoa_bụng`)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			words: words(
-				`la_lên cười_khẩy hét la_hét thở_hắt_ra nhún_vai đỏ_mặt vẫy_tay nghiêng_đầu tròn_mắt ngoảnh_lại ngẩng_đầu giật_mình`
+				`la_lên hét la_hét thở_hắt_ra nghiêng_đầu tròn_mắt ngoảnh_lại ngẩng_đầu giật_mình`
 			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			words: words(`cười_khẩy nhún_vai đỏ_mặt vẫy_tay`)
 		},
 		{
 			field: 'talk',
@@ -598,7 +627,32 @@ export const VI: SentenceLanguageData = {
 		{
 			subject: ['body'],
 			words: words(`ấm lạnh đau cứng mềm thô_ráp nhẵn xanh_xao khỏe tê nặng`)
-		}
+		},
+		// A reaction says what the moment was like, with nobody to say it of:
+		// `Thật may mắn`, `Rất ngon`, `Rất yên tĩnh`. Each group answers what the
+		// sentence before did, and the last fits after anything.
+		{ subject: [], impersonal: true, after: ['find', 'arrive'], words: words(`may_mắn`) },
+		{ subject: [], impersonal: true, after: ['find', 'look'], words: words(`lạ bất_ngờ thú_vị`) },
+		{ subject: [], impersonal: true, after: ['lose'], words: words(`đáng_tiếc buồn tệ`) },
+		{ subject: [], impersonal: true, after: ['eat', 'cook'], words: words(`ngon`) },
+		{ subject: [], impersonal: true, after: ['drink'], words: words(`ngon mát`) },
+		{ subject: [], impersonal: true, after: ['meet', 'talk'], words: words(`vui dễ_chịu`) },
+		{ subject: [], impersonal: true, after: ['rest', 'sleep'], words: words(`thoải_mái dễ_chịu`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['make', 'tend', 'sell', 'hide', 'buy'],
+			words: words(`mãn_nguyện tự_hào`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rise', 'go', 'move', 'play'],
+			words: words(`sảng_khoái vui`)
+		},
+		{ subject: [], impersonal: true, after: ['search', 'wait'], words: words(`chán mệt_mỏi`) },
+		{ subject: [], impersonal: true, after: ['think', 'look'], words: words(`lạ khó_hiểu`) },
+		{ subject: [], impersonal: true, words: words(`yên_tĩnh lạnh ấm_áp mát_mẻ vắng_lặng`) }
 	],
 	// Vietnamese puts the modifier after its noun, which the word frames already
 	// say; these are the ones a sentence may use, by what they describe.
@@ -776,7 +830,9 @@ export const VI: SentenceLanguageData = {
 			tiếp_đó chẳng_bao_lâu ít_lâu_sau bấy_giờ trong_chốc_lát ngay_sau_đó
 		`),
 		contrastive: words(`nhưng tuy_vậy tuy_nhiên dù_vậy thế_mà trái_lại ngược_lại có_điều dẫu_vậy`),
-		causal: words(`thế_là vì_thế rốt_cuộc do_đó bởi_vậy cho_nên vì_vậy`)
+		causal: words(`thế_là vì_thế rốt_cuộc do_đó bởi_vậy cho_nên vì_vậy`),
+		// Something new coming along: somebody else, the weather, the place changing.
+		turn: words(`bỗng bỗng_nhiên đúng_lúc_ấy ngay_lúc_đó`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -923,6 +979,19 @@ export const VI: SentenceLanguageData = {
 			words: words(`là`)
 		}
 	},
+	// A Vietnamese auxiliary is a word beside the verb that does not change, and
+	// the verb keeps its own form: `không ăn`, `muốn ăn`, `ăn thử`, with `đã` in
+	// front of all of it in the past. A question already closes on `không`, so it
+	// does not deny with one too; and `đang` is now.
+	auxiliaries: [
+		{ kind: 'negative', template: 'không {v}', moods: ['statement'] },
+		{ kind: 'desire', template: 'muốn {v}' },
+		{ kind: 'resolve', template: 'quyết định {v}' },
+		{ kind: 'effort', template: 'cố {v}' },
+		{ kind: 'begin', template: 'bắt đầu {v}' },
+		{ kind: 'progressive', template: 'đang {v}', tense: 'present' },
+		{ kind: 'attempt', template: '{v} thử' }
+	],
 	frames: [
 		// A date and a clock, standing where an adverbial stands.
 		{
@@ -1132,6 +1201,9 @@ export const VI: SentenceLanguageData = {
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],
 			weight: 5
-		}
+		},
+		// A reaction, with no subject at all: `Rất yên tĩnh.`, `Thật ngon.`
+		{ parts: [{ slot: 'state', head: 'rất' }], weight: 8 },
+		{ parts: [{ slot: 'degree' }, { slot: 'state' }], weight: 8 }
 	]
 };

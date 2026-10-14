@@ -6,6 +6,7 @@ Ported verbatim from the JavaScript package; see CLAUDE.md.
 from randino._internal.parse import words
 from randino.sentence.data._types import (
     ModifierGroup,
+    SentenceAuxiliary,
     SentenceCalendar,
     SentenceFrame,
     SentenceJoin,
@@ -154,38 +155,67 @@ VI = SentenceLanguageData(
             subject=("creature", "person"),
             condition="content",
             words=words("""
-                cười mỉm_cười ngâm_nga cười_khúc_khích cười_toe_toét cười_phá_lên huýt_sáo reo_hò
-                gật_đầu vỗ_tay nháy_mắt hò_reo cười_ngặt_nghẽo hớn_hở cười_tươi
+                cười mỉm_cười cười_khúc_khích cười_toe_toét cười_phá_lên cười_ngặt_nghẽo hớn_hở
+                cười_tươi
             """),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="content",
+            words=words("ngâm_nga huýt_sáo reo_hò gật_đầu vỗ_tay nháy_mắt hò_reo"),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             condition="restless",
             words=words("""
-                khóc thở_dài lầm_bầm nức_nở sụt_sịt rên_rỉ càu_nhàu lẩm_bẩm cau_mày nhăn_mặt lắc_đầu
-                rưng_rưng thút_thít bứt_rứt đi_đi_lại_lại cắn_môi gãi_đầu bồn_chồn
+                khóc nức_nở sụt_sịt rên_rỉ rưng_rưng thút_thít bứt_rứt đi_đi_lại_lại bồn_chồn
+            """),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="restless",
+            words=words("""
+                thở_dài lầm_bầm càu_nhàu lẩm_bẩm cau_mày nhăn_mặt lắc_đầu cắn_môi gãi_đầu
             """),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             condition="tired",
-            words=words("ngáp dụi_mắt vươn_vai xoa_vai xoay_cổ chớp_mắt"),
+            words=words("ngáp vươn_vai chớp_mắt"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="tired",
+            words=words("dụi_mắt xoa_vai xoay_cổ"),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             condition="hungry",
-            words=words("nuốt_nước_bọt liếm_môi xoa_bụng hít_hà chảy_nước_miếng"),
+            words=words("nuốt_nước_bọt liếm_môi hít_hà chảy_nước_miếng"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="hungry",
+            words=words("xoa_bụng"),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             words=words("""
-                la_lên cười_khẩy hét la_hét thở_hắt_ra nhún_vai đỏ_mặt vẫy_tay nghiêng_đầu tròn_mắt
-                ngoảnh_lại ngẩng_đầu giật_mình
+                la_lên hét la_hét thở_hắt_ra nghiêng_đầu tròn_mắt ngoảnh_lại ngẩng_đầu giật_mình
             """),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            words=words("cười_khẩy nhún_vai đỏ_mặt vẫy_tay"),
         ),
         VerbGroup(
             field="talk",
@@ -716,6 +746,77 @@ VI = SentenceLanguageData(
             subject=("body",),
             words=words("ấm lạnh đau cứng mềm thô_ráp nhẵn xanh_xao khỏe tê nặng"),
         ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "arrive"),
+            words=words("may_mắn"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "look"),
+            words=words("lạ bất_ngờ thú_vị"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("lose",),
+            words=words("đáng_tiếc buồn tệ"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("eat", "cook"),
+            words=words("ngon"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("drink",),
+            words=words("ngon mát"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("meet", "talk"),
+            words=words("vui dễ_chịu"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rest", "sleep"),
+            words=words("thoải_mái dễ_chịu"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("make", "tend", "sell", "hide", "buy"),
+            words=words("mãn_nguyện tự_hào"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rise", "go", "move", "play"),
+            words=words("sảng_khoái vui"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("search", "wait"),
+            words=words("chán mệt_mỏi"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("think", "look"),
+            words=words("lạ khó_hiểu"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            words=words("yên_tĩnh lạnh ấm_áp mát_mẻ vắng_lặng"),
+        ),
     ),
     modifiers=(
         ModifierGroup(
@@ -899,6 +1000,7 @@ VI = SentenceLanguageData(
             nhưng tuy_vậy tuy_nhiên dù_vậy thế_mà trái_lại ngược_lại có_điều dẫu_vậy
         """),
         "causal": words("thế_là vì_thế rốt_cuộc do_đó bởi_vậy cho_nên vì_vậy"),
+        "turn": words("bỗng bỗng_nhiên đúng_lúc_ấy ngay_lúc_đó"),
     },
     traits={
         "flier": words("""
@@ -1026,6 +1128,38 @@ VI = SentenceLanguageData(
         copula=StateGroup(
             subject=("event",),
             words=words("là"),
+        ),
+    ),
+    auxiliaries=(
+        SentenceAuxiliary(
+            kind="negative",
+            template="không {v}",
+            moods=("statement",),
+        ),
+        SentenceAuxiliary(
+            kind="desire",
+            template="muốn {v}",
+        ),
+        SentenceAuxiliary(
+            kind="resolve",
+            template="quyết định {v}",
+        ),
+        SentenceAuxiliary(
+            kind="effort",
+            template="cố {v}",
+        ),
+        SentenceAuxiliary(
+            kind="begin",
+            template="bắt đầu {v}",
+        ),
+        SentenceAuxiliary(
+            kind="progressive",
+            template="đang {v}",
+            tense="present",
+        ),
+        SentenceAuxiliary(
+            kind="attempt",
+            template="{v} thử",
         ),
     ),
     frames=(
@@ -1256,6 +1390,17 @@ VI = SentenceLanguageData(
                 SentencePart("money"),
             ),
             5,
+        ),
+        SentenceFrame(
+            (SentencePart("state", head="rất"),),
+            8,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            8,
         ),
     ),
 )

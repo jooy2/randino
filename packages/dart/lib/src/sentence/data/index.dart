@@ -286,6 +286,7 @@ class StoryStep {
     this.destination,
     this.needs = const <Condition>[],
     this.required = false,
+    this.fails = false,
     this.link,
     this.kinds = const <SentenceType>[],
     this.actor,
@@ -326,6 +327,13 @@ class StoryStep {
 
   /// A step every telling of the story has. The rest are drawn as room allows.
   final bool required;
+
+  /// Whether the step is told as not coming off: the hero looks and does not
+  /// find it, lies down and cannot sleep — `하지만 열쇠를 찾지 못했다`, `But she
+  /// could not sleep`. It changes nothing the field would have, leaves the hero
+  /// uneasy, and is never required, so a language with no way to say a thing
+  /// did not happen tells the story without it.
+  final bool fails;
 
   /// What a connective in front of this sentence may claim about the last one.
   final ConnectiveKind? link;
@@ -519,6 +527,13 @@ const List<Story> stories = <Story>[
     steps: <StoryStep>[
       StoryStep(StepKind.state, condition: Condition.restless),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.search], place: true, required: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.find],
+        object: StoryRole.item,
+        place: true,
+        fails: true,
+      ),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.look],
@@ -761,6 +776,7 @@ const List<Story> stories = <Story>[
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.express]),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.think]),
       StoryStep(StepKind.state, condition: Condition.tired),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.sleep], fails: true),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.sleep],
@@ -1059,6 +1075,13 @@ const List<Story> stories = <Story>[
         place: true,
         required: true,
         link: ConnectiveKind.causal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.find],
+        object: StoryRole.item,
+        place: true,
+        fails: true,
       ),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.wait], place: true),
       StoryStep(

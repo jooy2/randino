@@ -259,6 +259,154 @@ class PredicateTense {
 /// close every sentence the same way.
 typedef PredicateForms = Map<PredicateForm, WordPool>;
 
+/// A form an auxiliary attaches to where no [PredicateForm] already is one.
+/// Never a sentence's last word, so no level or mood reaches it.
+///
+/// Index-aligned with `words`, the way every form pool is.
+enum PredicateJoint {
+  /// The bare stem: Korean `먹` in `먹고 싶다` and `먹지 않는다`, and Japanese
+  /// `食べ` in `食べたい` and `食べ始める`.
+  stem,
+
+  /// The stem a Japanese negative is built on: `走ら` in `走らない`.
+  negative,
+}
+
+/// The joints a group declares, beside the forms a sentence ends on.
+typedef PredicateJoints = Map<PredicateJoint, WordPool>;
+
+/// What an auxiliary adds to the verb it goes with. Nine claims, and every
+/// language declares the ones its grammar writes.
+///
+/// The last four still say the thing happened, and they are the only ones a
+/// story writes: a story's next sentence builds on what the one before it did,
+/// and `사과를 먹지 않았다` followed by `배가 불렀다` is a story that lost its
+/// thread.
+enum AuxiliaryKind {
+  /// It did not happen (`먹지 않았다`, `did not eat`, `no comió`).
+  negative,
+
+  /// It could not (`먹지 못했다`, `could not eat`).
+  unable,
+
+  /// Somebody wanted it to (`먹고 싶었다`, `wanted to eat`, `食べたかった`).
+  desire,
+
+  /// Somebody decided on it (`먹기로 했다`, `decided to eat`).
+  resolve,
+
+  /// Somebody tried to, and it is left open whether they did (`tried to eat`,
+  /// `cố ăn`).
+  effort,
+
+  /// It started (`먹기 시작했다`, `began to eat`, `开始吃`).
+  begin,
+
+  /// It was going on (`먹고 있었다`, `食べていた`, `在吃`).
+  progressive,
+
+  /// Somebody tried it out, and so did it (`먹어 봤다`, `食べてみた`).
+  attempt,
+
+  /// It was done and over with (`먹어 버렸다`, `食べてしまった`).
+  completive,
+}
+
+/// The auxiliary word of a chained [SentenceAuxiliary]: the same shape a
+/// predicate group has, so it is said in the mood, the level and the tense the
+/// sentence is in.
+///
+/// More than one entry is allowed and any of them may be drawn — `begins to`
+/// and `starts to` — because nothing has to be translated through it by
+/// position.
+class AuxiliaryPredicate {
+  /// Creates the predicate of a chained auxiliary.
+  const AuxiliaryPredicate({
+    required this.words,
+    this.forms = const <PredicateForm, WordPool>{},
+    this.past,
+  });
+
+  /// The auxiliary in the form a plain statement ends on.
+  final WordPool words;
+
+  /// The same in another form, index-aligned with [words].
+  final PredicateForms forms;
+
+  /// The same in the past.
+  final PredicateTense? past;
+}
+
+/// One auxiliary a language writes beside a predicate, and how.
+///
+/// Two shapes, and the data says which. A **chained** auxiliary carries the
+/// sentence's mood, level and tense itself, and the verb in front of it takes a
+/// fixed form: Korean `먹고 싶었어요`, English `wanted to eat`, Japanese
+/// `食べてしまいました`. A **particle** is a word that does not change, and the
+/// verb keeps every form it would have had: Spanish `no comió`, Russian `не
+/// бежала`, Chinese `没吃`.
+///
+/// A predicate the caller required with `include` takes none: `include`
+/// promises the word, and `먹고 싶다` would be a sentence that does not contain
+/// `먹는다`.
+class SentenceAuxiliary {
+  /// Creates an auxiliary.
+  const SentenceAuxiliary({
+    required this.kind,
+    required this.template,
+    this.on = SentenceSlot.verb,
+    this.pastTemplate,
+    this.joint,
+    this.predicate,
+    this.dropsPastMark = false,
+    this.moods,
+    this.tense,
+    this.unless,
+  });
+
+  /// What it adds to the predicate.
+  final AuxiliaryKind kind;
+
+  /// What it goes with: [SentenceSlot.verb] or [SentenceSlot.state].
+  final SentenceSlot on;
+
+  /// How the two are written together: `{v}` is the predicate and `{a}` the
+  /// auxiliary. Korean `{v}고 {a}`, English `{a} {v}`, Japanese `{v}{a}`,
+  /// Spanish `no {v}`, Vietnamese `{v} thử`.
+  final String template;
+
+  /// The same in the past, where the word changes with it: Chinese `没{v}`
+  /// beside `不{v}`.
+  final String? pastTemplate;
+
+  /// The form the predicate takes in front of a chained auxiliary: the name of
+  /// a [PredicateJoint], of one of the predicate's own [PredicateForm]s
+  /// (`casual` is Korean `먹어` in `먹어 버렸다`, `linking` Japanese `食べて` in
+  /// `食べてしまう`, `question` English `eat` in `wants to eat`), or `words`, the
+  /// plain statement. Null for a particle.
+  final String? joint;
+
+  /// The auxiliary itself, for a chained one. Null for a particle.
+  final AuxiliaryPredicate? predicate;
+
+  /// Whether the language's own mark of the past is left out beside it: Chinese
+  /// writes `没吃` and never `没吃了`, and `想吃了` wants it gone too.
+  final bool dropsPastMark;
+
+  /// The moods it can be written in. Null for both: English `does not` asks
+  /// nothing.
+  final List<SentenceMood>? moods;
+
+  /// The one tense it can be written in, for one that cannot be written in the
+  /// other: Chinese `在`, Vietnamese `đang`.
+  final SentenceTense? tense;
+
+  /// Endings of the plain predicate it cannot follow, because the predicate
+  /// already says it: Korean `바라본다` takes no `-어 보다` (`바라봐 봤다`) and
+  /// `마셔버린다` no `-어 버리다`.
+  final List<String>? unless;
+}
+
 /// Verbs that take the same arguments.
 ///
 /// Written as a group rather than one tagged entry per verb, because the tag is
@@ -282,6 +430,7 @@ class VerbGroup {
     this.condition,
     this.forms = const <PredicateForm, WordPool>{},
     this.past,
+    this.joints = const <PredicateJoint, WordPool>{},
   });
 
   /// What these verbs do, as a story asks for it.
@@ -355,6 +504,9 @@ class VerbGroup {
   /// Null for a language that marks the past with a word beside the verb rather
   /// than on it — Chinese `了`, Vietnamese `đã` — which is `pastMark`'s business.
   final PredicateTense? past;
+
+  /// The forms an auxiliary attaches to, index-aligned with [words].
+  final PredicateJoints joints;
 }
 
 /// Predicate adjectives that describe the same kinds of thing, grouped the way
@@ -374,6 +526,9 @@ class StateGroup {
     this.pastHead,
     this.forms = const <PredicateForm, WordPool>{},
     this.past,
+    this.joints = const <PredicateJoint, WordPool>{},
+    this.impersonal = false,
+    this.after,
   });
 
   /// Classes a noun has to belong to to be described by these.
@@ -408,6 +563,23 @@ class StateGroup {
 
   /// The same adjectives in the past, index-aligned with [words].
   final PredicateTense? past;
+
+  /// The forms an auxiliary attaches to, index-aligned with [words].
+  final PredicateJoints joints;
+
+  /// Whether these describe no subject at all, but the moment: what it is like
+  /// just then (`조용하다`, `It is quiet`, `静かだ`), or what somebody makes of
+  /// what just happened (`다행이다`, `It was a relief`).
+  ///
+  /// Written only by a shape with no subject in it, which takes nothing else,
+  /// and with [subject] left empty so that nothing else ever draws them.
+  final bool impersonal;
+
+  /// The fields of the sentence before that an impersonal group answers:
+  /// `다행이다` after finding something, `맛있다` after eating it, `반갑다` after
+  /// meeting somebody. Null for one that fits after anything — the quiet, the
+  /// cold, the dark.
+  final List<VerbField>? after;
 }
 
 /// Attributive modifiers that fit the same kinds of noun, grouped the way the
@@ -747,7 +919,10 @@ enum NounTrait {
 /// each other. [ConnectiveKind.causal] is the one that can be false —
 /// `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel claims a
 /// consequence that is not there — so the generator writes one only where the
-/// sentences can carry it.
+/// sentences can carry it. [ConnectiveKind.turn] is the other one with a claim
+/// to keep: it opens a sentence about somebody or something that was not there
+/// a sentence ago — a passer-by, the weather, the place changing — and not the
+/// hero carrying on.
 enum ConnectiveKind {
   /// Here is one more thing (`그리고`, `besides`, `また`).
   additive,
@@ -760,6 +935,9 @@ enum ConnectiveKind {
 
   /// This follows from it (`그러므로`, `therefore`, `だから`).
   causal,
+
+  /// Something new has just come along (`그때`, `just then`, `すると`).
+  turn,
 }
 
 /// What a sentence opens on when it follows another one of the same result, by
@@ -961,6 +1139,7 @@ class SentenceLanguageData {
     this.openers = const <SentenceType, String>{},
     this.numeral,
     this.calendar,
+    this.auxiliaries = const <SentenceAuxiliary>[],
   });
 
   /// Placed between the phrases, and between the words inside one.
@@ -1148,6 +1327,11 @@ class SentenceLanguageData {
   /// — Russian equates with a dash rather than a word, and a dash does not
   /// change for a question or a level.
   final SentenceCalendar? calendar;
+
+  /// The auxiliaries the language writes beside a predicate. Empty for a
+  /// language that cannot write one correctly in its shapes — German puts
+  /// `nicht` wherever the rest of its clause is not.
+  final List<SentenceAuxiliary> auxiliaries;
 
   /// The shapes a sentence of this language can take.
   final List<SentenceFrame> frames;

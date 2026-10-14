@@ -29,6 +29,8 @@ Where a class is too wide, a group narrows it to themes on either side of the ve
 
 Below the theme, a noun may carry a **trait**: a language lists which of its nouns fly, swim or crawl, and a verb asks for one or rules one out. `날아오른다` takes a flier, `헤엄친다` a swimmer, and `달린다` takes anything that neither swims nor crawls — so a sparrow takes off, a mackerel swims, a snake crawls, and a lion, which is listed nowhere, runs. Every language lists its own: `the heron flew`, `der Basilisk kriecht`, `el sapo nada`. The lists name the exceptions and nothing else, and every noun keeps a verb in every field its kind has. A spell is no creature, and `myth` is an `idea` for that reason: the creatures of myth are a theme of their own, `monster`, so a curse fades and a prophecy lingers, and nobody writes `the charm chooses`. One trait takes a noun out of the places: a word of the `place` class that is no place — a wave, a comet, a lightyear — is `placeless`, so a sentence happens in a forest or on a moon and never `in the lightyear`. And a name is written as a name: a word a language lists as `proper` — a planet, a named star, a realm of myth — takes no article, no modifier and keeps its capital letter, so English writes `Mars glows` and `on Sedna`, and Spanish `Marte`, where every other noun would have written `the mars`. A verb may ask the same of its object: in English `sips` takes a `liquid`, `chews` takes none, and `roasts` and `slices` take something `raw`, so a curry is simmered and a steak is grilled, and nobody chews a syrup.
 
+What takes hands, shoulders or words is a person's alone. A fox laughs, cries and yawns in a story, and only a person shrugs, clears their throat, claps or mutters, so a sea cucumber never coughs. A modifier works the same way: one that fits several kinds of thing is listed beside the kinds it fits, so a village is lonely and a tax adviser is not rare, and an old jar is one thing an old demon is not. And a time happens nowhere: a sentence about a month, a dawn or a weekend is never given a place to happen in.
+
 A place takes the preposition it takes. Every English place frame writes `in`, and a language may list where that is the wrong word: `on the balcony`, `at the market`, `under the sky`. A place listed nowhere keeps the frame's own. Chinese marks a place after it rather than before, and lists the same way where the frame's `里` is wrong: `在火星上`, `在桥上`, `在路边`.
 
 It is not a promise that every sentence means something. A lion can bake a pudding here, and an ocarina can glitter at dusk. What the classes rule out is the sentence that does not parse as a thought at all.
@@ -51,6 +53,14 @@ First, a language declares only what it can write correctly. German has no shape
 
 Second, a particle belongs to the phrase rather than to the sentence. Korean picks between `가` and `이` by whether the word in front of it closes on a consonant, so `사자가` and `사슴이` come out right without either particle being stored twice. Italian picks between `l'`, `lo` and `il` by the sound the noun opens on. German writes its verb second, so a shape that opens on a time puts the subject behind it: `Am Morgen schläft ein Wolf.`
 
+## Not every sentence is built the same way {#variety}
+
+A sentence is not always a subject, an object and a verb, in that order. Three things keep a page of them from reading as one sentence written many times:
+
+- **The order moves.** A language declares several orders for the same parts. Korean and Japanese open on the place as well as on the subject (`공원에서 여우가 사과를 먹었다`) and mark a doer with the topic marker (`여우는 아침에 사과를 먹었다`); English opens on where it happened (`In the quiet garden, the fox ate the plum.`).
+- **The verb is said with something.** An auxiliary says what somebody wanted or decided, that something began or was going on, or that it did not happen: `먹고 싶어 했다`, `did not eat`, `食べ始めた`. See [what is said beside the verb](./rand-sentence#auxiliaries).
+- **Some sentences have no subject.** Inside a paragraph, a reaction says what the moment was like: `정말 다행스러웠다.`, `It was quiet.` See [more than one sentence](./rand-sentence#more-than-one-sentence).
+
 ## Length and the shape {#length-picks-the-shape}
 
 `minLength` and `maxLength` bound the whole sentence, punctuation included. The shapes that cannot land inside the range are dropped first, and each phrase is then drawn against the room left once the phrases behind it have reserved their shortest.
@@ -72,6 +82,8 @@ A result of more than one sentence follows a **story**, and a story is a list of
 So `여우가 시장으로 갔다. 사과를 샀다. 집에 들어와서 사과를 먹었다.` is a story the generator can tell and `여우가 사과를 먹었다. 사과를 샀다.` is not: nobody eats what they have not yet got.
 
 Three things follow from a step being a step rather than a sentence. The verb of each sentence is drawn from the **field** the step names, `buy`, `eat`, `arrive`, so the sentence says what the step says. The nouns a step puts on the page, the thing and the place, are pinned into every step after it. And two neighbouring steps may be written as one sentence, joined the way the language joins two clauses, where the range has room for both.
+
+A step may also not come off — the hero searches and does not find, lies down and cannot sleep — and that is a step too: it is told with the language's own way of saying a thing did not happen, opens on `but` or `그런데`, leaves the hero uneasy and changes nothing else, and the story carries on to the real thing afterwards.
 
 `randSentence` [describes the stories](./rand-sentence#more-than-one-sentence), and `tense` on the same page is what a story is told in.
 

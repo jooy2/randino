@@ -99,6 +99,107 @@ export type PredicateForm =
 export type PredicateForms = Partial<Record<PredicateForm, WordPool>>;
 
 /**
+ * A form an auxiliary attaches to where no `PredicateForm` already is one. Never
+ * a sentence's last word, so no level or mood reaches it.
+ *
+ * - `stem` is the bare stem: Korean `먹` in `먹고 싶다` and `먹지 않는다`, and
+ *   Japanese `食べ` in `食べたい` and `食べ始める`.
+ * - `negative` is the stem a Japanese negative is built on: `走ら` in `走らない`.
+ *
+ * Index-aligned with `words`, the way every form pool is.
+ */
+export type PredicateJoint = 'stem' | 'negative';
+
+export type PredicateJoints = Partial<Record<PredicateJoint, WordPool>>;
+
+/**
+ * What an auxiliary adds to the verb it goes with. Nine claims, and every
+ * language declares the ones its grammar writes:
+ *
+ * - `negative`: it did not happen (`먹지 않았다`, `did not eat`, `no comió`).
+ * - `unable`: it could not (`먹지 못했다`, `could not eat`).
+ * - `desire`: somebody wanted it to (`먹고 싶었다`, `wanted to eat`, `食べたかった`).
+ * - `resolve`: somebody decided on it (`먹기로 했다`, `decided to eat`).
+ * - `effort`: somebody tried to, and it is left open whether they did (`tried
+ *   to eat`, `cố ăn`).
+ * - `begin`: it started (`먹기 시작했다`, `began to eat`, `开始吃`).
+ * - `progressive`: it was going on (`먹고 있었다`, `食べていた`, `在吃`).
+ * - `attempt`: somebody tried it out, and so did it (`먹어 봤다`, `食べてみた`).
+ * - `completive`: it was done and over with (`먹어 버렸다`, `食べてしまった`).
+ *
+ * The last four still say the thing happened, and they are the only ones a
+ * story writes: a story's next sentence builds on what the one before it did,
+ * and `사과를 먹지 않았다` followed by `배가 불렀다` is a story that lost its
+ * thread.
+ */
+export type AuxiliaryKind =
+	| 'negative'
+	| 'unable'
+	| 'desire'
+	| 'resolve'
+	| 'effort'
+	| 'begin'
+	| 'progressive'
+	| 'attempt'
+	| 'completive';
+
+/**
+ * One auxiliary a language writes beside a predicate, and how.
+ *
+ * Two shapes, and the data says which. A **chained** auxiliary carries the
+ * sentence's mood, level and tense itself, and the verb in front of it takes a
+ * fixed form: Korean `먹고 싶었어요`, English `wanted to eat`, Japanese
+ * `食べてしまいました`. A **particle** is a word that does not change, and the
+ * verb keeps every form it would have had: Spanish `no comió`, Russian `не
+ * бежала`, Chinese `没吃`.
+ *
+ * A predicate the caller required with `include` takes none: `include` promises
+ * the word, and `먹고 싶다` would be a sentence that does not contain `먹는다`.
+ */
+export type SentenceAuxiliary = {
+	kind: AuxiliaryKind;
+	/** What it goes with. Left out by one that goes with a verb. */
+	on?: 'verb' | 'state';
+	/**
+	 * How the two are written together: `{v}` is the predicate and `{a}` the
+	 * auxiliary. Korean `{v}고 {a}`, English `{a} {v}`, Japanese `{v}{a}`, Spanish
+	 * `no {v}`, Vietnamese `{v} thử`.
+	 */
+	template: string;
+	/** The same in the past, where the word changes with it: Chinese `没{v}` beside `不{v}`. */
+	pastTemplate?: string;
+	/**
+	 * The form the predicate takes in front of a chained auxiliary: a joint, one
+	 * of the predicate's own forms (`casual` is Korean `먹어` in `먹어 버렸다`,
+	 * `linking` Japanese `食べて` in `食べてしまう`, `question` English `eat` in
+	 * `wants to eat`), or `words`, the plain statement. Left out by a particle.
+	 */
+	joint?: PredicateJoint | PredicateForm | 'words';
+	/**
+	 * The auxiliary itself, for a chained one: the same shape a predicate group
+	 * has, so it is said in the mood, the level and the tense the sentence is in.
+	 * More than one entry is allowed and any of them may be drawn — `begins to` and
+	 * `starts to` — because nothing has to be translated through it by position.
+	 */
+	predicate?: { words: WordPool; forms?: PredicateForms; past?: PredicateTense };
+	/**
+	 * Whether the language's own mark of the past is left out beside it: Chinese
+	 * writes `没吃` and never `没吃了`, and `想吃了` wants it gone too.
+	 */
+	dropsPastMark?: boolean;
+	/** The moods it can be written in. Left out, both: English `does not` asks nothing. */
+	moods?: readonly SentenceMood[];
+	/** The one tense it can be written in, for one that cannot be written in the other: Chinese `在`, Vietnamese `đang`. */
+	tense?: 'present' | 'past';
+	/**
+	 * Endings of the plain predicate it cannot follow, because the predicate
+	 * already says it: Korean `바라본다` takes no `-어 보다` (`바라봐 봤다`) and
+	 * `마셔버린다` no `-어 버리다`.
+	 */
+	unless?: readonly string[];
+};
+
+/**
  * What a verb does, as coarsely as a story needs to know it. A step of a story
  * asks for a field rather than for a word — "the hero eats something" — and the
  * language answers with any verb it has filed there, which is what lets one story
@@ -254,6 +355,8 @@ export type VerbGroup = {
 	 * `了`, Vietnamese `đã` — which is `pastMark`'s business.
 	 */
 	past?: PredicateTense;
+	/** The forms an auxiliary attaches to, index-aligned with `words`. */
+	joints?: PredicateJoints;
 };
 
 /**
@@ -286,6 +389,23 @@ export type StateGroup = {
 	forms?: PredicateForms;
 	/** The same adjectives in the past, index-aligned with `words`. */
 	past?: PredicateTense;
+	/** The forms an auxiliary attaches to, index-aligned with `words`. */
+	joints?: PredicateJoints;
+	/**
+	 * Whether these describe no subject at all, but the moment: what it is like
+	 * just then (`조용하다`, `It is quiet`, `静かだ`), or what somebody makes of
+	 * what just happened (`다행이다`, `It was a relief`). Written only by a shape
+	 * with no subject in it, which takes nothing else, and with `subject` left
+	 * empty so that nothing else ever draws them.
+	 */
+	impersonal?: boolean;
+	/**
+	 * The fields of the sentence before that an impersonal group answers:
+	 * `다행이다` after finding something, `맛있다` after eating it, `반갑다` after
+	 * meeting somebody. Left out by one that fits after anything — the quiet, the
+	 * cold, the dark.
+	 */
+	after?: readonly VerbField[];
 };
 
 /**
@@ -439,13 +559,18 @@ export type SentenceArticles = {
  * - `contrastive` says this cuts against it (`하지만`, `however`, `しかし`).
  * - `causal` says this follows from it (`그러므로`, `therefore`, `だから`).
  *
+ * - `turn` says something new has just come along (`그때`, `just then`, `すると`).
+ *
  * The first three can open any continuation: time passes whatever is said, one
  * more thing is always one more thing, and any two things can be set against
  * each other. `causal` is the one that can be false — `그러므로 금빛 하이볼이
  * 식죠?` after a sentence about a pretzel claims a consequence that is not
  * there — so the generator writes one only where the sentences can carry it.
+ * `turn` is the other one with a claim to keep: it opens a sentence about
+ * somebody or something that was not there a sentence ago — a passer-by, the
+ * weather, the place changing — and not the hero carrying on.
  */
-export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal';
+export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal' | 'turn';
 
 /**
  * What a noun can do that its theme does not say. A fish and a sparrow are both
@@ -893,5 +1018,11 @@ export type SentenceLanguageData = {
 	 * and a dash does not change for a question or a level.
 	 */
 	calendar?: SentenceCalendar;
+	/**
+	 * The auxiliaries the language writes beside a predicate. Left out by a
+	 * language that cannot write one correctly in its shapes — German puts
+	 * `nicht` wherever the rest of its clause is not.
+	 */
+	auxiliaries?: readonly SentenceAuxiliary[];
 	frames: readonly SentenceFrame[];
 };

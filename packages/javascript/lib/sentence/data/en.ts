@@ -178,14 +178,27 @@ export const EN: SentenceLanguageData = {
 		// What somebody shows, split by what it shows: a story draws the group that
 		// matches what is true of its hero, so the hero laughs after the meal and
 		// sighs after losing the key. The last group shows nothing in particular.
+		// What anything with a face can show. A fox laughs in a story and a sea
+		// cucumber does not shrug in any: what takes hands, shoulders or words is a
+		// person's alone, in the groups beside these.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
 			...tensed(
-				`laughs smiles hums giggles chuckles grins whistles cheers beams claps nods winks chortles brightens`,
-				`laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle brighten`,
-				`laughed smiled hummed giggled chuckled grinned whistled cheered beamed clapped nodded winked chortled brightened`
+				`laughs smiles grins beams brightens perks_up`,
+				`laugh smile grin beam brighten perk_up`,
+				`laughed smiled grinned beamed brightened perked_up`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
+			...tensed(
+				`hums giggles chuckles whistles cheers claps nods winks chortles`,
+				`hum giggle chuckle whistle cheer clap nod wink chortle`,
+				`hummed giggled chuckled whistled cheered clapped nodded winked chortled`
 			)
 		},
 		{
@@ -193,9 +206,19 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'restless',
 			...tensed(
-				`cries sighs mutters sobs weeps groans grumbles whimpers snorts frowns sniffles fidgets paces grimaces scowls pouts fumes sulks`,
-				`cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget pace grimace scowl pout fume sulk`,
-				`cried sighed muttered sobbed wept groaned grumbled whimpered snorted frowned sniffled fidgeted paced grimaced scowled pouted fumed sulked`
+				`cries sobs whimpers snorts fidgets paces`,
+				`cry sob whimper snort fidget pace`,
+				`cried sobbed whimpered snorted fidgeted paced`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
+			...tensed(
+				`sighs mutters weeps groans grumbles frowns sniffles grimaces scowls pouts fumes sulks`,
+				`sigh mutter weep groan grumble frown sniffle grimace scowl pout fume sulk`,
+				`sighed muttered wept groaned grumbled frowned sniffled grimaced scowled pouted fumed sulked`
 			)
 		},
 		{
@@ -222,9 +245,18 @@ export const EN: SentenceLanguageData = {
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`shouts gasps shrugs blushes squints flinches exclaims looks_up looks_round`,
-				`shout gasp shrug blush squint flinch exclaim look_up look_round`,
-				`shouted gasped shrugged blushed squinted flinched exclaimed looked_up looked_round`
+				`gasps squints flinches looks_up looks_round startles`,
+				`gasp squint flinch look_up look_round startle`,
+				`gasped squinted flinched looked_up looked_round startled`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			...tensed(
+				`shouts shrugs blushes exclaims`,
+				`shout shrug blush exclaim`,
+				`shouted shrugged blushed exclaimed`
 			)
 		},
 		{
@@ -777,6 +809,80 @@ export const EN: SentenceLanguageData = {
 		{
 			subject: ['body'],
 			words: words(`warm cold sore stiff steady strong weak numb tender rough smooth heavy`)
+		},
+		// A reaction says what the moment was like, with `it` standing for it:
+		// `It was a relief`, `It was delicious`, `It was quiet`. Each group answers
+		// what the sentence before did, and the last fits after anything.
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'arrive'],
+			words: words(`lucky fortunate wonderful`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'look'],
+			words: words(`surprising amazing curious`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['lose'],
+			words: words(`awful frustrating maddening unlucky`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['eat', 'cook'],
+			words: words(`delicious tasty filling`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['drink'],
+			words: words(`refreshing delicious soothing`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['meet', 'talk'],
+			words: words(`nice pleasant lovely cheerful`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rest', 'sleep'],
+			words: words(`peaceful cozy restful`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['make', 'tend', 'sell', 'hide', 'buy'],
+			words: words(`satisfying rewarding worthwhile`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rise', 'go', 'move', 'play'],
+			words: words(`refreshing fun lively`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['search', 'wait'],
+			words: words(`tiring hopeless dull tedious`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			after: ['think', 'look'],
+			words: words(`odd puzzling strange`)
+		},
+		{
+			subject: [],
+			impersonal: true,
+			words: words(`quiet peaceful still silent chilly cold warm calm`)
 		}
 	],
 	// Attributive, grouped by what they can sit in front of. Lowercase, because
@@ -885,6 +991,8 @@ export const EN: SentenceLanguageData = {
 				steady weary stiff sore rough smooth pale thin strong
 			`)
 		},
+		// The words that fit more than one kind of thing, each beside the kinds it
+		// does fit: a humble cottage and a humble baker, and never a humble comet.
 		{
 			subject: [
 				'creature',
@@ -897,7 +1005,27 @@ export const EN: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`beautiful mysterious strange new lovely familiar odd ordinary splendid humble`)
+			words: words(`beautiful strange odd lovely`)
+		},
+		{
+			subject: ['creature', 'person', 'plant', 'thing', 'place', 'idea', 'event'],
+			words: words(`mysterious`)
+		},
+		{
+			subject: ['person', 'thing', 'vehicle', 'place', 'idea', 'event'],
+			words: words(`new`)
+		},
+		{
+			subject: ['person', 'creature', 'place', 'thing', 'vehicle', 'idea'],
+			words: words(`familiar ordinary`)
+		},
+		{
+			subject: ['thing', 'place', 'event', 'vehicle', 'creature', 'plant'],
+			words: words(`splendid`)
+		},
+		{
+			subject: ['person', 'place', 'thing'],
+			words: words(`humble`)
 		}
 	],
 	manners: [
@@ -1011,7 +1139,9 @@ export const EN: SentenceLanguageData = {
 			but still however yet even_so then_again all_the_same even_then
 			nevertheless nonetheless instead on_the_other_hand
 		`),
-		causal: words(`so therefore in_the_end thus hence as_a_result for_that_reason consequently`)
+		causal: words(`so therefore in_the_end thus hence as_a_result for_that_reason consequently`),
+		// Something new coming along: somebody else, the weather, the place changing.
+		turn: words(`just_then at_that_moment out_of_nowhere right_then all_of_a_sudden`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -1196,6 +1326,53 @@ export const EN: SentenceLanguageData = {
 	// English puts its verb second, and the sentence grows to the right of it.
 	// Every `is` and `does` in a head has its past beside it, because those are the
 	// words that carry the tense once the verb has fallen back to its base form.
+	// An English auxiliary stands in front of the verb's base form and carries the
+	// tense itself: `wants to eat`, `wanted to eat`, `did not eat`. A question asks
+	// with `does` in front of the subject and the base form after it, so only the
+	// ones that go there are asked: `Does the fox want to eat?`, never `Does the
+	// fox does not eat?`.
+	auxiliaries: [
+		{
+			kind: 'negative',
+			template: '{a} {v}',
+			joint: 'question',
+			predicate: { words: words(`does_not`), past: { words: words(`did_not`) } },
+			moods: ['statement']
+		},
+		{
+			kind: 'unable',
+			template: '{a} {v}',
+			joint: 'question',
+			predicate: { words: words(`cannot`), past: { words: words(`could_not`) } },
+			moods: ['statement']
+		},
+		{
+			kind: 'desire',
+			template: '{a} {v}',
+			joint: 'question',
+			predicate: tensed(`wants_to`, `want_to`, `wanted_to`),
+			unless: ['wants']
+		},
+		{
+			kind: 'resolve',
+			template: '{a} {v}',
+			joint: 'question',
+			predicate: tensed(`decides_to`, `decide_to`, `decided_to`)
+		},
+		{
+			kind: 'effort',
+			template: '{a} {v}',
+			joint: 'question',
+			predicate: tensed(`tries_to`, `try_to`, `tried_to`)
+		},
+		{
+			kind: 'begin',
+			template: '{a} {v}',
+			joint: 'question',
+			predicate: tensed(`begins_to starts_to`, `begin_to start_to`, `began_to started_to`),
+			unless: ['begins', 'starts']
+		}
+	],
 	frames: [
 		// A date and a clock, standing where an adverbial stands.
 		{
@@ -1363,6 +1540,30 @@ export const EN: SentenceLanguageData = {
 		// subject and the verb falls back to its base form — `Does the lion run?`
 		// rather than `Runs the lion?`. `is` moves the same way, and in the past
 		// both auxiliaries carry the tense: `Did the lion run?`, `Was the lion big?`
+		// Where it happens, in front: `In the quiet garden, the fox ate the plum.`
+		{
+			parts: [
+				{ slot: 'place', head: 'in', tail: ',', modifiable: true },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 6
+		},
+		{
+			parts: [
+				{ slot: 'place', head: 'in', tail: ',', modifiable: true },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'object', modifiable: true }
+			],
+			weight: 4
+		},
+		// A reaction, with `it` for the moment: `It was very quiet.`
+		{ parts: [{ slot: 'state', head: 'it is', pastHead: 'it was' }], weight: 8 },
+		{
+			parts: [{ slot: 'degree' }, { slot: 'state', head: 'it is', pastHead: 'it was' }],
+			weight: 8
+		},
 		{
 			parts: [
 				{ slot: 'subject', head: 'does', pastHead: 'did', modifiable: true },

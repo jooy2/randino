@@ -6,6 +6,7 @@ Ported verbatim from the JavaScript package; see CLAUDE.md.
 from randino._internal.parse import words
 from randino.sentence.data._types import (
     ModifierGroup,
+    SentenceAuxiliary,
     SentenceCalendar,
     SentenceFrame,
     SentenceJoin,
@@ -123,34 +124,59 @@ ZH = SentenceLanguageData(
             field="express",
             subject=("creature", "person"),
             condition="content",
-            words=words(
-                "微笑 哼歌 大笑 咯咯笑 傻笑 欢呼 点头 拍手 眨眼 咧嘴笑 眉开眼笑 笑出声 轻笑 哼着小曲"
-            ),
+            words=words("微笑 大笑 咯咯笑 傻笑 眉开眼笑 笑出声 轻笑"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="content",
+            words=words("哼歌 欢呼 点头 拍手 眨眼 咧嘴笑 哼着小曲"),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             condition="restless",
-            words=words(
-                "哭泣 叹气 咕哝 抽泣 呜咽 抱怨 嘀咕 皱眉 摇头 自言自语 流泪 踱步 咬嘴唇 挠头 撇嘴 坐立不安 唉声叹气 发牢骚"
-            ),
+            words=words("哭泣 抽泣 呜咽 流泪 踱步 坐立不安"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="restless",
+            words=words("叹气 咕哝 抱怨 嘀咕 皱眉 摇头 自言自语 咬嘴唇 挠头 撇嘴 唉声叹气 发牢骚"),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             condition="tired",
-            words=words("打哈欠 揉眼睛 伸懒腰 揉肩膀 转脖子 捶背"),
+            words=words("打哈欠 伸懒腰"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="tired",
+            words=words("揉眼睛 揉肩膀 转脖子 捶背"),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
             condition="hungry",
-            words=words("咽口水 舔嘴唇 摸肚子 吸鼻子 流口水"),
+            words=words("咽口水 舔嘴唇 吸鼻子 流口水"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="hungry",
+            words=words("摸肚子"),
         ),
         VerbGroup(
             field="express",
             subject=("creature", "person"),
-            words=words("喊叫 倒吸一口气 耸肩 挥手 脸红 尖叫 叫喊 歪头 瞪大眼睛 回头 抬头 一愣"),
+            words=words("喊叫 倒吸一口气 尖叫 叫喊 歪头 瞪大眼睛 回头 抬头 一愣"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            words=words("耸肩 挥手 脸红"),
         ),
         VerbGroup(
             field="talk",
@@ -317,8 +343,8 @@ ZH = SentenceLanguageData(
             field="change",
             subject=("place",),
             words=words("""
-                安静下来 变暗 变亮 热闹起来 沉寂 亮起来 苏醒 醒来 入睡 沉睡 静下来 热闹 喧闹起来 冷清下来 空了 空下来 挤满人 人来人往 闪烁 发亮 发光 结冰 融化
-                变湿 变干 被雾笼罩 变了样 焕然一新 忙碌起来 沸腾起来 暗下来 明亮起来 生机勃勃 热闹非凡
+                安静下来 变暗 变亮 热闹起来 沉寂 亮起来 苏醒 醒来 入睡 沉睡 静下来 热闹 喧闹起来 冷清下来 空下来 挤满人 人来人往 闪烁 发亮 发光 结冰 融化 变湿
+                变干 被雾笼罩 变了样 焕然一新 忙碌起来 沸腾起来 暗下来 明亮起来 生机勃勃 热闹非凡
             """),
         ),
         VerbGroup(
@@ -552,6 +578,77 @@ ZH = SentenceLanguageData(
             subject=("body",),
             words=words("温暖 冰凉 酸痛 僵硬 柔软 粗糙 光滑 苍白 有力 麻木 沉重"),
         ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "arrive"),
+            words=words("幸运 庆幸"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "look"),
+            words=words("神奇 意外 稀奇"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("lose",),
+            words=words("可惜 遗憾 糟糕"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("eat", "cook"),
+            words=words("好吃 香"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("drink",),
+            words=words("好喝 爽口 清凉"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("meet", "talk"),
+            words=words("开心 愉快 高兴"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rest", "sleep"),
+            words=words("舒服 惬意 安稳"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("make", "tend", "sell", "hide", "buy"),
+            words=words("满足 踏实 自豪"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rise", "go", "move", "play"),
+            words=words("舒畅 痛快 开心"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("search", "wait"),
+            words=words("无聊 着急 焦急"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("think", "look"),
+            words=words("奇怪 古怪 微妙"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            words=words("安静 平静 冷 暖和 凉快 寂静"),
+        ),
     ),
     modifiers=(
         ModifierGroup(
@@ -704,6 +801,7 @@ ZH = SentenceLanguageData(
         ),
         "contrastive": words("但是 不过 可是 然而 反倒 相反 尽管如此 话说回来 只是"),
         "causal": words("所以 于是 因此 结果 因而 故而 由此"),
+        "turn": words("这时 就在这时 正在这时 冷不防"),
     },
     traits={
         "flier": words("""
@@ -795,6 +893,111 @@ ZH = SentenceLanguageData(
         copula=StateGroup(
             subject=("event",),
             words=words("是"),
+        ),
+    ),
+    auxiliaries=(
+        SentenceAuxiliary(
+            kind="negative",
+            template="没{v}",
+            drops_past_mark=True,
+            tense="past",
+        ),
+        SentenceAuxiliary(
+            kind="desire",
+            template="想{v}",
+            drops_past_mark=True,
+        ),
+        SentenceAuxiliary(
+            kind="resolve",
+            template="决定{v}",
+            drops_past_mark=True,
+        ),
+        SentenceAuxiliary(
+            kind="begin",
+            template="开始{v}",
+            drops_past_mark=True,
+            unless=(
+                "到",
+                "完",
+                "好",
+                "起来",
+                "下来",
+                "进",
+                "过去",
+                "上",
+                "开",
+                "掉",
+                "走",
+                "回",
+                "回来",
+                "过",
+                "下",
+                "出来",
+                "上去",
+                "着",
+                "住",
+                "出",
+                "了",
+                "下去",
+            ),
+        ),
+        SentenceAuxiliary(
+            kind="progressive",
+            template="在{v}",
+            tense="present",
+            unless=(
+                "到",
+                "完",
+                "好",
+                "起来",
+                "下来",
+                "进",
+                "过去",
+                "上",
+                "开",
+                "掉",
+                "走",
+                "回",
+                "回来",
+                "过",
+                "下",
+                "出来",
+                "上去",
+                "着",
+                "住",
+                "出",
+                "了",
+                "下去",
+            ),
+        ),
+        SentenceAuxiliary(
+            kind="attempt",
+            template="试着{v}",
+            drops_past_mark=True,
+            unless=(
+                "到",
+                "完",
+                "好",
+                "起来",
+                "下来",
+                "进",
+                "过去",
+                "上",
+                "开",
+                "掉",
+                "走",
+                "回",
+                "回来",
+                "过",
+                "下",
+                "出来",
+                "上去",
+                "着",
+                "住",
+                "出",
+                "了",
+                "下去",
+            ),
         ),
     ),
     frames=(
@@ -1036,6 +1239,17 @@ ZH = SentenceLanguageData(
                 SentencePart("money"),
             ),
             5,
+        ),
+        SentenceFrame(
+            (SentencePart("state", head="很"),),
+            8,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            8,
         ),
     ),
 )

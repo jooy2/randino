@@ -84,6 +84,36 @@ Map<String, Object?>? tense(PredicateTense? source) => source == null
         },
       };
 
+/// A predicate's joints, keyed by name, with an empty map for none.
+Map<String, Object?> joints(PredicateJoints source) => <String, Object?>{
+  for (final j in source.entries) j.key.name: listed(j.value),
+};
+
+/// An auxiliary, with every optional field present.
+Map<String, Object?> auxiliary(SentenceAuxiliary source) => <String, Object?>{
+  'kind': source.kind.name,
+  'on': source.on.name,
+  'template': source.template,
+  'pastTemplate': source.pastTemplate ?? '',
+  'joint': source.joint ?? '',
+  'predicate': source.predicate == null
+      ? null
+      : <String, Object?>{
+          'words': listed(source.predicate!.words),
+          'forms': <String, Object?>{
+            for (final f in source.predicate!.forms.entries)
+              f.key.name: listed(f.value),
+          },
+          'past': tense(source.predicate!.past),
+        },
+  'dropsPastMark': source.dropsPastMark,
+  'moods': source.moods == null
+      ? null
+      : <String>[for (final mood in source.moods!) mood.name],
+  'tense': source.tense?.name ?? '',
+  'unless': listed(source.unless),
+};
+
 /// A group of modifiers or manners, narrowed by class and optionally by theme.
 List<Object?> groups(List<ModifierGroup> source) => <Object?>[
   for (final group in source)
@@ -120,6 +150,7 @@ Map<String, Object?> step(StoryStep source) => <String, Object?>{
   'destination': source.destination?.name ?? '',
   'needs': <String>[for (final c in source.needs) c.name],
   'required': source.required,
+  'fails': source.fails,
   'link': source.link?.name ?? '',
   'kinds': <String>[for (final kind in source.kinds) kind.name],
   'actor': source.actor?.name ?? '',
@@ -328,6 +359,7 @@ void main() {
                   f.key.name: listed(f.value),
               },
               'past': tense(group.past),
+              'joints': joints(group.joints),
             },
         ],
         'states': <Object?>[
@@ -342,13 +374,21 @@ void main() {
               'condition': group.condition?.name ?? '',
               'head': group.head ?? '',
               'pastHead': group.pastHead ?? '',
+              'impersonal': group.impersonal,
+              'after': group.after == null
+                  ? null
+                  : <String>[for (final field in group.after!) field.name],
               'words': listed(group.words),
               'forms': <String, Object?>{
                 for (final f in group.forms.entries)
                   f.key.name: listed(f.value),
               },
               'past': tense(group.past),
+              'joints': joints(group.joints),
             },
+        ],
+        'auxiliaries': <Object?>[
+          for (final each in entry.value.auxiliaries) auxiliary(each),
         ],
         'modifiers': groups(entry.value.modifiers),
         'manners': groups(entry.value.manners),

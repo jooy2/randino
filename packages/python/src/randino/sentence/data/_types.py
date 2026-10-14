@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from dataclasses import field as attribute
 from typing import Literal
 
-from randino._types import SentenceQuote, SentenceSlot, WordTheme
+from randino._types import SentenceQuote, SentenceSlot, SentenceTense, WordTheme
 from randino.word.data._types import WordAgreement, WordGender, WordPool
 
 NounClass = Literal[
@@ -81,6 +81,49 @@ An entry may write more than one ending with `|` between them, and one of them i
 That is what keeps a pool index-aligned with `words` while `달리니|달리나|달리는가` is
 still one entry for one verb — a Korean question has several endings and a generator
 that only ever wrote the first would close every sentence the same way.
+"""
+
+PredicateJoint = Literal["stem", "negative"]
+"""A form an auxiliary attaches to where no `PredicateForm` already is one.
+
+Never a sentence's last word, so no level or mood reaches it. `"stem"` is the bare stem:
+Korean `먹` in `먹고 싶다` and `먹지 않는다`, and Japanese `食べ` in `食べたい` and
+`食べ始める`. `"negative"` is the stem a Japanese negative is built on: `走ら` in `走らない`.
+Index-aligned with `words`, the way every form pool is.
+"""
+
+PredicateJoints = Mapping[PredicateJoint, WordPool]
+"""The joints a group declares, index-aligned with its `words`."""
+
+AuxiliaryKind = Literal[
+    "negative",
+    "unable",
+    "desire",
+    "resolve",
+    "effort",
+    "begin",
+    "progressive",
+    "attempt",
+    "completive",
+]
+"""What an auxiliary adds to the verb it goes with.
+
+Nine claims, and every language declares the ones its grammar writes:
+
+- `"negative"`: it did not happen (`먹지 않았다`, `did not eat`, `no comió`).
+- `"unable"`: it could not (`먹지 못했다`, `could not eat`).
+- `"desire"`: somebody wanted it to (`먹고 싶었다`, `wanted to eat`, `食べたかった`).
+- `"resolve"`: somebody decided on it (`먹기로 했다`, `decided to eat`).
+- `"effort"`: somebody tried to, and it is left open whether they did (`tried to eat`,
+  `cố ăn`).
+- `"begin"`: it started (`먹기 시작했다`, `began to eat`, `开始吃`).
+- `"progressive"`: it was going on (`먹고 있었다`, `食べていた`, `在吃`).
+- `"attempt"`: somebody tried it out, and so did it (`먹어 봤다`, `食べてみた`).
+- `"completive"`: it was done and over with (`먹어 버렸다`, `食べてしまった`).
+
+The last four still say the thing happened, and they are the only ones a story writes: a
+story's next sentence builds on what the one before it did, and `사과를 먹지 않았다`
+followed by `배가 불렀다` is a story that lost its thread.
 """
 
 VerbField = Literal[
@@ -158,6 +201,25 @@ class PredicateTense:
 
     forms: PredicateForms = attribute(default_factory=dict)
     """The other forms, index-aligned with `words`."""
+
+
+@dataclass(frozen=True, slots=True)
+class AuxiliaryPredicate:
+    """The auxiliary itself, for a chained one: the same shape a predicate group has.
+
+    So it is said in the mood, the level and the tense the sentence is in. More than one
+    entry is allowed and any of them may be drawn — `begins to` and `starts to` — because
+    nothing has to be translated through it by position.
+    """
+
+    words: WordPool
+    """The statement form."""
+
+    forms: PredicateForms = attribute(default_factory=dict)
+    """The other forms, index-aligned with `words`."""
+
+    past: PredicateTense | None = None
+    """The same in the past."""
 
 
 NounTrait = Literal["flier", "swimmer", "crawler", "liquid", "raw", "placeless", "proper"]
@@ -266,6 +328,9 @@ class VerbGroup:
     on it — Chinese `了`, Vietnamese `đã` — which is `past_mark`'s business.
     """
 
+    joints: PredicateJoints = attribute(default_factory=dict)
+    """The forms an auxiliary attaches to, index-aligned with `words`."""
+
 
 @dataclass(frozen=True, slots=True)
 class StateGroup:
@@ -307,6 +372,25 @@ class StateGroup:
 
     past: PredicateTense | None = None
     """The same adjectives in the past, index-aligned with `words`."""
+
+    joints: PredicateJoints = attribute(default_factory=dict)
+    """The forms an auxiliary attaches to, index-aligned with `words`."""
+
+    impersonal: bool = False
+    """Whether these describe no subject at all, but the moment.
+
+    What it is like just then (`조용하다`, `It is quiet`, `静かだ`), or what somebody makes
+    of what just happened (`다행이다`, `It was a relief`). Written only by a shape with no
+    subject in it, which takes nothing else, and with `subject` left empty so that nothing
+    else ever draws them.
+    """
+
+    after: tuple[VerbField, ...] | None = None
+    """The fields of the sentence before that an impersonal group answers.
+
+    `다행이다` after finding something, `맛있다` after eating it, `반갑다` after meeting
+    somebody. None for one that fits after anything — the quiet, the cold, the dark.
+    """
 
 
 @dataclass(frozen=True, slots=True)
@@ -464,6 +548,69 @@ class SentenceFrame:
 
 
 @dataclass(frozen=True, slots=True)
+class SentenceAuxiliary:
+    """One auxiliary a language writes beside a predicate, and how.
+
+    Two shapes, and the data says which. A **chained** auxiliary carries the sentence's
+    mood, level and tense itself, and the verb in front of it takes a fixed form: Korean
+    `먹고 싶었어요`, English `wanted to eat`, Japanese `食べてしまいました`. A **particle**
+    is a word that does not change, and the verb keeps every form it would have had:
+    Spanish `no comió`, Russian `не бежала`, Chinese `没吃`.
+
+    A predicate the caller required with `include` takes none: `include` promises the
+    word, and `먹고 싶다` would be a sentence that does not contain `먹는다`.
+    """
+
+    kind: AuxiliaryKind
+    """What it adds to the predicate."""
+
+    template: str
+    """How the two are written together: `{v}` is the predicate and `{a}` the auxiliary.
+
+    Korean `{v}고 {a}`, English `{a} {v}`, Japanese `{v}{a}`, Spanish `no {v}`,
+    Vietnamese `{v} thử`.
+    """
+
+    on: Literal["verb", "state"] = "verb"
+    """What it goes with."""
+
+    past_template: str | None = None
+    """The same in the past, where the word changes with it: Chinese `没{v}` beside `不{v}`."""
+
+    joint: PredicateJoint | PredicateForm | Literal["words"] | None = None
+    """The form the predicate takes in front of a chained auxiliary.
+
+    A `PredicateJoint`, one of the predicate's own forms (`"casual"` is Korean `먹어` in
+    `먹어 버렸다`, `"linking"` Japanese `食べて` in `食べてしまう`, `"question"` English
+    `eat` in `wants to eat`), or `"words"`, the plain statement. None for a particle.
+    """
+
+    predicate: AuxiliaryPredicate | None = None
+    """The auxiliary itself, for a chained one. None for a particle."""
+
+    drops_past_mark: bool = False
+    """Whether the language's own mark of the past is left out beside it.
+
+    Chinese writes `没吃` and never `没吃了`, and `想吃了` wants it gone too.
+    """
+
+    moods: tuple[SentenceMood, ...] | None = None
+    """The moods it can be written in. None for both: English `does not` asks nothing."""
+
+    tense: SentenceTense | None = None
+    """The one tense it can be written in, for one that cannot be written in the other.
+
+    Chinese `在`, Vietnamese `đang`.
+    """
+
+    unless: tuple[str, ...] | None = None
+    """Endings of the plain predicate it cannot follow, because the predicate already says it.
+
+    Korean `바라본다` takes no `-어 보다` (`바라봐 봤다`) and `마셔버린다` no `-어 버리다`.
+    """
+
+
+@dataclass(frozen=True, slots=True)
 class SentenceTimes:
     """When something happens, written whole, sorted by what a paragraph has to know.
 
@@ -581,19 +728,22 @@ asked — and the generator writes the language's own terminator in its place.
 """
 
 
-ConnectiveKind = Literal["additive", "temporal", "contrastive", "causal"]
+ConnectiveKind = Literal["additive", "temporal", "contrastive", "causal", "turn"]
 """What a connective claims about the sentence before it.
 
 - `additive` says here is one more thing (`그리고`, `besides`, `また`).
 - `temporal` says time passed (`이윽고`, `meanwhile`, `やがて`).
 - `contrastive` says this cuts against it (`하지만`, `however`, `しかし`).
 - `causal` says this follows from it (`그러므로`, `therefore`, `だから`).
+- `turn` says something new has just come along (`그때`, `just then`, `すると`).
 
 The first three can open any continuation: time passes whatever is said, one more thing
 is always one more thing, and any two things can be set against each other. `causal` is
 the one that can be false — `그러므로 금빛 하이볼이 식죠?` after a sentence about a
 pretzel claims a consequence that is not there — so the generator writes one only where
-the sentences can carry it.
+the sentences can carry it. `turn` is the other one with a claim to keep: it opens a
+sentence about somebody or something that was not there a sentence ago — a passer-by, the
+weather, the place changing — and not the hero carrying on.
 """
 
 SentenceConnectives = Mapping[ConnectiveKind, WordPool]
@@ -901,6 +1051,13 @@ class SentenceLanguageData:
     Chinese `在火星上`, `在桥上` and `在路边` where every place frame writes `在…里`. `""` is
     a place that takes none. A place listed nowhere takes the frame's. None for a language
     whose one tail is right for every place.
+    """
+
+    auxiliaries: tuple[SentenceAuxiliary, ...] = ()
+    """The auxiliaries the language writes beside a predicate.
+
+    Empty for a language that cannot write one correctly in its shapes — German puts
+    `nicht` wherever the rest of its clause is not.
     """
     """Noun classes the language's written pronouns are wrong for.
 

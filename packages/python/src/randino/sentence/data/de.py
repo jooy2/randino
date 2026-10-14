@@ -191,14 +191,19 @@ DE = SentenceLanguageData(
             field="express",
             subject=("creature", "person"),
             condition="content",
-            words=words("""
-                lacht lächelt summt kichert grinst pfeift jauchzt jubelt nickt klatscht zwinkert
-                strahlt schmunzelt gluckst
-            """),
+            words=words("lacht lächelt kichert grinst strahlt gluckst"),
+            past=PredicateTense(
+                words=words("lachte lächelte kicherte grinste strahlte gluckste"),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="content",
+            words=words("summt pfeift jauchzt jubelt nickt klatscht zwinkert schmunzelt"),
             past=PredicateTense(
                 words=words("""
-                    lachte lächelte summte kicherte grinste pfiff jauchzte jubelte nickte klatschte
-                    zwinkerte strahlte schmunzelte gluckste
+                    summte pfiff jauchzte jubelte nickte klatschte zwinkerte schmunzelte
                 """),
             ),
         ),
@@ -207,13 +212,23 @@ DE = SentenceLanguageData(
             subject=("creature", "person"),
             condition="restless",
             words=words("""
-                weint seufzt murmelt schluchzt stöhnt murrt brummt schnieft schnaubt stammelt
-                wimmert heult jammert flucht zappelt grummelt zittert bebt
+                weint schluchzt stöhnt schnieft schnaubt wimmert heult zappelt zittert bebt
             """),
             past=PredicateTense(
                 words=words("""
-                    weinte seufzte murmelte schluchzte stöhnte murrte brummte schniefte schnaubte
-                    stammelte wimmerte heulte jammerte fluchte zappelte grummelte zitterte bebte
+                    weinte schluchzte stöhnte schniefte schnaubte wimmerte heulte zappelte zitterte
+                    bebte
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            condition="restless",
+            words=words("seufzt murmelt murrt brummt stammelt jammert flucht grummelt"),
+            past=PredicateTense(
+                words=words("""
+                    seufzte murmelte murrte brummte stammelte jammerte fluchte grummelte
                 """),
             ),
         ),
@@ -239,15 +254,22 @@ DE = SentenceLanguageData(
             field="express",
             subject=("creature", "person"),
             words=words("""
-                ruft schreit keucht niest prustet kreischt hustet räuspert_sich grunzt quiekt fiept
-                kräht zirpt brüllt faucht knurrt jault winselt errötet schnalzt winkt zuckt stutzt
+                ruft schreit keucht niest prustet kreischt hustet grunzt quiekt fiept kräht zirpt
+                brüllt faucht knurrt jault winselt zuckt stutzt
             """),
             past=PredicateTense(
                 words=words("""
-                    rief schrie keuchte nieste prustete kreischte hustete räusperte_sich grunzte
-                    quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte errötete
-                    schnalzte winkte zuckte stutzte
+                    rief schrie keuchte nieste prustete kreischte hustete grunzte quiekte fiepte
+                    krähte zirpte brüllte fauchte knurrte jaulte winselte zuckte stutzte
                 """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("person",),
+            words=words("räuspert_sich errötet schnalzt winkt"),
+            past=PredicateTense(
+                words=words("räusperte_sich errötete schnalzte winkte"),
             ),
         ),
         VerbGroup(
@@ -681,6 +703,65 @@ DE = SentenceLanguageData(
             subject=("body",),
             words=words("warm kalt wund steif weich rau glatt blass stark taub schwer"),
         ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("find", "look"),
+            words=words("seltsam überraschend merkwürdig"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("lose",),
+            words=words("schrecklich ärgerlich traurig"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("eat", "cook", "drink"),
+            words=words("köstlich lecker"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("meet", "talk"),
+            words=words("schön angenehm nett"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rest", "sleep"),
+            words=words("gemütlich angenehm erholsam"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("make", "tend", "sell"),
+            words=words("befriedigend lohnend"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("rise", "go", "move", "play"),
+            words=words("lustig erfrischend"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("search", "wait"),
+            words=words("langweilig mühsam"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            after=("think",),
+            words=words("seltsam rätselhaft"),
+        ),
+        StateGroup(
+            subject=(),
+            impersonal=True,
+            words=words("still ruhig kalt warm kühl friedlich"),
+        ),
     ),
     modifiers=(
         ModifierGroup(
@@ -1076,6 +1157,17 @@ DE = SentenceLanguageData(
             ),
             6,
             mood="question",
+        ),
+        SentenceFrame(
+            (SentencePart("state", head="es ist", past_head="es war"),),
+            8,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("degree"),
+                SentencePart("state", head="es ist", past_head="es war"),
+            ),
+            8,
         ),
     ),
 )

@@ -27,7 +27,12 @@ import { agree } from '../dist/word/wordGenerator.js';
 import type { WordGender } from '../dist/word/data/types.js';
 import { NAME_DATA } from '../dist/name/data/index.js';
 import { INTERLUDES, SENTENCE_DATA, STORIES, THEME_CLASS } from '../dist/sentence/data/index.js';
-import type { NounClass, VerbField, VerbGroup } from '../dist/sentence/data/types.js';
+import type {
+	NounClass,
+	SentenceAuxiliary,
+	VerbField,
+	VerbGroup
+} from '../dist/sentence/data/types.js';
 import { shapeOf } from '../dist/sentence/sentenceGenerator.js';
 import { heroClassesFor, itemThemesFor, propThemesFor, tellable } from '../dist/sentence/story.js';
 
@@ -349,7 +354,87 @@ type Group = {
 	words: readonly string[];
 	forms?: Partial<Record<string, readonly string[]>>;
 	past?: { words: readonly string[]; forms?: Partial<Record<string, readonly string[]>> };
+	joints?: Partial<Record<string, readonly string[]>>;
 };
+
+/** One way a predicate phrase reads: the predicate, and the auxiliary written around it. */
+type Helped = { verb: string; helper: string; auxiliary: SentenceAuxiliary | null };
+
+/**
+ * The ways a predicate phrase reads: as itself, and as a predicate with one of
+ * the language's auxiliaries written around it — `먹고 싶어 했다` is `먹` and
+ * `싶어 했다`, `没吃` is `吃`, `did not eat` is `eat` and `did not`. Every
+ * reading the templates allow, because which one the generator meant is not
+ * written down anywhere but in the phrase.
+ */
+function helpedIn(language: WordLanguage, slot: SentenceSlot, phrase: string): Helped[] {
+	const out: Helped[] = [{ verb: phrase, helper: '', auxiliary: null }];
+
+	for (const auxiliary of SENTENCE_DATA[language].auxiliaries ?? []) {
+		if ((auxiliary.on ?? 'verb') !== slot) {
+			continue;
+		}
+
+		const helpers = auxiliary.predicate ? new Set(everyForm(auxiliary.predicate)) : new Set(['']);
+		const templates = [auxiliary.template, auxiliary.pastTemplate].filter(
+			(template): template is string => template !== undefined
+		);
+
+		for (const template of templates) {
+			for (const helper of helpers) {
+				const [front, back] = template.replace('{a}', helper).split('{v}');
+
+				if (
+					phrase.length > front.length + back.length &&
+					phrase.startsWith(front) &&
+					phrase.endsWith(back)
+				) {
+					out.push({
+						verb: phrase.slice(front.length, phrase.length - back.length),
+						helper,
+						auxiliary
+					});
+				}
+			}
+		}
+	}
+
+	return out;
+}
+
+/**
+ * The entries of a group an auxiliary follows: the form it is joined by for a
+ * chained one, and the group's every form for a particle, which leaves the
+ * predicate as it was.
+ */
+function jointsOf(group: Group, auxiliary: SentenceAuxiliary): string[] {
+	if (!auxiliary.predicate) {
+		return everyForm(group);
+	}
+
+	const joint = auxiliary.joint ?? 'words';
+
+	if (joint === 'words') {
+		return [...group.words];
+	}
+
+	return endings(group.joints?.[joint] ?? group.forms?.[joint] ?? []);
+}
+
+/**
+ * Whether a group wrote this predicate phrase: as one of its forms, or as the
+ * form an auxiliary follows with that auxiliary around it.
+ */
+function writes(language: WordLanguage, group: Group, slot: SentenceSlot, phrase: string): boolean {
+	// A past that agrees with its subject is any of its agreed forms: `откинулась`.
+	const agreement = SENTENCE_DATA[language].pastAgreement;
+	const agreed = (forms: string[]) =>
+		agreement ? forms.flatMap((word) => agreedBy(agreement, word)) : forms;
+
+	return helpedIn(language, slot, phrase).some(({ verb, auxiliary }) =>
+		agreed(auxiliary ? jointsOf(group, auxiliary) : everyForm(group)).includes(verb)
+	);
+}
 
 /** Every ending an entry lists: `달리니|달리나` is one entry and two endings. */
 function endings(pool: readonly string[]): string[] {
@@ -678,6 +763,7 @@ describe('Sentence', () => {
 
 	it('every phrase is written out of the language`s own pools', () => {
 		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
 			const fixed = new Map(
 				(['verb', 'state', 'manner', 'time', 'degree'] as SentenceSlot[]).map((slot) => [
 					slot,
@@ -697,8 +783,18 @@ describe('Sentence', () => {
 					const pool = fixed.get(slot);
 
 					if (pool) {
+						// A predicate may carry an auxiliary, and is then the form that
+						// auxiliary follows, from the same pools.
+						const helped =
+							(slot === 'verb' || slot === 'state') &&
+							[written, phrase].some((each) =>
+								(slot === 'verb' ? data.verbs : data.states).some((group) =>
+									writes(language, group, slot, each)
+								)
+							);
+
 						assert.ok(
-							pool.has(written) || pool.has(phrase),
+							pool.has(written) || pool.has(phrase) || helped,
 							`${language}: '${phrase}' is not in the ${slot} pools (${detail.sentence})`
 						);
 
@@ -800,7 +896,8 @@ describe('Sentence', () => {
 				// right when one of its groups accounts for it.
 				const groups = data.verbs.filter(
 					(group) =>
-						everyForm(group).includes(detail.phrases[at]) && Boolean(group.object) === transitive
+						writes(language, group, 'verb', detail.phrases[at]) &&
+						Boolean(group.object) === transitive
 				);
 
 				assert.ok(
@@ -1066,9 +1163,10 @@ describe('Sentence', () => {
 		// write `die schlanke Wolke` — so a range only the longer one can reach is a
 		// range a name cannot be in. Drawn rather than asked for, it is one more
 		// thing to decide against the room, and deciding it before the range is even
-		// known is what both ports were doing.
+		// known is what both ports were doing. Korean is not among them: its
+		// multi-word predicates and adverbials are spaced the way they are written,
+		// and a named sentence reaches the top of its range.
 		for (const [language, minLength] of [
-			['ko', 54],
 			['zh', 33],
 			['ja', 58],
 			['de', 92]
@@ -1829,7 +1927,12 @@ describe('Sentence', () => {
 				const named = [...nounsIn(language, phrase)].flatMap((noun) =>
 					tails.filter(([, pool]) => pool.includes(noun)).map(([tail]) => tail)
 				);
-				const after = detail.sentence.slice(detail.sentence.indexOf(phrase) + phrase.length);
+				// Found where the phrases before it leave off, because the place's noun
+				// may be inside one of them too.
+				const from = detail.phrases
+					.slice(0, at)
+					.reduce((cursor, before) => detail.sentence.indexOf(before, cursor) + before.length, 0);
+				const after = detail.sentence.slice(detail.sentence.indexOf(phrase, from) + phrase.length);
 
 				listed += named.length ? 1 : 0;
 				assert.ok(
@@ -2537,9 +2640,23 @@ describe('Sentence', () => {
 					const phrase = detail.phrases[i];
 					const written = i === 0 ? phrase.charAt(0).toLowerCase() + phrase.slice(1) : phrase;
 					const pool = expected[slot];
+					// An auxiliary that carries the sentence's form is the one asked in it,
+					// and a particle leaves the predicate in the form it would have had.
+					const helped = [written, phrase].some((each) =>
+						helpedIn(language, slot, each).some(
+							({ verb, helper, auxiliary }) =>
+								auxiliary !== null &&
+								(auxiliary.predicate
+									? formsOf(auxiliary.predicate, 'plain', 'question').includes(helper) &&
+										(slot === 'verb' ? data.verbs : data.states).some((group) =>
+											jointsOf(group, auxiliary).includes(verb)
+										)
+									: pool.has(verb))
+						)
+					);
 
 					assert.ok(
-						pool.has(written) || pool.has(phrase),
+						pool.has(written) || pool.has(phrase) || helped,
 						`${language}: '${phrase}' is not the ${slot} form a question asks for (${detail.sentence})`
 					);
 				}
@@ -2837,7 +2954,10 @@ describe('Sentence', () => {
 					const at = detail.slots.indexOf('verb');
 
 					if (at >= 0) {
-						assert.ok(pools.has(detail.phrases[at]), `${language} ${style}: ${detail.sentence}`);
+						assert.ok(
+							helpedIn(language, 'verb', detail.phrases[at]).some(({ verb }) => pools.has(verb)),
+							`${language} ${style}: ${detail.sentence}`
+						);
 					}
 				}
 			}
@@ -2909,8 +3029,19 @@ describe('Sentence', () => {
 								continue;
 							}
 
+							// An auxiliary carries the level and the mood where it is a predicate
+							// of its own, and the predicate in front of it the form it follows.
+							const helped = helpedIn(language, slot, detail.phrases[i]).some(
+								({ verb, helper, auxiliary }) =>
+									auxiliary?.predicate !== undefined &&
+									formsOf(auxiliary.predicate, style, mark).includes(helper) &&
+									(slot === 'verb' ? data.verbs : data.states).some((group) =>
+										jointsOf(group, auxiliary).includes(verb)
+									)
+							);
+
 							assert.ok(
-								pools[slot].has(detail.phrases[i]),
+								pools[slot].has(detail.phrases[i]) || helped,
 								`${language} ${style} ${type}: '${detail.phrases[i]}' is not a ${style} ${slot} (${detail.sentence})`
 							);
 						}
@@ -2927,6 +3058,485 @@ describe('Sentence', () => {
 			for (const group of [...data.verbs, ...data.states]) {
 				for (const [form, pool] of Object.entries(group.forms ?? {})) {
 					assert.strictEqual(pool.length, group.words.length, `${language} ${form}`);
+				}
+			}
+		}
+	});
+
+	it('every pool a group writes is as long as the words it restates, in either tense', () => {
+		// Index alignment is what translates a required word, and what keeps a verb's
+		// past the same verb. Korean spells its past out of its 해체 forms, and a form
+		// written in two words — `배를 문질러` — once split into two stems and put every
+		// past after it one verb out of step: `배를다`.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			for (const group of [...data.verbs, ...data.states]) {
+				const pools: [string, readonly string[] | undefined][] = [
+					...Object.entries(group.forms ?? {}),
+					...Object.entries(group.joints ?? {}),
+					['past', group.past?.words],
+					...Object.entries(group.past?.forms ?? {}).map(
+						([form, pool]) => [`past ${form}`, pool] as [string, readonly string[] | undefined]
+					)
+				];
+
+				for (const [form, pool] of pools) {
+					if (pool) {
+						assert.strictEqual(
+							pool.length,
+							group.words.length,
+							`${language} ${form}: ${group.words[0]}`
+						);
+					}
+				}
+			}
+		}
+	});
+
+	it('a Korean predicate is spaced where Korean spaces it, and carries no object of its own', () => {
+		// `입을 다시다` is two words, and `입을다시다` is one that does not exist. And a
+		// verb that already has its object takes no second one: `팽이버섯을 값을
+		// 치렀다` is a mushroom paid twice.
+		const data = SENTENCE_DATA.ko;
+
+		for (const group of [...data.verbs, ...data.states]) {
+			for (const word of group.words) {
+				assert.ok(!/[을를](?=[가-힣])/.test(word), `ko: '${word}' runs its object into its verb`);
+
+				if ('object' in group && group.object) {
+					assert.ok(!/[을를] /.test(word), `ko: '${word}' takes an object and carries one`);
+				}
+			}
+		}
+	});
+
+	it('an auxiliary is written around a predicate the way the language writes it', () => {
+		// The kinds that still say the thing happened — the only ones a story writes —
+		// and the ones only somebody can do.
+		const HAPPENS = ['begin', 'progressive', 'attempt', 'completive'];
+		const WILLED = ['unable', 'desire', 'resolve', 'effort', 'attempt'];
+
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const auxiliaries = data.auxiliaries ?? [];
+
+			// Every one of them has somewhere to put the predicate, and a chained one an
+			// auxiliary of its own and a form of the predicate to follow.
+			for (const auxiliary of auxiliaries) {
+				for (const template of [auxiliary.template, auxiliary.pastTemplate]) {
+					if (template === undefined) {
+						continue;
+					}
+
+					assert.strictEqual(template.split('{v}').length, 2, `${language}: ${template}`);
+					assert.strictEqual(
+						template.includes('{a}'),
+						auxiliary.predicate !== undefined,
+						`${language}: ${template}`
+					);
+				}
+
+				if (auxiliary.predicate) {
+					const groups = (auxiliary.on ?? 'verb') === 'verb' ? data.verbs : data.states;
+
+					assert.ok(
+						groups.some((group) => jointsOf(group, auxiliary).length > 0),
+						`${language} ${auxiliary.kind}: no group writes the form it follows`
+					);
+				}
+			}
+
+			if (!auxiliaries.length) {
+				continue;
+			}
+
+			let seen = 0;
+			// A predicate with an auxiliary around it, read the way `writes` reads one.
+			const helped = (detail: SentenceDetail) =>
+				detail.phrases.flatMap((phrase, i) => {
+					const slot = detail.slots[i];
+
+					if (slot !== 'verb' && slot !== 'state') {
+						return [];
+					}
+
+					const groups = slot === 'verb' ? data.verbs : data.states;
+
+					return helpedIn(language, slot, phrase).filter(
+						({ verb, auxiliary }) =>
+							auxiliary !== null &&
+							groups.some((group) => jointsOf(group, auxiliary).includes(verb)) &&
+							!groups.some((group) => everyForm(group).includes(phrase))
+					);
+				});
+
+			for (const detail of randSentence({
+				language,
+				includeName: false,
+				count: 300,
+				output: 'detail'
+			})) {
+				for (const { auxiliary } of helped(detail)) {
+					seen += 1;
+
+					// Only somebody wants, decides, tries or fails to: a soup cools and a
+					// bus runs, and neither of them wants to.
+					if (WILLED.includes(auxiliary!.kind) && detail.theme !== null) {
+						assert.ok(
+							['person', 'creature'].includes(THEME_CLASS[detail.theme]),
+							`${language}: ${detail.theme} cannot ${auxiliary!.kind} (${detail.sentence})`
+						);
+					}
+				}
+			}
+
+			assert.ok(seen > 0, `${language} never wrote an auxiliary`);
+
+			// A story builds on what each of its sentences did, so it writes only the
+			// ones that say the thing happened — and denies one only where a step of
+			// it does not come off: the hero looks and does not find, lies down and
+			// cannot sleep.
+			const failing = new Set(
+				STORIES.flatMap((story) =>
+					story.steps
+						.filter((step) => step.fails)
+						.flatMap((step) =>
+							step.field === undefined
+								? []
+								: typeof step.field === 'string'
+									? [step.field]
+									: step.field
+						)
+				)
+			);
+			const failed = (detail: SentenceDetail) =>
+				detail.phrases.some(
+					(phrase, i) =>
+						detail.slots[i] === 'verb' &&
+						data.verbs.some(
+							(group) => failing.has(group.field) && writes(language, group, 'verb', phrase)
+						)
+				);
+
+			for (const detail of randSentence({
+				language,
+				sentences: 4,
+				includeName: false,
+				count: 80,
+				output: 'detail'
+			})) {
+				if (detail.story === null) {
+					continue;
+				}
+
+				for (const { auxiliary } of helped(detail)) {
+					assert.ok(
+						HAPPENS.includes(auxiliary!.kind) ||
+							(['negative', 'unable'].includes(auxiliary!.kind) && failed(detail)),
+						`${language}: a story said ${auxiliary!.kind} (${detail.sentence})`
+					);
+				}
+			}
+		}
+	});
+
+	it('a reaction says what the moment was like, after what it answers, and never first', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const impersonal = data.states.filter((group) => group.impersonal);
+			const shaped = data.frames.some(
+				(frame) => !frame.parts.some((part) => part.slot === 'subject' || part.slot === 'quantity')
+			);
+
+			// A language has the shape with no subject and the groups that go in it, or
+			// neither; and such a group describes nobody, so nothing else draws it.
+			assert.strictEqual(impersonal.length > 0, shaped, language);
+
+			for (const group of impersonal) {
+				assert.strictEqual(group.subject.length, 0, `${language}: ${group.words[0]}`);
+			}
+
+			if (!impersonal.length) {
+				continue;
+			}
+
+			const personal = new Set(
+				inflectedFor(language, data.states.filter((group) => !group.impersonal).flatMap(everyForm))
+			);
+			// What each reaction answers: the fields of the groups it is in, or null
+			// where one of them fits after anything.
+			const answers = new Map<string, Set<VerbField> | null>();
+
+			for (const group of impersonal) {
+				for (const word of everyForm(group)) {
+					const known = answers.get(word);
+
+					answers.set(
+						word,
+						!group.after || known === null ? null : new Set([...(known ?? []), ...group.after])
+					);
+				}
+			}
+
+			const lower = (word: string) => word.charAt(0).toLowerCase() + word.slice(1);
+			// A verb in the past with the language's own mark beside it: `触摸了`, `đã ăn`.
+			const unmarked = (verb: string) => {
+				const head = data.pastMark?.head ? data.pastMark.head + data.space : '';
+				const tail = data.pastMark?.tail ?? '';
+
+				return verb.startsWith(head) && verb.endsWith(tail)
+					? verb.slice(head.length, verb.length - tail.length)
+					: verb;
+			};
+			let seen = 0;
+
+			for (const detail of randSentence({
+				language,
+				sentences: 5,
+				includeName: false,
+				count: 150,
+				output: 'detail'
+			})) {
+				const at = sentenceOf(detail);
+				const reaction = (i: number): string | null => {
+					const slots = detail.slots.filter((_, j) => at[j] === i);
+					const phrases = detail.phrases.filter((_, j) => at[j] === i);
+					const state = phrases[slots.indexOf('state')];
+
+					if (
+						state === undefined ||
+						slots.some((slot) => slot !== 'state' && slot !== 'degree') ||
+						personal.has(lower(state)) ||
+						!answers.has(lower(state))
+					) {
+						return null;
+					}
+
+					return lower(state);
+				};
+
+				detail.sentences.forEach((sentence, i) => {
+					const word = reaction(i);
+
+					if (word === null) {
+						return;
+					}
+
+					seen += 1;
+					assert.ok(i > 0, `${language}: a result opened on a reaction (${detail.sentence})`);
+					assert.strictEqual(
+						reaction(i - 1),
+						null,
+						`${language}: two reactions (${detail.sentence})`
+					);
+
+					// One that answers something answers what the sentence before did.
+					const after = answers.get(word);
+
+					if (after) {
+						const verbs = detail.phrases.filter(
+							(_, j) => at[j] === i - 1 && detail.slots[j] === 'verb'
+						);
+
+						assert.ok(
+							verbs.some((verb) =>
+								data.verbs.some(
+									(group) =>
+										after.has(group.field) &&
+										[verb, lower(verb)]
+											.flatMap((each) => [each, unmarked(each)])
+											.some((each) => writes(language, group, 'verb', each))
+								)
+							),
+							`${language}: '${word}' answers nothing before it (${detail.sentence})`
+						);
+					}
+				});
+			}
+
+			assert.ok(seen > 0, `${language} never wrote a reaction`);
+		}
+	});
+
+	it('a step that does not come off is told denied, and the story carries on', () => {
+		// `잠들지 못했다` and then, later, `잠들었다`: the night is long, and it ends.
+		for (const language of ['ko', 'en', 'ja'] as WordLanguage[]) {
+			const data = SENTENCE_DATA[language];
+			const sleeps = data.verbs.filter((group) => group.field === 'sleep');
+			const denied = (phrase: string) =>
+				helpedIn(language, 'verb', phrase).some(
+					({ verb, auxiliary }) =>
+						auxiliary !== null &&
+						['negative', 'unable'].includes(auxiliary.kind) &&
+						sleeps.some((group) => jointsOf(group, auxiliary).includes(verb))
+				);
+			const sleeping = (phrase: string) =>
+				!denied(phrase) && sleeps.some((group) => writes(language, group, 'verb', phrase));
+			let seen = 0;
+
+			for (const detail of randSentence({
+				language,
+				story: 'evening',
+				sentences: 6,
+				includeName: false,
+				count: 80,
+				output: 'detail'
+			})) {
+				const verbs = detail.phrases.filter((_, i) => detail.slots[i] === 'verb');
+				const at = verbs.findIndex(denied);
+
+				if (at < 0) {
+					continue;
+				}
+
+				seen += 1;
+				assert.ok(
+					verbs.slice(at + 1).some(sleeping),
+					`${language}: the hero never sleeps after all (${detail.sentence})`
+				);
+			}
+
+			assert.ok(seen > 0, `${language} never told a step that did not come off`);
+		}
+	});
+
+	it('a `turn` connective opens a sentence about something that just came along', () => {
+		// `그때 참새가 날아갔다`, `Just then the sky darkened`: something new, named,
+		// and at the moment the connective has already said.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const turns = (data.connectives.turn ?? []).map(
+				(word) => (data.capitalize ? upperFirst(word) : word) + data.space
+			);
+
+			if (!turns.length) {
+				continue;
+			}
+
+			let seen = 0;
+
+			for (const detail of randSentence({
+				language,
+				sentences: 5,
+				includeName: false,
+				count: 150,
+				output: 'detail'
+			})) {
+				const at = sentenceOf(detail);
+
+				detail.sentences.forEach((sentence, i) => {
+					if (!turns.some((turn) => sentence.startsWith(turn))) {
+						return;
+					}
+
+					seen += 1;
+
+					const slots = detail.slots.filter((_, j) => at[j] === i);
+					const subject = detail.phrases.find(
+						(_, j) => at[j] === i && detail.slots[j] === 'subject'
+					);
+
+					// The pronouns a topic is referred to by, and not a first or second
+					// person: Vietnamese `bạn` is `you` and a friend alike.
+					const topical = Object.values(data.pronouns).flatMap((pool) => [...(pool ?? [])]);
+
+					assert.ok(
+						subject !== undefined && ![...topical, ...topical.map(upperFirst)].includes(subject),
+						`${language}: a turn names nothing new (${sentence})`
+					);
+					assert.ok(!slots.includes('time'), `${language}: a turn says when twice (${sentence})`);
+				});
+			}
+
+			assert.ok(seen > 0, `${language} never wrote a turn`);
+		}
+	});
+
+	it('a connective claims one thing, and is no other word of the language', () => {
+		// A word in two pools is read as either: `그때` is a time a sentence names and
+		// a turn it opens on, and a check on one of them cannot tell which it was.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const seen = new Map<string, string>();
+			const pools: [string, readonly string[]][] = [
+				['time', Object.values(data.times).flatMap((pool) => [...(pool ?? [])])],
+				['manner', data.manners.flatMap((group) => [...group.words])],
+				...Object.entries(data.connectives).map(
+					([kind, pool]) => [kind, pool ?? []] as [string, readonly string[]]
+				)
+			];
+
+			for (const [kind, pool] of pools) {
+				for (const word of new Set(pool)) {
+					// A time may be a manner too, which nothing reads the other way round;
+					// a connective is checked against everything before it.
+					if (kind !== 'time' && kind !== 'manner') {
+						assert.ok(
+							!seen.has(word) || seen.get(word) === kind,
+							`${language}: '${word}' is ${seen.get(word)} and ${kind}`
+						);
+					}
+
+					if (!seen.has(word)) {
+						seen.set(word, kind);
+					}
+				}
+			}
+		}
+	});
+
+	it('a connective is no prefix of a word a sentence can open on', () => {
+		// Japanese and Chinese write nothing after a connective, so one that is the
+		// start of a word a phrase can open on reads as a connective where there is
+		// none: `突然` was a turn and `突然の` a modifier.
+		for (const language of ['ja', 'zh'] as WordLanguage[]) {
+			const openings = [
+				...modifiersFor(language),
+				...poolFor(language, 'subject'),
+				...poolFor(language, 'time'),
+				...poolFor(language, 'manner'),
+				...poolFor(language, 'degree')
+			];
+
+			for (const connective of connectivesOf(language)) {
+				const longer = openings.find((word) => word !== connective && word.startsWith(connective));
+
+				assert.strictEqual(longer, undefined, `${language}: '${connective}' opens '${longer}'`);
+			}
+		}
+	});
+
+	it('a sentence does not put one noun where it is and where it happens', () => {
+		// `水星在水星上沉睡`, `공원에서 공원이 조용해졌다`.
+		for (const language of WORD_LANGUAGES) {
+			for (const detail of sentenceDetails({
+				language,
+				slots: ['place', 'destination'],
+				count: 200
+			})) {
+				const nouns = (['subject', 'place', 'destination'] as SentenceSlot[]).flatMap((slot) => {
+					const at = detail.slots.indexOf(slot);
+
+					return at < 0 ? [] : [longest([...nounsIn(language, detail.phrases[at])])];
+				});
+				const known = nouns.filter((noun): noun is string => noun !== null);
+
+				assert.strictEqual(new Set(known).size, known.length, `${language}: ${detail.sentence}`);
+			}
+		}
+	});
+
+	it('a time is never somewhere', () => {
+		// A month, a dawn and a weekend are when, not what: `중순이 갯벌에서 저물었다`.
+		for (const language of WORD_LANGUAGES) {
+			for (const detail of sentenceDetails({
+				language,
+				slots: ['place', 'destination'],
+				count: 300
+			})) {
+				if (detail.slots.includes('place') || detail.slots.includes('destination')) {
+					assert.notStrictEqual(detail.theme, 'time', `${language}: ${detail.sentence}`);
 				}
 			}
 		}
@@ -3147,7 +3757,7 @@ describe('Sentence', () => {
 				assert.ok(at >= 0, `${language}: ${detail.sentence}`);
 				assert.ok(
 					data.verbs.some(
-						(group) => MONEY_FIELDS.includes(group.field) && everyForm(group).includes(verb)
+						(group) => MONEY_FIELDS.includes(group.field) && writes(language, group, 'verb', verb)
 					),
 					`${language}: '${verb}' does not handle money (${detail.sentence})`
 				);
@@ -3318,13 +3928,22 @@ describe('Sentence', () => {
 						if (slot === 'verb') {
 							const head = data.pastMark?.head ? data.pastMark.head + data.space : '';
 							const tail = data.pastMark?.tail ?? '';
+							const marked = written.startsWith(head) && written.endsWith(tail);
+							const bare = marked
+								? written.slice(head.length, written.length - tail.length)
+								: written;
+							// The mark goes around an auxiliary too — `đã không ăn` — except
+							// where the auxiliary has no room for it: `没吃`, never `没吃了`.
+							const readings = helpedIn(language, slot, bare).filter(
+								({ auxiliary }) => marked || auxiliary?.dropsPastMark
+							);
 
 							assert.ok(
-								written.startsWith(head) && written.endsWith(tail),
+								readings.length > 0,
 								`${language}: '${phrase}' carries no past mark (${detail.sentence})`
 							);
 							assert.ok(
-								present.has(written.slice(head.length, written.length - tail.length)),
+								readings.some(({ verb }) => present.has(verb)),
 								`${language}: '${phrase}' is not a verb the pools hold (${detail.sentence})`
 							);
 						}
@@ -3337,12 +3956,27 @@ describe('Sentence', () => {
 						? inflectedFor(language, [...usable])
 						: [...usable];
 
+					// An auxiliary that carries the tense is the one in the past, and a
+					// particle leaves the predicate in the past it would have been in.
+					const helped = [written, phrase].some((each) =>
+						helpedIn(language, slot, each).some(
+							({ verb, helper, auxiliary }) =>
+								auxiliary !== null &&
+								(auxiliary.predicate
+									? pastForms(auxiliary.predicate).includes(helper)
+									: inflected.includes(verb))
+						)
+					);
+
 					assert.ok(
-						inflected.includes(written) || inflected.includes(phrase) || present.has(written),
+						inflected.includes(written) ||
+							inflected.includes(phrase) ||
+							present.has(written) ||
+							helped,
 						`${language}: '${phrase}' is not a past ${slot} (${detail.sentence})`
 					);
 
-					if (slot === 'verb' && groups.some((g) => g.past)) {
+					if (slot === 'verb' && groups.some((g) => g.past) && !helped) {
 						assert.ok(
 							!present.has(written) || past.has(written),
 							`${language}: '${phrase}' is a present verb in a past sentence (${detail.sentence})`
@@ -3713,7 +4347,13 @@ describe('Sentence', () => {
 				const written = verb === 0 ? phrase.charAt(0).toLowerCase() + phrase.slice(1) : phrase;
 
 				assert.ok(
-					going.has(written) || going.has(phrase),
+					going.has(written) ||
+						going.has(phrase) ||
+						data.verbs.some(
+							(group) =>
+								group.requires === 'destination' &&
+								[written, phrase].some((each) => writes(language, group, 'verb', each))
+						),
 					`${language}: '${phrase}' goes nowhere, and has a destination (${detail.sentence})`
 				);
 
@@ -3853,9 +4493,17 @@ describe('Sentence', () => {
 	it('a sentence that opens on `later` does not also say when', () => {
 		for (const language of ['ko', 'en', 'ja'] as WordLanguage[]) {
 			const data = SENTENCE_DATA[language];
-			const temporal = (data.connectives.temporal ?? []).map((word) =>
-				data.capitalize ? word.charAt(0).toUpperCase() + word.slice(1) : word
+			const written = (word: string) =>
+				data.capitalize ? word.charAt(0).toUpperCase() + word.slice(1) : word;
+			// The ones that say when: time passing, and something new coming along just
+			// then. Read against every connective, longest first, because Japanese writes
+			// no space after one and `一方で` opens on `一方`.
+			const dating = new Set(
+				[...(data.connectives.temporal ?? []), ...(data.connectives.turn ?? [])].map(written)
 			);
+			const openers = connectivesOf(language)
+				.map(written)
+				.sort((a, b) => b.length - a.length);
 			const times = poolFor(language, 'time');
 			let opened = 0;
 
@@ -3864,8 +4512,9 @@ describe('Sentence', () => {
 
 				for (let at = 0; at < detail.sentences.length; at += 1) {
 					const sentence = detail.sentences[at];
+					const opener = openers.find((word) => sentence.startsWith(word + data.space));
 
-					if (!temporal.some((word) => sentence.startsWith(word + data.space))) {
+					if (opener === undefined || !dating.has(opener)) {
 						continue;
 					}
 

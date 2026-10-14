@@ -78,15 +78,18 @@ import {
 } from '../word/wordGenerator.js';
 import { drawName } from '../name/nameGenerator.js';
 import { nameLengthRange } from '../name/nameLengthRange.js';
-import { SENTENCE_DATA, STORIES, THEME_CLASS } from './data/index.js';
+import { AGENT_CLASSES, SENTENCE_DATA, STORIES, THEME_CLASS } from './data/index.js';
 import type { Story, StoryStep } from './data/index.js';
 import type {
+	AuxiliaryKind,
 	Condition,
 	ConnectiveKind,
 	NounClass,
 	NounTrait,
 	PredicateForm,
+	PredicateJoint,
 	ReplyCue,
+	SentenceAuxiliary,
 	SentenceFrame,
 	SentenceJoin,
 	SentenceLanguageData,
@@ -129,6 +132,10 @@ const SHARE_ATTEMPTS = 3;
 // How many times a name is drawn again when it is one the result already
 // carries. Two people in one story sharing a name reads as a mistake.
 const NAME_ATTEMPTS = 6;
+
+// How many times a subject, a place or a destination is drawn again when it drew
+// the noun another of them already holds.
+const RESEAT_ATTEMPTS = 3;
 
 // How often a noun phrase that may carry a modifier is given one. Length can
 // override it in both directions — see `modifyChanceFor`.
@@ -188,6 +195,81 @@ function takesObject(frame: SentenceFrame): boolean {
 			part.slot === 'money' ||
 			(part.slot === 'quantity' && subject !== 'quantity')
 	);
+}
+
+/**
+ * Whether a shape has no subject at all: it says what the moment is like, or
+ * what somebody makes of what just happened — `정말 다행이었다`, `It was quiet`.
+ * Such a shape is drawn for a reaction alone, and a reaction draws nothing else.
+ */
+function isImpersonal(frame: SentenceFrame): boolean {
+	return !frame.parts.some((part) => part.slot === 'subject' || part.slot === 'quantity');
+}
+
+const personalCache = new WeakMap<SentenceLanguageData, readonly SentenceFrame[]>();
+const reactionCache = new WeakMap<SentenceLanguageData, readonly SentenceFrame[]>();
+
+/**
+ * The shapes a sentence about something can take: every one but the reactions'.
+ * What a language says it writes — its length range, the shapes and the slots it
+ * answers — is about these, because a reaction is never what a caller draws.
+ */
+function personalFrames(data: SentenceLanguageData): readonly SentenceFrame[] {
+	let frames = personalCache.get(data);
+
+	if (!frames) {
+		frames = data.frames.filter((frame) => !isImpersonal(frame));
+		personalCache.set(data, frames);
+	}
+
+	return frames;
+}
+
+/** The shapes a reaction takes: the ones with no subject at all. */
+function reactionFrames(data: SentenceLanguageData): readonly SentenceFrame[] {
+	let frames = reactionCache.get(data);
+
+	if (!frames) {
+		frames = data.frames.filter(isImpersonal);
+		reactionCache.set(data, frames);
+	}
+
+	return frames;
+}
+
+/**
+ * The themes a sentence about which happens nowhere. A month, a dawn and a
+ * weekend are when rather than what, and `중순이 갯벌에서 저물었다` put one
+ * somewhere.
+ */
+const UNPLACED_THEMES: readonly WordTheme[] = ['time'];
+
+const placedCache = new WeakMap<readonly WordTheme[], readonly WordTheme[]>();
+const placingCache = new WeakMap<SentenceFrame, boolean>();
+
+/** The subject themes a shape can take: `themes`, less the ones it would place somewhere they are not. */
+function placedThemes(frame: SentenceFrame, themes: readonly WordTheme[]): readonly WordTheme[] {
+	let placing = placingCache.get(frame);
+
+	if (placing === undefined) {
+		placing = frame.parts.some((part) => part.slot === 'place' || part.slot === 'destination');
+		placingCache.set(frame, placing);
+	}
+
+	if (!placing) {
+		return themes;
+	}
+
+	let kept = placedCache.get(themes);
+
+	if (!kept) {
+		const left = themes.filter((theme) => !UNPLACED_THEMES.includes(theme));
+
+		kept = left.length ? left : themes;
+		placedCache.set(themes, kept);
+	}
+
+	return kept;
 }
 
 /** The digits of a number, grouped the way the language groups them. */
@@ -539,7 +621,23 @@ type Draw = {
 	 * these.
 	 */
 	spoken: boolean;
+	/**
+	 * Set for a reaction: a sentence with no subject that says what the moment is
+	 * like, or what somebody makes of what the sentence before did — the field
+	 * that sentence's verb came from, or `'ambient'` after one that had none.
+	 * Null for every other sentence.
+	 */
+	reaction: VerbField | 'ambient' | null;
+	/**
+	 * How long this sentence would rather be against the ones before it, so that a
+	 * paragraph does not go on in one length: short after a long one, long after a
+	 * run of short ones, and null where it can be either.
+	 */
+	cadence: Cadence;
 };
+
+/** What a sentence would rather be, beside the ones around it. */
+type Cadence = 'short' | 'long' | null;
 
 /**
  * What one sentence of a story has to be: which fields its verb may come from,
@@ -589,6 +687,11 @@ type BeatDraw = {
 	 * and `가벼운 스웨터` found three lines later.
 	 */
 	avoid: readonly string[];
+	/**
+	 * Whether the step is told as not coming off — `찾지 못했다`, `could not
+	 * sleep` — which is what the language's denying auxiliary is for.
+	 */
+	fails?: boolean;
 };
 
 /**
@@ -713,13 +816,18 @@ function framesFor(
 	data: SentenceLanguageData,
 	settings: Settings,
 	mood: SentenceMood,
-	beat: BeatDraw | null = null
+	beat: BeatDraw | null = null,
+	reaction = false
 ): readonly SentenceFrame[] {
+	// A shape with no subject is a reaction's, and a reaction takes nothing else.
+	// Every other sentence is about something, and never draws one.
+	const own = reaction ? reactionFrames(data) : personalFrames(data);
+	const frames = own.length ? own : personalFrames(data);
 	// A language that writes its question with the mark alone declares no question
 	// shape, and answers with the statement shapes it does have. That is not a
 	// fallback so much as the point: `¿El león corre?` is the statement.
-	const storied = beat ? data.frames.filter((frame) => storyFrame(frame, beat)) : data.frames;
-	const shaped = storied.length ? storied : data.frames;
+	const storied = beat ? frames.filter((frame) => storyFrame(frame, beat)) : frames;
+	const shaped = storied.length ? storied : frames;
 	const byMood = shaped.filter((frame) => (frame.mood ?? 'statement') === mood);
 	const moody = byMood.length
 		? byMood
@@ -761,8 +869,9 @@ const UNSTORIED: readonly SentenceSlot[] = ['quantity', 'money', 'date', 'clock'
  * Whether a shape can be one sentence of a story. It has to be headed the way
  * the step is — a verb for something done, a state for a description — it may not
  * count or price or date anything, its verb has to be one the step's fields can
- * supply, and a change of scene carries no place of its own: `숲이 숲에서
- * 조용해졌다` is the sentence that rule keeps out.
+ * supply, a change of scene carries no place of its own — `숲이 숲에서
+ * 조용해졌다` is the sentence that rule keeps out — and a step that does not come
+ * off carries no manner.
  */
 function storyFrame(frame: SentenceFrame, beat: BeatDraw): boolean {
 	if (frame.parts.some((part) => UNSTORIED.includes(part.slot) || part.copula)) {
@@ -776,6 +885,12 @@ function storyFrame(frame: SentenceFrame, beat: BeatDraw): boolean {
 	}
 
 	if (frame.fields && !frame.fields.some((field) => beat.fields.includes(field))) {
+		return false;
+	}
+
+	// What did not come off was done in no manner: `즐겁게 잠들지 못했다` says how
+	// somebody did what they did not do.
+	if (beat.fails && frame.parts.some((part) => part.slot === 'manner')) {
 		return false;
 	}
 
@@ -796,12 +911,15 @@ function storyFrame(frame: SentenceFrame, beat: BeatDraw): boolean {
 function carries(data: SentenceLanguageData, settings: Settings): boolean {
 	if (
 		settings.slots !== 'all' &&
-		!data.frames.some((f) => matchesSlots(f, settings.slots as never))
+		!personalFrames(data).some((f) => matchesSlots(f, settings.slots as never))
 	) {
 		return false;
 	}
 
-	return settings.shape === 'all' || data.frames.some((frame) => shapeOf(frame) === settings.shape);
+	return (
+		settings.shape === 'all' ||
+		personalFrames(data).some((frame) => shapeOf(frame) === settings.shape)
+	);
 }
 
 /**
@@ -1572,7 +1690,7 @@ function naturalSpan(
 export function naturalRange(language: WordLanguage): readonly [number, number] {
 	const data = SENTENCE_DATA[language];
 
-	return naturalSpan(data, data.frames, slotBounds(language));
+	return naturalSpan(data, personalFrames(data), slotBounds(language));
 }
 
 /* --- Choosing the words ---------------------------------------------------- */
@@ -2098,12 +2216,24 @@ function stateGroupTest(
 	themes: readonly WordTheme[],
 	frame: SentenceFrame,
 	plan: Plan,
-	beat: BeatDraw | null = null
+	beat: BeatDraw | null = null,
+	reaction: VerbField | 'ambient' | null = null
 ): (group: StateGroup) => boolean {
 	const subject = requiredAt(frame, plan, 'subject');
 	const state = requiredAt(frame, plan, 'state');
+	const impersonal = isImpersonal(frame);
 
 	return (group) => {
+		// A shape with no subject takes a group that describes none, and every other
+		// shape a group that describes its subject.
+		if (Boolean(group.impersonal) !== impersonal) {
+			return false;
+		}
+
+		if (impersonal) {
+			return reactsTo(group, reaction);
+		}
+
 		if (state && !group.words.includes(state.word)) {
 			return false;
 		}
@@ -2131,9 +2261,25 @@ function stateGroupsFor(
 	themes: readonly WordTheme[],
 	frame: SentenceFrame,
 	plan: Plan,
-	beat: BeatDraw | null = null
+	beat: BeatDraw | null = null,
+	reaction: VerbField | 'ambient' | null = null
 ): readonly StateGroup[] {
-	return data.states.filter(stateGroupTest(language, data, vocabulary, themes, frame, plan, beat));
+	const usable = data.states.filter(
+		stateGroupTest(language, data, vocabulary, themes, frame, plan, beat, reaction)
+	);
+
+	// A reaction to something done is usually about that: `다행이었다` after the key
+	// turned up, `맛있었다` after the soup. What the moment is like fits after
+	// anything, and is what is left the rest of the time.
+	if (reaction && reaction !== 'ambient') {
+		const answering = usable.filter((group) => group.after?.includes(reaction));
+
+		if (answering.length && chance(ANSWERING_CHANCE)) {
+			return answering;
+		}
+	}
+
+	return usable;
 }
 
 /** Whether some state group can head the shape, stopping at the first one that can. */
@@ -2144,9 +2290,38 @@ function hasStateGroup(
 	themes: readonly WordTheme[],
 	frame: SentenceFrame,
 	plan: Plan,
-	beat: BeatDraw | null
+	beat: BeatDraw | null,
+	reaction: VerbField | 'ambient' | null = null
 ): boolean {
-	return data.states.some(stateGroupTest(language, data, vocabulary, themes, frame, plan, beat));
+	return data.states.some(
+		stateGroupTest(language, data, vocabulary, themes, frame, plan, beat, reaction)
+	);
+}
+
+// How often a reaction to something done answers what was done, where the
+// language has a reaction for it, rather than saying what the moment is like.
+const ANSWERING_CHANCE = 75;
+
+/**
+ * Whether an impersonal group can answer the sentence before: one that names
+ * no field fits after anything, and one that does fits after those.
+ */
+function reactsTo(group: StateGroup, reaction: VerbField | 'ambient' | null): boolean {
+	if (!group.after) {
+		return true;
+	}
+
+	return reaction !== null && reaction !== 'ambient' && group.after.includes(reaction);
+}
+
+/** The impersonal groups a language could answer this with, which is whether it can react at all. */
+function reactionsFor(
+	data: SentenceLanguageData,
+	reaction: VerbField | 'ambient'
+): readonly StateGroup[] {
+	return reactionFrames(data).length
+		? data.states.filter((group) => group.impersonal && reactsTo(group, reaction))
+		: [];
 }
 
 /* --- Building one sentence ------------------------------------------------- */
@@ -2199,6 +2374,8 @@ type Built = {
 	 * pronoun for it — or left it out, which is a pronoun that writes nothing.
 	 */
 	object: { noun: string; named: boolean } | null;
+	/** Whether this sentence was a reaction to the one before, with no subject of its own. */
+	reaction?: boolean;
 };
 
 /** The article a phrase opens with, by the noun's gender and the word after it. */
@@ -2497,7 +2674,16 @@ function predicateGroupsFor(
 	return headed === 'copula'
 		? [data.calendar!.copula]
 		: headed === 'state'
-			? stateGroupsFor(language, data, settings.vocabulary, themes, frame, plan, draw.beat)
+			? stateGroupsFor(
+					language,
+					data,
+					settings.vocabulary,
+					themes,
+					frame,
+					plan,
+					draw.beat,
+					draw.reaction
+				)
 			: verbGroupsFor(
 					language,
 					data,
@@ -2531,7 +2717,7 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	const wordData = WORD_DATA[language];
 	const data = SENTENCE_DATA[language];
 	const bounds = roomFor(language, settings.includeName);
-	const allowed = framesFor(data, settings, moodFor(draw.mark), draw.beat);
+	const allowed = framesFor(data, settings, moodFor(draw.mark), draw.beat, draw.reaction !== null);
 	const requested = draw.beat?.subject ?? subjectThemesFor(settings, follow);
 	// The words a caller required go in the first sentence that can carry them —
 	// once in the result rather than once in every sentence of it. A story that
@@ -2558,10 +2744,10 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	const [min, max] = budget;
 	// A result that has reached the last phase of its day has no later one to name,
 	// so a sentence after that carries no time at all rather than a wrong one. And a
-	// sentence that opens on `later` or `잠시후` has said when already: `잠시후
+	// sentence that opens on `later` or `잠시 후` has said when already: `잠시 후
 	// 한낮에` says it twice.
 	const spent = follow !== null && draw.dayAt >= data.times.day.length - 1;
-	const dated = draw.dated || (data.connectives.temporal ?? []).includes(draw.opener);
+	const dated = draw.dated || saysWhen(data, draw.opener);
 	// A line somebody says names no time either, and a shape with a time part is
 	// left out for one rather than written without it: German puts its verb second,
 	// and a shape that opened on the time opened on the verb once the time was gone
@@ -2576,7 +2762,10 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	// predicate. A quoted line is the exception: `“배고파요.”` is what people say,
 	// and so is the second clause of one sentence, which its first clause carries.
 	const dropped =
-		draw.link !== 'second' && follow?.reference === 'pronoun' && follow.pronoun === '';
+		draw.reaction === null &&
+		draw.link !== 'second' &&
+		follow?.reference === 'pronoun' &&
+		follow.pronoun === '';
 	// The same for an object the sentence before named, which this one leaves out
 	// or stands a clitic for: `냄새맡는다.` is a subject and an object gone.
 	const elided =
@@ -2612,30 +2801,76 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 		}
 
 		return frame.parts.some((part) => part.slot === 'state')
-			? hasStateGroup(language, data, settings.vocabulary, requested, frame, plan, draw.beat)
+			? hasStateGroup(
+					language,
+					data,
+					settings.vocabulary,
+					placedThemes(frame, requested),
+					frame,
+					plan,
+					draw.beat,
+					draw.reaction
+				)
 			: hasVerbGroup(
 					language,
 					data,
 					settings.vocabulary,
 					frame,
-					requested,
+					placedThemes(frame, requested),
 					plan,
 					draw.beat,
 					subjectNounOf(frame, plan, follow)
 				);
 	};
+	// Whether a shape can be built, asked once per shape and held for every attempt.
+	const known = new Map<SentenceFrame, boolean>();
+	const builds = (frame: SentenceFrame): boolean => {
+		let answer = known.get(frame);
+
+		if (answer === undefined) {
+			answer = buildable(frame);
+			known.set(frame, answer);
+		}
+
+		return answer;
+	};
 	// Prefer a shape that can land inside the range, then one that has somewhere to
 	// put every word the caller required, and settle for any of them after that.
-	const fitting = frames.filter((frame) => {
+	// Whether a shape can be built is asked of the shape drawn rather than of every
+	// one in range: `buildable` walks the verb groups of the language, and asking
+	// it of all of them was a fifth of what a sentence took. A shape that cannot be
+	// built is drawn out and the draw made again, which lands on the same shapes
+	// with the same odds as filtering them first.
+	let usable: readonly SentenceFrame[] = frames.filter((frame) => {
 		const [low, high] = frameRange(frame, data, bounds);
 
-		return high >= min && low <= max && buildable(frame);
+		return high >= min && low <= max;
 	});
-	// Only asked for when nothing fits. `buildable` walks every verb group of the
-	// language against the shape, and computing this every time cost a quarter of
-	// what a Korean paragraph took to answer a question it usually never asks.
-	const loose = fitting.length ? [] : frames.filter(buildable);
-	const usable = fitting.length ? fitting : loose.length ? loose : frames;
+	// Whether `usable` still has to be asked: not once nothing could be built and
+	// any shape at all is what is left.
+	let checking = true;
+	const drawFrom = (
+		pool: readonly SentenceFrame[],
+		weigh: (frame: SentenceFrame) => number
+	): { frame: SentenceFrame; left: readonly SentenceFrame[] } | null => {
+		if (!checking) {
+			return pool.length ? { frame: pickFrame(pool, weigh), left: pool } : null;
+		}
+
+		let left = pool;
+
+		while (left.length) {
+			const frame = pickFrame(left, weigh);
+
+			if (builds(frame)) {
+				return { frame, left };
+			}
+
+			left = left.filter((each) => each !== frame);
+		}
+
+		return null;
+	};
 	// `compose` leads with a subject on the `startsWith` character where the shape
 	// opens on its subject, and a shape whose predicates take no subject on it has
 	// to invent one: `かヌゾが…` at `realism: 'real'`, while another shape had a
@@ -2697,11 +2932,41 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 			)
 				? 3
 				: 1;
-			const fuller = draw.beat && candidate.parts.length >= 3 ? 2 : 1;
+			// And a sentence that would rather be short or long than what came before it
+			// leans that way, which is what keeps a paragraph from going on in one length.
+			const fuller =
+				draw.cadence === 'short'
+					? candidate.parts.length <= 2
+						? CADENCE_LEAN
+						: 1
+					: draw.cadence === 'long'
+						? candidate.parts.length >= 4
+							? CADENCE_LEAN
+							: candidate.parts.length === 3
+								? 1.5
+								: 1
+						: draw.beat && candidate.parts.length >= 3
+							? 2
+							: 1;
 
 			return fit * preferred * fuller;
 		};
-		let frame = pickFrame(usable, weigh);
+		let picked = drawFrom(usable, weigh);
+
+		// Nothing in range can be built: any shape that can, and failing that any.
+		if (!picked) {
+			const loose = frames.filter(builds);
+
+			usable = loose.length ? loose : frames;
+			checking = loose.length > 0;
+			picked = drawFrom(usable, weigh)!;
+		}
+
+		// What the draw learned stays learned: a shape that could not be built is not
+		// drawn again on the next attempt.
+		usable = picked.left;
+
+		let frame = picked.frame;
 
 		if (steered) {
 			let left = usable;
@@ -2718,8 +2983,17 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 					break;
 				}
 
-				left = left.filter((each) => each !== frame);
-				frame = pickFrame(left, weigh);
+				const next = drawFrom(
+					left.filter((each) => each !== frame),
+					weigh
+				);
+
+				if (!next) {
+					break;
+				}
+
+				frame = next.frame;
+				left = next.left;
 			}
 		}
 
@@ -2855,7 +3129,7 @@ function compose(
 	draw: Draw
 ): Built {
 	const follow = draw.follow;
-	const themes = requested.length ? requested : WORD_THEMES;
+	const themes = placedThemes(frame, requested.length ? requested : WORD_THEMES);
 	const headed = headOf(frame);
 	// A shape whose predicate has nothing to say about the requested subject only
 	// gets this far when no shape of the language did, so the fallback is the same
@@ -2929,7 +3203,7 @@ function compose(
 		!requiredAt(frame, plan, subjectSlot)
 			? settings.prefix
 			: '';
-	const offered = groups.length ? groups : headedFallback(data, frame, headed);
+	const offered = groups.length ? groups : headedFallback(data, frame, headed, draw.beat);
 	const leadingGroups = leading ? leadingGroupsOf(language, data, settings, offered, themes) : [];
 	const group = pick(leadingGroups.length ? leadingGroups : offered);
 	// The same predicates, in the form this type of sentence ends on, in the tense
@@ -3113,17 +3387,29 @@ function compose(
 	const placed: Requirement[] = [];
 	// The noun phrases this sentence drew for the slots a later one keeps.
 	const drawn = new Map<SentenceSlot, Phrase>();
+	// The nouns its subject, its place and its destination stand on, which none of
+	// the others may stand on too.
+	const seats = new Set<string>();
 	let subject: Phrase | undefined;
 	let named = false;
 	// A pronoun says nothing about its own gender, and neither does a name carried
 	// over, so what agrees with either agrees with the noun it stands for.
+	// A reaction is about nobody, and agrees with nobody: Russian `было тихо`.
 	let gender: WordGender | undefined =
-		pronoun !== null || proper.some((word, i) => word && parts[i].part.slot === 'subject')
+		!isImpersonal(frame) &&
+		(pronoun !== null || proper.some((word, i) => word && parts[i].part.slot === 'subject'))
 			? follow?.topic.gender
 			: undefined;
 	// A clitic is written in front of the verb, and paid for here because it
 	// belongs to no part's share of the range.
 	const clitic = reference?.clitic ? reference.text : '';
+	// Whatever does what the predicate says: the subject drawn, or the topic a
+	// pronoun or a dropped subject stands for.
+	const doer =
+		pronoun !== null ? (follow?.topic.class ?? null) : (THEME_CLASS[subjectTheme] ?? null);
+	// And what is said beside the predicate, if anything: `먹고 싶었다`, `did not
+	// eat`, `没吃`.
+	const auxiliary = auxiliaryFor(data, group, headed, frame, plan, draw, doer, clitic);
 	let used =
 		close.length +
 		open.length +
@@ -3239,40 +3525,59 @@ function compose(
 				part.slot !== 'quantity' &&
 				(part.modifiable ?? false) &&
 				(Boolean(owed) || needed || (room >= bounds.modifier[0] + space && chance(modifyChance)));
-			const built = nounPhrase(
-				language,
-				data,
-				theme,
-				required?.word,
-				modify,
-				// A counted phrase drops its article and takes no modifier: `12 apples`,
-				// never `the 12 red apples`.
-				part.slot === 'quantity' || (part.bare ?? false),
-				owed?.word,
-				settings.invent,
-				prefixable && i === 0 ? settings.prefix : '',
-				low,
-				high,
-				[nounLow, nounHigh],
-				part.slot === 'quantity' ? countText(data, theme) : '',
-				required && !required.known ? null : theme,
-				part.slot === subjectSlot
-					? subjectPoolFor(language, data, group, theme, settings.vocabulary)
-					: part.slot === 'object'
-						? objectPoolAvoiding(
-								language,
-								data,
-								group,
-								theme,
-								settings.vocabulary,
-								draw.beat?.avoid ?? []
-							)
-						: part.slot === 'place' || part.slot === 'destination'
-							? placePoolFor(language, data, theme, settings.vocabulary)
-							: null,
-				settings.vocabulary,
-				settled
-			);
+			const drawPhrase = (): Phrase =>
+				nounPhrase(
+					language,
+					data,
+					theme,
+					required?.word,
+					modify,
+					// A counted phrase drops its article and takes no modifier: `12 apples`,
+					// never `the 12 red apples`.
+					part.slot === 'quantity' || (part.bare ?? false),
+					owed?.word,
+					settings.invent,
+					prefixable && i === 0 ? settings.prefix : '',
+					low,
+					high,
+					[nounLow, nounHigh],
+					part.slot === 'quantity' ? countText(data, theme) : '',
+					required && !required.known ? null : theme,
+					part.slot === subjectSlot
+						? subjectPoolFor(language, data, group, theme, settings.vocabulary)
+						: part.slot === 'object'
+							? objectPoolAvoiding(
+									language,
+									data,
+									group,
+									theme,
+									settings.vocabulary,
+									draw.beat?.avoid ?? []
+								)
+							: part.slot === 'place' || part.slot === 'destination'
+								? placePoolFor(language, data, theme, settings.vocabulary)
+								: null,
+					settings.vocabulary,
+					settled
+				);
+			// A sentence does not put one noun where it is and where it happens —
+			// `水星在水星上`, `공원에서 공원이` — so a subject, a place or a destination
+			// that drew a noun another of them holds is drawn again before it is kept.
+			const seated =
+				part.slot === subjectSlot || part.slot === 'place' || part.slot === 'destination';
+			let built = drawPhrase();
+
+			for (
+				let again = 0;
+				again < RESEAT_ATTEMPTS && seated && !required && seats.has(built.noun);
+				again += 1
+			) {
+				built = drawPhrase();
+			}
+
+			if (seated) {
+				seats.add(built.noun);
+			}
 
 			phrase = built.text;
 
@@ -3327,26 +3632,49 @@ function compose(
 				placed.push(required);
 			}
 
-			const drawn = predicateFor(
-				part.slot,
-				wordData,
-				data,
-				group.words,
-				predicates,
-				required,
-				gender,
-				low,
-				high,
-				part.slot === 'verb' && inverted ? avoidingPhrasal(draw.avoid, group.words) : draw.avoid,
-				draw.tense,
-				draw.dayAt,
-				// The first sentence of a result may set its scene in any time it likes;
-				// the ones after it only move the day forward.
-				follow === null && draw.link !== 'second',
-				THEME_CLASS[subjectTheme],
-				draw.beat !== null,
-				field
-			);
+			// A pronoun standing where the object stood goes inside a verb of two words
+			// rather than after it — `brought it along`, never `brought along it` — so a
+			// sentence with one steers away from such a verb where it has another, the
+			// way a pronoun after its verb does.
+			const pronounObject = reference !== null && !referredOut && reference.text !== '';
+			const avoid =
+				part.slot === 'verb' && (inverted || pronounObject)
+					? avoidingPhrasal(draw.avoid, group.words)
+					: draw.avoid;
+			const drawWith = (base: WordPool, pool: WordPool, from: number, to: number): Predicate =>
+				predicateFor(
+					part.slot,
+					wordData,
+					data,
+					base,
+					pool,
+					required,
+					gender,
+					from,
+					to,
+					avoid,
+					draw.tense,
+					draw.dayAt,
+					// The first sentence of a result may set its scene in any time it likes;
+					// the ones after it only move the day forward.
+					follow === null && draw.link !== 'second',
+					THEME_CLASS[subjectTheme],
+					draw.beat !== null,
+					field
+				);
+			// An auxiliary is written around the predicate, and its share of the room
+			// comes out of the predicate's: what is left is what the predicate is drawn
+			// against. One that still does not fit gives way to the plain predicate.
+			// A step that does not come off keeps what denies it whatever the room:
+			// told without it, it would say the opposite.
+			const helped =
+				auxiliary && (part.slot === 'verb' || part.slot === 'state')
+					? (helpedPredicate(auxiliary, group, predicates, draw, low, high, drawWith) ??
+						(draw.beat?.fails
+							? helpedPredicate(auxiliary, group, predicates, draw, low, Infinity, drawWith)
+							: null))
+					: null;
+			const drawn = helped ?? drawWith(group.words, predicates, low, high);
 
 			phrase = drawn.text;
 
@@ -3364,11 +3692,15 @@ function compose(
 			if (part.slot === 'verb' && past) {
 				// A mark in front of the verb is written once per sentence: `đã về nhà
 				// rồi ăn táo`, not `đã về nhà rồi đã ăn táo`.
-				if (mark?.head && draw.link !== 'second') {
+				// A particle that cannot stand beside the mark leaves it out: `没吃`, never
+				// `没吃了`.
+				const marked = !(helped && auxiliary?.dropsPastMark);
+
+				if (mark?.head && draw.link !== 'second' && marked) {
 					phrase = mark.head + data.space + phrase;
 				}
 
-				if (mark?.tail) {
+				if (mark?.tail && marked) {
 					phrase += mark.tail;
 				}
 
@@ -3466,7 +3798,8 @@ function compose(
 		gender: subject || named ? gender : pronoun !== null ? follow?.topic.gender : undefined,
 		named: named || (pronoun !== null && (follow?.topic.named ?? false)),
 		field,
-		dayAt
+		dayAt,
+		reaction: draw.reaction !== null
 	};
 }
 
@@ -3578,6 +3911,276 @@ function predicateFor(
 
 	return { text: agreed(drawn), base: plainly(pool.indexOf(drawn)), dayAt: -1 };
 }
+
+/* --- Auxiliaries ----------------------------------------------------------- */
+
+// How often a predicate is written with an auxiliary, where the language has one
+// that fits: a sentence on its own terms, and one of a story — which writes only
+// the ones that still say the thing happened, and so has fewer to draw from.
+const AUXILIARY_CHANCE = 24;
+const STORY_AUXILIARY_CHANCE = 16;
+
+// How often a sentence that opens on `but` says what did not happen, where it can:
+// `하지만 여우는 사과를 먹지 않았다`. A contrast needs something to cut against,
+// and a sentence that only carries on is not that.
+const CONTRARY_CHANCE = 60;
+
+// How likely each kind is, against the others the sentence could take.
+const AUXILIARY_WEIGHT: Record<AuxiliaryKind, number> = {
+	negative: 4,
+	unable: 2,
+	desire: 4,
+	resolve: 2,
+	effort: 2,
+	begin: 4,
+	progressive: 4,
+	attempt: 3,
+	completive: 3
+};
+
+// The kinds that still say the thing happened, which are the only ones a story
+// writes: its next sentence builds on what this one did.
+const HAPPENS: readonly AuxiliaryKind[] = ['begin', 'progressive', 'attempt', 'completive'];
+
+// The kinds that say it did not happen, which is how a step that does not come
+// off is told.
+const DENIES: readonly AuxiliaryKind[] = ['negative', 'unable'];
+
+/**
+ * Whether the language can say a verb did not happen, in a statement in this
+ * tense — which is what a story's step that does not come off needs.
+ */
+function denies(data: SentenceLanguageData, tense: SentenceTense): boolean {
+	return (data.auxiliaries ?? []).some(
+		(auxiliary) =>
+			DENIES.includes(auxiliary.kind) &&
+			(auxiliary.on ?? 'verb') === 'verb' &&
+			(!auxiliary.tense || auxiliary.tense === tense) &&
+			(!auxiliary.moods || auxiliary.moods.includes('statement'))
+	);
+}
+
+// The kinds only somebody can do. A bus does not want to run, and a soup does not
+// decide to cool.
+const WILLED: readonly AuxiliaryKind[] = ['unable', 'desire', 'resolve', 'effort', 'attempt'];
+
+// The fields each kind does not go with. A moment does not go on (`arrive`,
+// `find`), nobody tries out losing something, and `먹어 버렸다` is over and done
+// with where `기다려 버렸다` is nothing at all.
+const AUXILIARY_WITHOUT: Record<AuxiliaryKind, readonly VerbField[]> = {
+	negative: [],
+	unable: ['express', 'change', 'lose'],
+	desire: ['change', 'lose', 'express'],
+	resolve: ['express', 'change', 'lose'],
+	effort: ['express', 'change', 'lose', 'sleep'],
+	begin: ['arrive', 'find', 'lose', 'rise', 'meet'],
+	progressive: ['arrive', 'find', 'lose', 'rise', 'meet'],
+	attempt: ['rise', 'arrive', 'lose', 'sleep', 'express', 'change', 'find', 'take'],
+	completive: [
+		'rise',
+		'arrive',
+		'wait',
+		'look',
+		'think',
+		'talk',
+		'meet',
+		'play',
+		'express',
+		'search',
+		'make',
+		'tend',
+		'cook',
+		'buy',
+		'take',
+		'find',
+		'move',
+		'lose'
+	]
+};
+
+/**
+ * The auxiliary this sentence's predicate is written with, or null for none.
+ *
+ * Never on a first clause, whose predicate links to the next rather than ending
+ * anything; never on a word the caller required, which `include` promises as it
+ * is; never in somebody's own voice, where `I wants to` is what English would
+ * write; and in a story only one that says the thing happened. A sentence that
+ * opens on `but` says what did not happen more often than not, where it can.
+ */
+function auxiliaryFor(
+	data: SentenceLanguageData,
+	group: VerbGroup | StateGroup,
+	headed: 'state' | 'verb' | 'copula',
+	frame: SentenceFrame,
+	plan: Plan,
+	draw: Draw,
+	doer: NounClass | null,
+	clitic: string
+): SentenceAuxiliary | null {
+	const pool = data.auxiliaries;
+
+	if (
+		!pool?.length ||
+		headed === 'copula' ||
+		draw.link === 'first' ||
+		draw.speech !== null ||
+		draw.reaction !== null ||
+		requiredAt(frame, plan, headed)
+	) {
+		return null;
+	}
+
+	const mood = moodFor(draw.mark);
+	const field = headed === 'verb' ? (group as VerbGroup).field : null;
+	const fails = draw.beat?.fails ?? false;
+	const usable = pool.filter(
+		(auxiliary) =>
+			(auxiliary.on ?? 'verb') === headed &&
+			(!auxiliary.moods || auxiliary.moods.includes(mood)) &&
+			(!auxiliary.tense || auxiliary.tense === draw.tense) &&
+			// A particle goes in front of the verb, and a clitic is already there.
+			(auxiliary.predicate !== undefined || !clitic) &&
+			// A step that does not come off is told with what denies it, and every
+			// other step of a story with what says it happened.
+			(!draw.beat ||
+				(fails ? DENIES.includes(auxiliary.kind) : HAPPENS.includes(auxiliary.kind))) &&
+			(!WILLED.includes(auxiliary.kind) || (doer !== null && AGENT_CLASSES.includes(doer))) &&
+			(field === null || !AUXILIARY_WITHOUT[auxiliary.kind].includes(field)) &&
+			joins(group, auxiliary)
+	);
+
+	if (!usable.length) {
+		return null;
+	}
+
+	// What could not be done rather than what was not: `찾지 못했다`, where `찾지
+	// 않았다` is somebody who chose not to look.
+	if (fails) {
+		const unable = usable.filter((auxiliary) => auxiliary.kind === 'unable');
+
+		return pick(unable.length ? unable : usable);
+	}
+
+	const weightOf = (auxiliary: SentenceAuxiliary) => AUXILIARY_WEIGHT[auxiliary.kind];
+
+	if ((data.connectives.contrastive ?? []).includes(draw.opener)) {
+		const denying = usable.filter(
+			(auxiliary) => auxiliary.kind === 'negative' || auxiliary.kind === 'unable'
+		);
+
+		if (denying.length && chance(CONTRARY_CHANCE)) {
+			return pickWeighted(denying, weightOf);
+		}
+	}
+
+	return chance(draw.beat ? STORY_AUXILIARY_CHANCE : AUXILIARY_CHANCE)
+		? pickWeighted(usable, weightOf)
+		: null;
+}
+
+/** Whether a group writes the form an auxiliary follows, without spelling it out. */
+function joins(group: VerbGroup | StateGroup, auxiliary: SentenceAuxiliary): boolean {
+	const joint = auxiliary.joint ?? 'words';
+
+	if (!auxiliary.predicate || joint === 'words') {
+		return true;
+	}
+
+	return joint === 'stem' || joint === 'negative'
+		? group.joints?.[joint as PredicateJoint] !== undefined
+		: group.forms?.[joint as PredicateForm] !== undefined;
+}
+
+/**
+ * The predicate's entries in the form an auxiliary follows, index-aligned with
+ * its words — or, for a particle, the entries the sentence would have written
+ * anyway. Null where the group has no such form.
+ */
+function jointOf(
+	group: VerbGroup | StateGroup,
+	auxiliary: SentenceAuxiliary,
+	predicates: WordPool
+): WordPool | null {
+	if (!auxiliary.predicate) {
+		return predicates;
+	}
+
+	const joint = auxiliary.joint ?? 'words';
+
+	if (joint === 'words') {
+		return group.words;
+	}
+
+	if (joint === 'stem' || joint === 'negative') {
+		return group.joints?.[joint as PredicateJoint] ?? null;
+	}
+
+	const pool = group.forms?.[joint as PredicateForm];
+
+	return pool ? pool.map(oneOf) : null;
+}
+
+/**
+ * The predicate with an auxiliary written around it, or null where the two do not
+ * fit the room the predicate has.
+ *
+ * A chained auxiliary is said in the sentence's own form and the predicate in the
+ * one it is joined by — `먹고` in front of `싶어 했다` — while a particle leaves
+ * the predicate as the sentence would have written it. Either way the predicate
+ * is drawn against what the auxiliary leaves of the room, and only from the
+ * entries the auxiliary can follow: `바라봐 봤다` says looking twice.
+ */
+function helpedPredicate(
+	auxiliary: SentenceAuxiliary,
+	group: VerbGroup | StateGroup,
+	predicates: WordPool,
+	draw: Draw,
+	low: number,
+	high: number,
+	drawWith: (base: WordPool, pool: WordPool, from: number, to: number) => Predicate
+): Predicate | null {
+	const joined = jointOf(group, auxiliary, predicates);
+
+	if (!joined) {
+		return null;
+	}
+
+	const helper = auxiliary.predicate
+		? oneOf(pick(formOf(auxiliary.predicate, draw.mark, draw.style, draw.tense)))
+		: '';
+	const template =
+		draw.tense === 'past' && auxiliary.pastTemplate ? auxiliary.pastTemplate : auxiliary.template;
+	const written = template.replace('{a}', helper);
+	const overhead = written.length - '{v}'.length;
+	const kept = group.words
+		.map((_, at) => at)
+		.filter(
+			(at) =>
+				joined[at] !== undefined &&
+				!auxiliary.unless?.some((ending) => group.words[at].endsWith(ending))
+		);
+
+	if (!kept.length) {
+		return null;
+	}
+
+	const drawn = drawWith(
+		kept.map((at) => group.words[at]),
+		kept.map((at) => joined[at]),
+		Math.max(1, low - overhead),
+		Math.max(1, high - overhead)
+	);
+
+	if (!drawn.text || drawn.text.length + overhead > high) {
+		return null;
+	}
+
+	return { ...drawn, text: written.replace('{v}', drawn.text) };
+}
+
+// How much more likely a shape of the length a sentence would rather be is, for
+// a sentence that leans one way.
+const CADENCE_LEAN = 3;
 
 // How many phases of the day one sentence may move on from the last one named.
 const DAY_STRIDE = 4;
@@ -3702,7 +4305,7 @@ function endings(pool: WordPool): WordPool {
  * of the verb.
  */
 function formOf(
-	group: StateGroup | VerbGroup,
+	group: Pick<VerbGroup, 'words' | 'forms' | 'past'>,
 	mark: SentenceMark,
 	style: SentenceStyle,
 	tense: SentenceTense,
@@ -3738,11 +4341,17 @@ function upper(word: string): string {
 	return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-/** Whatever the language can head this shape with, when nothing narrower fits. */
+/**
+ * Whatever the language can head this shape with, when nothing narrower fits — and,
+ * for a story's step, a verb of the step's own field before any other: a cooking
+ * step whose thing no cooking verb takes by its traits still cooks it, where any
+ * transitive verb at all wrote `forgot the pea` in the middle of a meal.
+ */
 function headedFallback(
 	data: SentenceLanguageData,
 	frame: SentenceFrame,
-	headed: 'state' | 'verb' | 'copula'
+	headed: 'state' | 'verb' | 'copula',
+	beat: BeatDraw | null = null
 ): (StateGroup | VerbGroup)[] {
 	if (headed === 'copula') {
 		return [data.calendar!.copula];
@@ -3753,13 +4362,17 @@ function headedFallback(
 	}
 
 	const wantsDestination = frame.parts.some((part) => part.slot === 'destination');
-
-	return data.verbs.filter(
+	const fitting = data.verbs.filter(
 		(group) =>
 			Boolean(group.object) === takesObject(frame) &&
 			(!group.requires || frame.parts.some((part) => part.slot === group.requires)) &&
 			(!wantsDestination || group.requires === 'destination')
 	);
+	const own = beat?.fields.length
+		? fitting.filter((group) => beat.fields.includes(group.field))
+		: [];
+
+	return own.length ? own : fitting;
 }
 
 // Where a subject can go, and where a story happens. `place` and `building`, and
@@ -3813,7 +4426,8 @@ const CONNECTIVE_KINDS: readonly ConnectiveKind[] = [
 	'additive',
 	'temporal',
 	'contrastive',
-	'causal'
+	'causal',
+	'turn'
 ];
 
 // How a sentence refers to the topic, against the other two ways of doing it.
@@ -3997,6 +4611,18 @@ function openerFor(
 }
 
 /**
+ * Whether a sentence's opener says when already: `later`, `잠시 후`, and the
+ * ones that say something new came along just then — `그때`, `just then`.
+ */
+function saysWhen(data: SentenceLanguageData, opener: string): boolean {
+	return (
+		opener !== '' &&
+		((data.connectives.temporal ?? []).includes(opener) ||
+			(data.connectives.turn ?? []).includes(opener))
+	);
+}
+
+/**
  * The connectives this sentence may open on: the ones whose claim about the
  * sentence before it can actually be true.
  *
@@ -4016,9 +4642,14 @@ function connectivesOf(
 	const follows = follow.reference !== 'fresh' && (mark === 'statement' || mark === 'trailing');
 	// A story has already decided what each of its sentences may claim about the
 	// one before it, and hands the kinds in; a paragraph with no story lets every
-	// kind in that the two sentences can carry.
+	// kind in that the two sentences can carry — and `turn` only where something new
+	// has come along, which in a paragraph is a fresh subject.
 	const wanted = allowed ?? CONNECTIVE_KINDS;
-	const kinds = follows ? wanted : wanted.filter((kind) => kind !== 'causal');
+	const kinds = wanted.filter(
+		(kind) =>
+			(kind !== 'causal' || follows) &&
+			(kind !== 'turn' || allowed !== null || follow.reference === 'fresh')
+	);
 
 	return kinds.flatMap((kind) => data.connectives[kind] ?? []);
 }
@@ -4309,15 +4940,32 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 		for (let i = 0; i < settings.sentences; i += 1) {
 			const budget = budgets[i];
 			const [type, mark] = kindFor(data, settled, room, budget, flow);
-			const follow = topic ? followFor(data, topic, scene, flow.repeated) : null;
-			const item = scene.get('object');
 			const last = built.length ? built[built.length - 1] : null;
+			// A sentence that follows something done is now and then a reaction to it:
+			// `정말 다행이었다`, `It was delicious`.
+			const reaction = reactionAfter(data, settled, last, type, budget, room);
+			// And the one after a reaction names the topic again, because the reaction
+			// spoke of the moment and a pronoun after it would stand for that.
+			const follow = topic
+				? last?.reaction
+					? { topic, reference: 'repeat' as const, pronoun: '', scene }
+					: followFor(data, topic, scene, flow.repeated)
+				: null;
+			const item = scene.get('object');
 			const draw: Draw = {
 				budget,
 				type,
 				mark,
 				quote: quoteFor(data, type, settings.quote),
-				opener: openerFor(data, mark, follow, budget[1], shortest, flow),
+				opener: openerFor(
+					data,
+					mark,
+					follow,
+					budget[1],
+					shortest,
+					flow,
+					reaction ? REACTION_LINKS : null
+				),
 				style: styleFor(type, settings.style, voice),
 				avoid: spent,
 				described,
@@ -4330,11 +4978,13 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 				dayAt: built.reduce((latest, one) => Math.max(latest, one.dayAt), -1),
 				dated: timeSpent(built, settings.sentences),
 				object:
-					item && last?.object?.noun === item.word
+					!reaction && item && last?.object?.noun === item.word
 						? objectReferenceFor(language, data, item.word, false, last.object.named)
 						: null,
 				speech: null,
-				spoken: false
+				spoken: false,
+				reaction,
+				cadence: reaction ? null : cadenceFor(built)
 			};
 			const [one, opened] = drawOne(paragraph, draw);
 
@@ -4372,6 +5022,101 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 
 		return { built, tense, story: null, theme: built[0].theme };
 	}
+}
+
+// How often a sentence of a paragraph is a reaction to the one before it, where
+// the language can write one and the sentence before was not one already.
+const PARAGRAPH_REACTION_CHANCE = 20;
+
+// What a reaction may open on: what makes it follow, or what it cuts against —
+// `그래서 다행이었다`, `하지만 아쉬웠다` — and never `그리고`, which makes the
+// moment one more thing that happened.
+const REACTION_LINKS: readonly ConnectiveKind[] = ['causal', 'contrastive'];
+
+/**
+ * Whether a result can carry a reaction at all. The caller left its shapes and
+ * its kinds to the generator — a reaction has no subject to carry a slot beside,
+ * no word of the caller's to place, and it is told rather than asked — and the
+ * range leaves a sentence room to be that short.
+ */
+function reactable(
+	data: SentenceLanguageData,
+	settings: Settings,
+	budget: readonly [number, number],
+	room: Record<string, readonly [number, number]>
+): boolean {
+	return (
+		settings.slots === 'all' &&
+		settings.shape === 'all' &&
+		!settings.typed &&
+		!settings.include.length &&
+		reactionFrames(data).some((frame) => frameRange(frame, data, room)[1] >= budget[0])
+	);
+}
+
+/**
+ * The reaction a paragraph's next sentence is, or null for an ordinary one. Only
+ * after a narrated sentence, only as one, and never straight after another.
+ */
+function reactionAfter(
+	data: SentenceLanguageData,
+	settings: Settings,
+	last: Built | null,
+	type: SentenceType,
+	budget: readonly [number, number],
+	room: Record<string, readonly [number, number]>
+): VerbField | 'ambient' | null {
+	if (
+		!last ||
+		last.reaction ||
+		(type !== 'statement' && type !== 'exclamation') ||
+		QUOTED_TYPES.includes(last.type) ||
+		!reactable(data, settings, budget, room)
+	) {
+		return null;
+	}
+
+	const answered = last.field ?? 'ambient';
+
+	return reactionsFor(data, answered).length && chance(PARAGRAPH_REACTION_CHANCE) ? answered : null;
+}
+
+// How often a sentence leans against the length of the ones before it.
+const CADENCE_CHANCE = 65;
+
+/**
+ * Whether the next sentence would rather be short or long. After a long one, a
+ * short one; after two short ones in a row, a long one. A paragraph whose
+ * sentences are all one length reads as a list of them, whatever they say.
+ */
+function cadenceFor(built: readonly Built[]): Cadence {
+	const last = built[built.length - 1];
+
+	if (!last) {
+		return null;
+	}
+
+	const lengths = built.map((one) => one.sentence.length);
+	const mean = lengths.reduce((sum, length) => sum + length, 0) / lengths.length;
+	const before = built.length > 1 ? built[built.length - 2] : null;
+
+	if (
+		(last.slots.length >= 4 || (before !== null && last.sentence.length > mean * 1.25)) &&
+		chance(CADENCE_CHANCE)
+	) {
+		return 'short';
+	}
+
+	if (
+		last.slots.length <= 2 &&
+		before !== null &&
+		before.slots.length <= 2 &&
+		chance(CADENCE_CHANCE)
+	) {
+		return 'long';
+	}
+
+	return null;
 }
 
 // How many of a result's sentences may say when, as a share of its count: one in
@@ -4592,7 +5337,7 @@ function storyFor(telling: Telling): {
 	const heroThemes = subjectThemesFor(settings, null);
 	const heroClasses = [...new Set(heroThemes.map((theme) => THEME_CLASS[theme]))];
 	const stories = [...storiesFor(data, heroClasses, settings.story)];
-	const [, longest] = naturalSpan(data, data.frames, room);
+	const [, longest] = naturalSpan(data, personalFrames(data), room);
 	const joinable = budgets[0][1] >= longest * JOIN_ROOM;
 
 	while (stories.length) {
@@ -4612,7 +5357,17 @@ function storyFor(telling: Telling): {
 		// A story is spoken in only where the caller left the kinds to it: a story
 		// told on its own terms is prose, and a caller who asked for every kind gets
 		// the register they asked for.
-		const planned = plan(data, story, hero, item, settings.sentences, joinable, !settings.typed);
+		const planned = plan(
+			data,
+			story,
+			hero,
+			item,
+			settings.sentences,
+			joinable,
+			!settings.typed,
+			reactable(data, settings, budgets[0], room),
+			denies(data, telling.tense)
+		);
 
 		if (planned) {
 			// The hero's themes: the ones asked for, in the hero's class, and — where
@@ -4843,6 +5598,7 @@ function tellStory(telling: Telling): Result | null {
 			// sentence that is not about the hero.
 			state: step.kind === 'act' ? beat.before : null,
 			nameless: step.kind === 'other' && step.actor !== 'item',
+			fails: beat.fails,
 			pinned: pinnedFor(beat),
 			avoid: [step.object === 'prop' ? roles.item?.word : roles.prop?.word].filter(
 				(word): word is string => word !== undefined
@@ -4927,6 +5683,9 @@ function tellStory(telling: Telling): Result | null {
 	): [Built, SentenceType, SentenceMark, string, Follow | null] => {
 		const scene = beat.step.kind === 'scene';
 		const other = beat.step.kind === 'other';
+		// A reaction to what the sentence before did, with no subject of its own. Only
+		// once the story has a hero for it to be about.
+		const reacting = beat.reaction !== null && topic !== null;
 
 		// Somebody answers the line before. Not a sentence of the story's own, and
 		// not drawn: written whole, at the level the line was said in. Only after a
@@ -4978,8 +5737,7 @@ function tellStory(telling: Telling): Result | null {
 			timeSpent(built, beats.length) ||
 			(beat.join === 'second' &&
 				previous !== null &&
-				((data.connectives.temporal ?? []).includes(openedBefore) ||
-					previous.slots.includes('time')));
+				(saysWhen(data, openedBefore) || previous.slots.includes('time')));
 		// A line the hero says or thinks, in their own voice: the first person where
 		// the language writes one, a level a person speaks at, and nothing in front
 		// of it — nobody opens a line on "meanwhile". What is true of them is said
@@ -5035,7 +5793,7 @@ function tellStory(telling: Telling): Result | null {
 
 							return [type, type as SentenceMark] as const;
 						})();
-		const pinned = commented ? new Map<SentenceSlot, Requirement>() : pinnedFor(beat);
+		const pinned = commented || reacting ? new Map<SentenceSlot, Requirement>() : pinnedFor(beat);
 		// The sentence this one follows: the first clause for a second one, and the
 		// sentence before for a whole one. What it named is what this one may refer
 		// to rather than name again.
@@ -5053,6 +5811,9 @@ function tellStory(telling: Telling): Result | null {
 			const shared = topicOf(previous) ?? topic;
 
 			follow = shared ? { topic: shared, reference: 'pronoun', pronoun: '', scene: pinned } : null;
+		} else if (reacting) {
+			// A reaction writes no subject, and the hero is still who the story is about.
+			follow = { topic: topic!, reference: 'pronoun', pronoun: '', scene: pinned };
 		} else if (scene) {
 			// The scene is the one sentence whose subject is not the hero: the place
 			// the story is happening in, named in full.
@@ -5159,13 +5920,31 @@ function tellStory(telling: Telling): Result | null {
 						pinned: new Map(),
 						avoid: []
 					}
-				: beatDraw(beat, commented),
+				: reacting
+					? {
+							headed: 'state',
+							fields: [],
+							wants: [],
+							prefers: [],
+							item: null,
+							places: placeThemes,
+							subject: [],
+							state: null,
+							nameless: true,
+							pinned: new Map(),
+							avoid: []
+						}
+					: beatDraw(beat, commented),
 			link: beat.join,
 			dayAt,
 			dated,
-			object,
+			object: reacting ? null : object,
 			speech: line ? data.speech! : asked ? data.listener! : null,
-			spoken
+			spoken,
+			reaction: reacting ? beat.reaction : null,
+			// A clause of a two-clause sentence is as long as the two of them make it,
+			// and a reaction as short as what it says.
+			cadence: beat.join === null && !reacting ? cadenceFor(built) : null
 		};
 		let [one, opened] = drawOne(telling, draw);
 
@@ -5179,6 +5958,7 @@ function tellStory(telling: Telling): Result | null {
 			!scene &&
 			!other &&
 			!spoken &&
+			!reacting &&
 			beat.join === null &&
 			distanceFrom(one.sentence.length, budget) > 1
 		) {
@@ -5275,11 +6055,13 @@ function tellStory(telling: Telling): Result | null {
 				one.scene.has('destination'));
 		dayAt = Math.max(dayAt, one.dayAt);
 
-		if (!topic && !scene && !other && !commented) {
+		if (!topic && !scene && !other && !commented && !reacting) {
 			topic = topicOf(one);
 		}
 
-		heroLast = !scene && !other && !commented;
+		// And after a reaction the hero is named again too: `It was delicious. It took
+		// another` has lost track of who `it` is.
+		heroLast = !scene && !other && !commented && !reacting;
 
 		return [one, type, mark, opened, follow];
 	};

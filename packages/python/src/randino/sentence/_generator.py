@@ -22,8 +22,9 @@ not — no tag on any noun, because `THEME_CLASS` already knows what a theme nam
 import sys
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
+from functools import partial
 from types import MappingProxyType
-from typing import cast
+from typing import Literal, cast
 
 from randino._internal.generate import (
     collect,
@@ -81,15 +82,19 @@ from randino.sentence._story import (
     unjoined,
 )
 from randino.sentence._story import Plan as StoryPlan
-from randino.sentence.data import SENTENCE_DATA, STORIES, THEME_CLASS, StoryStep
+from randino.sentence.data import AGENT_CLASSES, SENTENCE_DATA, STORIES, THEME_CLASS, StoryStep
 from randino.sentence.data._types import (
+    AuxiliaryKind,
+    AuxiliaryPredicate,
     Condition,
     ConnectiveKind,
     NounClass,
     NounTrait,
     PredicateForm,
+    PredicateJoint,
     PredicateTense,
     ReplyCue,
+    SentenceAuxiliary,
     SentenceFrame,
     SentenceJoin,
     SentenceLanguageData,
@@ -140,6 +145,12 @@ NAME_ATTEMPTS = 6
 """How many times a name is drawn again when it is one the result already carries.
 
 Two people in one story sharing a name reads as a mistake.
+"""
+
+RESEAT_ATTEMPTS = 3
+"""How many times a subject, a place or a destination is drawn again.
+
+When it drew the noun another of them already holds.
 """
 """How many times a story is told before settling for the closest fit found.
 
@@ -227,6 +238,87 @@ def _takes_object(frame: SentenceFrame) -> bool:
         or (part.slot == "quantity" and subject != "quantity")
         for part in frame.parts
     )
+
+
+def _is_impersonal(frame: SentenceFrame) -> bool:
+    """Whether a shape has no subject at all.
+
+    It says what the moment is like, or what somebody makes of what just happened —
+    `정말 다행이었다`, `It was quiet`. Such a shape is drawn for a reaction alone, and a
+    reaction draws nothing else.
+    """
+    return not any(part.slot in ("subject", "quantity") for part in frame.parts)
+
+
+# Keyed on `id(data)`, which is safe for the same reason `_ARTICLE_CACHE` is: every
+# dataset is a module constant that lives as long as the process.
+_PERSONAL_CACHE: dict[int, tuple[SentenceFrame, ...]] = {}
+_REACTION_CACHE: dict[int, tuple[SentenceFrame, ...]] = {}
+
+
+def _personal_frames(data: SentenceLanguageData) -> tuple[SentenceFrame, ...]:
+    """The shapes a sentence about something can take: every one but the reactions'.
+
+    What a language says it writes — its length range, the shapes and the slots it
+    answers — is about these, because a reaction is never what a caller draws.
+    """
+    frames = _PERSONAL_CACHE.get(id(data))
+
+    if frames is None:
+        frames = tuple(frame for frame in data.frames if not _is_impersonal(frame))
+        _PERSONAL_CACHE[id(data)] = frames
+
+    return frames
+
+
+def _reaction_frames(data: SentenceLanguageData) -> tuple[SentenceFrame, ...]:
+    """The shapes a reaction takes: the ones with no subject at all."""
+    frames = _REACTION_CACHE.get(id(data))
+
+    if frames is None:
+        frames = tuple(frame for frame in data.frames if _is_impersonal(frame))
+        _REACTION_CACHE[id(data)] = frames
+
+    return frames
+
+
+UNPLACED_THEMES: tuple[WordTheme, ...] = ("time",)
+"""The themes a sentence about which happens nowhere.
+
+A month, a dawn and a weekend are when rather than what, and `중순이 갯벌에서 저물었다` put
+one somewhere.
+"""
+
+_PLACING_CACHE: dict[int, bool] = {}
+_PLACED_CACHE: dict[tuple[WordTheme, ...], tuple[WordTheme, ...]] = {}
+
+
+def _placed_themes(frame: SentenceFrame, themes: Sequence[WordTheme]) -> tuple[WordTheme, ...]:
+    """The subject themes a shape can take: `themes`, less the ones it would place somewhere.
+
+    A shape with no place and no destination takes them all. Held per shape, by its
+    identity, and per list of themes, by its value: the lists are a handful of subsets of
+    the thirty-seven themes, so the cache stays small.
+    """
+    placing = _PLACING_CACHE.get(id(frame))
+
+    if placing is None:
+        placing = any(part.slot in ("place", "destination") for part in frame.parts)
+        _PLACING_CACHE[id(frame)] = placing
+
+    asked = tuple(themes)
+
+    if not placing:
+        return asked
+
+    kept = _PLACED_CACHE.get(asked)
+
+    if kept is None:
+        left = tuple(theme for theme in asked if theme not in UNPLACED_THEMES)
+        kept = left or asked
+        _PLACED_CACHE[asked] = kept
+
+    return kept
 
 
 def _grouped(value: int, group: str) -> str:
@@ -653,6 +745,14 @@ def _mood_for(mark: SentenceMark) -> SentenceMood:
     return "question" if mark == "question" else "statement"
 
 
+Reaction = VerbField | Literal["ambient"]
+"""What a reaction answers: the field the sentence before drew its verb from, or
+`"ambient"` after one that had none."""
+
+Cadence = Literal["short", "long"] | None
+"""What a sentence would rather be, beside the ones around it."""
+
+
 @dataclass(frozen=True, slots=True)
 class Draw:
     """Everything one sentence of a result is drawn against.
@@ -753,6 +853,21 @@ class Draw:
     All of them for its first sentence; a sentence that could not carry one hands it on.
     """
 
+    reaction: Reaction | None = None
+    """Set for a reaction, and None for every other sentence.
+
+    A sentence with no subject that says what the moment is like, or what somebody makes
+    of what the sentence before did — the field that sentence's verb came from, or
+    `"ambient"` after one that had none.
+    """
+
+    cadence: Cadence = None
+    """How long this sentence would rather be against the ones before it.
+
+    So that a paragraph does not go on in one length: short after a long one, long after
+    a run of short ones, and None where it can be either.
+    """
+
 
 @dataclass(frozen=True, slots=True)
 class BeatDraw:
@@ -812,6 +927,13 @@ class BeatDraw:
 
     What `Follow.scene` carries once there is a topic to follow; this is how the first
     sentence about the hero gets them when a scene came before it.
+    """
+
+    fails: bool = False
+    """Whether the step is told as not coming off.
+
+    `찾지 못했다`, `could not sleep` — which is what the language's denying auxiliary is
+    for.
     """
 
 
@@ -930,8 +1052,9 @@ def _story_frame(frame: SentenceFrame, beat: BeatDraw) -> bool:
 
     It has to be headed the way the step is — a verb for something done, a state for a
     description — it may not count or price or date anything, its verb has to be one the
-    step's fields can supply, and a change of scene carries no place of its own:
-    `숲이 숲에서 조용해졌다` is the sentence that rule keeps out.
+    step's fields can supply, a change of scene carries no place of its own — `숲이 숲에서
+    조용해졌다` is the sentence that rule keeps out — and a step that does not come off
+    carries no manner.
     """
     if any(part.slot in UNSTORIED or part.copula is not None for part in frame.parts):
         return False
@@ -940,6 +1063,11 @@ def _story_frame(frame: SentenceFrame, beat: BeatDraw) -> bool:
         return False
 
     if frame.fields is not None and not any(field in beat.fields for field in frame.fields):
+        return False
+
+    # What did not come off was done in no manner: `즐겁게 잠들지 못했다` says how somebody
+    # did what they did not do.
+    if beat.fails and any(part.slot == "manner" for part in frame.parts):
         return False
 
     # A shape that has somewhere the story did not ask for — a destination for a hero who
@@ -959,6 +1087,7 @@ def _frames_for(
     settings: Settings,
     mood: SentenceMood,
     beat: BeatDraw | None = None,
+    reaction: bool = False,
 ) -> list[SentenceFrame]:
     """The shapes one sentence may take.
 
@@ -967,10 +1096,13 @@ def _frames_for(
     too-narrow length range gets. A language that writes its question with the mark
     alone declares no question shape, and answers with the statement shapes it does
     have — that is not a fallback so much as the point: `¿El león corre?` is the
-    statement.
+    statement. A shape with no subject is a reaction's, and a reaction takes nothing else;
+    every other sentence is about something, and never draws one.
     """
-    storied = [frame for frame in data.frames if _story_frame(frame, beat)] if beat else []
-    shaped = storied or list(data.frames)
+    own = _reaction_frames(data) if reaction else _personal_frames(data)
+    frames = own or _personal_frames(data)
+    storied = [frame for frame in frames if _story_frame(frame, beat)] if beat else []
+    shaped = storied or list(frames)
     by_mood = [frame for frame in shaped if frame.mood == mood]
     moody = by_mood or [frame for frame in shaped if frame.mood == "statement"]
     moodly = moody or shaped
@@ -1012,12 +1144,12 @@ def _frames_for(
 def _carries(data: SentenceLanguageData, settings: Settings) -> bool:
     """Whether a language has a shape that answers the request at all."""
     if settings.slots != "all" and not any(
-        _matches_slots(frame, settings.slots) for frame in data.frames
+        _matches_slots(frame, settings.slots) for frame in _personal_frames(data)
     ):
         return False
 
     return settings.shape == "all" or any(
-        shape_of(frame) == settings.shape for frame in data.frames
+        shape_of(frame) == settings.shape for frame in _personal_frames(data)
     )
 
 
@@ -1816,7 +1948,7 @@ def natural_range(language: WordLanguage) -> tuple[int, int]:
     """
     data = SENTENCE_DATA[language]
 
-    return _natural_span(data, data.frames, _slot_bounds(language))
+    return _natural_span(data, _personal_frames(data), _slot_bounds(language))
 
 
 # --- Choosing the words -----------------------------------------------------
@@ -1832,7 +1964,7 @@ def _themes_for_classes(
 
 def _pick_frame(
     frames: Sequence[SentenceFrame],
-    boost: Callable[[SentenceFrame], int] | None = None,
+    boost: Callable[[SentenceFrame], float] | None = None,
 ) -> SentenceFrame:
     """One shape, drawn in proportion to the weights the language gave them.
 
@@ -1840,7 +1972,7 @@ def _pick_frame(
     that reaches further without dropping the others.
     """
 
-    def weight_of(frame: SentenceFrame) -> int:
+    def weight_of(frame: SentenceFrame) -> float:
         return frame.weight * (1 if boost is None else boost(frame))
 
     total = sum(weight_of(frame) for frame in frames)
@@ -2310,12 +2442,22 @@ def _state_group_test(
     frame: SentenceFrame,
     plan: Plan,
     beat: BeatDraw | None = None,
+    reaction: Reaction | None = None,
 ) -> Callable[[StateGroup], bool]:
-    """The same, for a shape headed by an adjective rather than a verb."""
+    """The same, for a shape headed by an adjective rather than a verb.
+
+    A shape with no subject takes a group that describes none, one that answers
+    `reaction`, and every other shape a group that describes its subject.
+    """
     subject = _required_at(frame, plan, "subject")
     state = _required_at(frame, plan, "state")
+    impersonal = _is_impersonal(frame)
 
     def test(group: StateGroup) -> bool:
+        if group.impersonal != impersonal:
+            return False
+        if impersonal:
+            return _reacts_to(group, reaction)
         if state is not None and state.word not in group.words:
             return False
         # A story's description says what is true of the hero just now, and a plain
@@ -2342,11 +2484,26 @@ def _state_groups_for(
     frame: SentenceFrame,
     plan: Plan,
     beat: BeatDraw | None = None,
+    reaction: Reaction | None = None,
 ) -> list[StateGroup]:
-    """The state groups one sentence may use: every group `_state_group_test` lets through."""
-    test = _state_group_test(language, data, vocabulary, themes, frame, plan, beat)
+    """The state groups one sentence may use: every group `_state_group_test` lets through.
 
-    return [group for group in data.states if test(group)]
+    A reaction to something done is usually about that: `다행이었다` after the key turned
+    up, `맛있었다` after the soup. What the moment is like fits after anything, and is what
+    is left the rest of the time.
+    """
+    test = _state_group_test(language, data, vocabulary, themes, frame, plan, beat, reaction)
+    usable = [group for group in data.states if test(group)]
+
+    if reaction is not None and reaction != "ambient":
+        answering = [
+            group for group in usable if group.after is not None and reaction in group.after
+        ]
+
+        if answering and chance(ANSWERING_CHANCE):
+            return answering
+
+    return usable
 
 
 def _has_state_group(
@@ -2357,11 +2514,38 @@ def _has_state_group(
     frame: SentenceFrame,
     plan: Plan,
     beat: BeatDraw | None,
+    reaction: Reaction | None = None,
 ) -> bool:
     """Whether some state group can head the shape, stopping at the first one that can."""
-    test = _state_group_test(language, data, vocabulary, themes, frame, plan, beat)
+    test = _state_group_test(language, data, vocabulary, themes, frame, plan, beat, reaction)
 
     return any(test(group) for group in data.states)
+
+
+ANSWERING_CHANCE = 75
+"""How often a reaction to something done answers what was done.
+
+Where the language has a reaction for it, rather than saying what the moment is like.
+"""
+
+
+def _reacts_to(group: StateGroup, reaction: Reaction | None) -> bool:
+    """Whether an impersonal group can answer the sentence before.
+
+    One that names no field fits after anything, and one that does fits after those.
+    """
+    if group.after is None:
+        return True
+
+    return reaction is not None and reaction != "ambient" and reaction in group.after
+
+
+def _reactions_for(data: SentenceLanguageData, reaction: Reaction) -> list[StateGroup]:
+    """The impersonal groups a language could answer this with: whether it can react at all."""
+    if not _reaction_frames(data):
+        return []
+
+    return [group for group in data.states if group.impersonal and _reacts_to(group, reaction)]
 
 
 # --- Building one sentence --------------------------------------------------
@@ -2431,6 +2615,9 @@ class Built:
 
     The sentences after it no longer owe them.
     """
+
+    reaction: bool = False
+    """Whether this sentence was a reaction to the one before, with no subject of its own."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -2732,12 +2919,11 @@ def _agree_by(rules: WordAgreement, word: str, gender: WordGender | None) -> str
 
 
 def _form_of(
-    state_group: StateGroup | None,
-    verb_group: VerbGroup | None,
+    group: StateGroup | VerbGroup | AuxiliaryPredicate,
     mark: SentenceMark,
     style: SentenceStyle,
     tense: SentenceTense,
-    join: SentenceJoin | None,
+    join: SentenceJoin | None = None,
 ) -> WordPool:
     """The predicates of a group, in the form this sentence ends on.
 
@@ -2749,8 +2935,7 @@ def _form_of(
     and it writes its present forms.
 
     Args:
-        state_group: The state group heading the shape, or None.
-        verb_group: The verb group heading it, or None.
+        group: The group heading the shape, or the auxiliary written beside it.
         mark: The kind whose mark the sentence closes on.
         style: How the sentence addresses its reader.
         tense: When the sentence happened.
@@ -2759,13 +2944,14 @@ def _form_of(
     Returns:
         The pool the predicate is drawn from.
     """
-    group: StateGroup | VerbGroup = state_group if state_group is not None else verb_group  # type: ignore[assignment]
     linking = group.forms.get("linking")
 
     if join is not None and join.form == "linking" and linking:
         return tuple(_one_of(entry) for entry in linking)
 
-    tensed = group.past if tense == "past" and group.past is not None else group
+    tensed: StateGroup | VerbGroup | AuxiliaryPredicate | PredicateTense = (
+        group.past if tense == "past" and group.past is not None else group
+    )
 
     for key in FORM_CHAIN[style][mark]:
         pool = tensed.forms.get(key)
@@ -2914,6 +3100,289 @@ def _predicate_for(
     return agreed(drawn), plainly(pool.index(drawn)), -1
 
 
+# --- Auxiliaries ------------------------------------------------------------
+
+AUXILIARY_CHANCE = 24
+"""How often a predicate is written with an auxiliary, where the language has one that fits."""
+
+STORY_AUXILIARY_CHANCE = 16
+"""The same in a sentence of a story.
+
+Which writes only the ones that still say the thing happened, and so has fewer to draw
+from.
+"""
+
+CONTRARY_CHANCE = 60
+"""How often a sentence that opens on `but` says what did not happen, where it can.
+
+`하지만 여우는 사과를 먹지 않았다`. A contrast needs something to cut against, and a
+sentence that only carries on is not that.
+"""
+
+AUXILIARY_WEIGHT: dict[AuxiliaryKind, int] = {
+    "negative": 4,
+    "unable": 2,
+    "desire": 4,
+    "resolve": 2,
+    "effort": 2,
+    "begin": 4,
+    "progressive": 4,
+    "attempt": 3,
+    "completive": 3,
+}
+"""How likely each kind is, against the others the sentence could take."""
+
+HAPPENS: tuple[AuxiliaryKind, ...] = ("begin", "progressive", "attempt", "completive")
+"""The kinds that still say the thing happened, which are the only ones a story writes.
+
+Its next sentence builds on what this one did.
+"""
+
+DENIES: tuple[AuxiliaryKind, ...] = ("negative", "unable")
+"""The kinds that say it did not happen, which is how a step that does not come off is told."""
+
+WILLED: tuple[AuxiliaryKind, ...] = ("unable", "desire", "resolve", "effort", "attempt")
+"""The kinds only somebody can do. A bus does not want to run, and a soup does not decide
+to cool."""
+
+AUXILIARY_WITHOUT: dict[AuxiliaryKind, tuple[VerbField, ...]] = {
+    "negative": (),
+    "unable": ("express", "change", "lose"),
+    "desire": ("change", "lose", "express"),
+    "resolve": ("express", "change", "lose"),
+    "effort": ("express", "change", "lose", "sleep"),
+    "begin": ("arrive", "find", "lose", "rise", "meet"),
+    "progressive": ("arrive", "find", "lose", "rise", "meet"),
+    "attempt": ("rise", "arrive", "lose", "sleep", "express", "change", "find", "take"),
+    "completive": (
+        "rise",
+        "arrive",
+        "wait",
+        "look",
+        "think",
+        "talk",
+        "meet",
+        "play",
+        "express",
+        "search",
+        "make",
+        "tend",
+        "cook",
+        "buy",
+        "take",
+        "find",
+        "move",
+        "lose",
+    ),
+}
+"""The fields each kind does not go with.
+
+A moment does not go on (`arrive`, `find`), nobody tries out losing something, and
+`먹어 버렸다` is over and done with where `기다려 버렸다` is nothing at all.
+"""
+
+
+def _denies(data: SentenceLanguageData, tense: SentenceTense) -> bool:
+    """Whether the language can say a verb did not happen, in a statement in this tense.
+
+    Which is what a story's step that does not come off needs.
+    """
+    return any(
+        auxiliary.kind in DENIES
+        and auxiliary.on == "verb"
+        and (auxiliary.tense is None or auxiliary.tense == tense)
+        and (auxiliary.moods is None or "statement" in auxiliary.moods)
+        for auxiliary in data.auxiliaries
+    )
+
+
+def _auxiliary_for(
+    data: SentenceLanguageData,
+    group: VerbGroup | StateGroup,
+    headed: Literal["state", "verb", "copula"],
+    frame: SentenceFrame,
+    plan: Plan,
+    draw: Draw,
+    doer: NounClass | None,
+    clitic: str,
+) -> SentenceAuxiliary | None:
+    """The auxiliary this sentence's predicate is written with, or None for none.
+
+    Never on a first clause, whose predicate links to the next rather than ending
+    anything; never on a word the caller required, which `include` promises as it is;
+    never in somebody's own voice, where `I wants to` is what English would write; and in
+    a story only one that says the thing happened. A sentence that opens on `but` says
+    what did not happen more often than not, where it can.
+    """
+    pool = data.auxiliaries
+
+    if (
+        not pool
+        or headed == "copula"
+        or draw.link == "first"
+        or draw.speech is not None
+        or draw.reaction is not None
+    ):
+        return None
+
+    slot: SentenceSlot = "state" if headed == "state" else "verb"
+
+    if _required_at(frame, plan, slot) is not None:
+        return None
+
+    mood = _mood_for(draw.mark)
+    field = group.field if isinstance(group, VerbGroup) and headed == "verb" else None
+    fails = draw.beat is not None and draw.beat.fails
+    usable = [
+        auxiliary
+        for auxiliary in pool
+        if auxiliary.on == headed
+        and (auxiliary.moods is None or mood in auxiliary.moods)
+        and (auxiliary.tense is None or auxiliary.tense == draw.tense)
+        # A particle goes in front of the verb, and a clitic is already there.
+        and (auxiliary.predicate is not None or not clitic)
+        # A step that does not come off is told with what denies it, and every other
+        # step of a story with what says it happened.
+        and (
+            draw.beat is None or (auxiliary.kind in DENIES if fails else auxiliary.kind in HAPPENS)
+        )
+        and (auxiliary.kind not in WILLED or (doer is not None and doer in AGENT_CLASSES))
+        and (field is None or field not in AUXILIARY_WITHOUT[auxiliary.kind])
+        and _joins(group, auxiliary)
+    ]
+
+    if not usable:
+        return None
+
+    # What could not be done rather than what was not: `찾지 못했다`, where `찾지 않았다`
+    # is somebody who chose not to look.
+    if fails:
+        unable = [auxiliary for auxiliary in usable if auxiliary.kind == "unable"]
+
+        return pick(unable or usable)
+
+    def weight_of(auxiliary: SentenceAuxiliary) -> float:
+        return AUXILIARY_WEIGHT[auxiliary.kind]
+
+    if draw.opener in data.connectives.get("contrastive", ()):
+        denying = [auxiliary for auxiliary in usable if auxiliary.kind in DENIES]
+
+        if denying and chance(CONTRARY_CHANCE):
+            return pick_weighted(denying, weight_of)
+
+    return (
+        pick_weighted(usable, weight_of)
+        if chance(STORY_AUXILIARY_CHANCE if draw.beat is not None else AUXILIARY_CHANCE)
+        else None
+    )
+
+
+def _joint_pool(group: VerbGroup | StateGroup, joint: str) -> WordPool | None:
+    """The group's pool for a joint or a form an auxiliary follows, or None where it has none."""
+    if joint in ("stem", "negative"):
+        return group.joints.get(cast("PredicateJoint", joint))
+
+    return group.forms.get(cast("PredicateForm", joint))
+
+
+def _joins(group: VerbGroup | StateGroup, auxiliary: SentenceAuxiliary) -> bool:
+    """Whether a group writes the form an auxiliary follows, without spelling it out."""
+    joint = auxiliary.joint or "words"
+
+    if auxiliary.predicate is None or joint == "words":
+        return True
+
+    return _joint_pool(group, joint) is not None
+
+
+def _joint_of(
+    group: VerbGroup | StateGroup, auxiliary: SentenceAuxiliary, predicates: WordPool
+) -> WordPool | None:
+    """The predicate's entries in the form an auxiliary follows, index-aligned with its words.
+
+    Or, for a particle, the entries the sentence would have written anyway. None where the
+    group has no such form.
+    """
+    if auxiliary.predicate is None:
+        return predicates
+
+    joint = auxiliary.joint or "words"
+
+    if joint == "words":
+        return group.words
+
+    pool = _joint_pool(group, joint)
+
+    if pool is None:
+        return None
+
+    return pool if joint in ("stem", "negative") else tuple(_one_of(entry) for entry in pool)
+
+
+def _helped_predicate(
+    auxiliary: SentenceAuxiliary,
+    group: VerbGroup | StateGroup,
+    predicates: WordPool,
+    draw: Draw,
+    low: int,
+    high: int,
+    draw_with: Callable[[WordPool, WordPool, int, int], tuple[str, str, int]],
+) -> tuple[str, str, int] | None:
+    """The predicate with an auxiliary written around it, or None where the two do not fit.
+
+    A chained auxiliary is said in the sentence's own form and the predicate in the one it
+    is joined by — `먹고` in front of `싶어 했다` — while a particle leaves the predicate as
+    the sentence would have written it. Either way the predicate is drawn against what the
+    auxiliary leaves of the room, and only from the entries the auxiliary can follow:
+    `바라봐 봤다` says looking twice.
+    """
+    joined = _joint_of(group, auxiliary, predicates)
+
+    if joined is None:
+        return None
+
+    helper = (
+        _one_of(pick(_form_of(auxiliary.predicate, draw.mark, draw.style, draw.tense)))
+        if auxiliary.predicate is not None
+        else ""
+    )
+    template = (
+        auxiliary.past_template
+        if draw.tense == "past" and auxiliary.past_template
+        else auxiliary.template
+    )
+    written = template.replace("{a}", helper, 1)
+    overhead = len(written) - len("{v}")
+    unless = auxiliary.unless or ()
+    kept = [
+        at
+        for at, word in enumerate(group.words)
+        if at < len(joined) and not any(word.endswith(ending) for ending in unless)
+    ]
+
+    if not kept:
+        return None
+
+    text, plain_form, day = draw_with(
+        tuple(group.words[at] for at in kept),
+        tuple(joined[at] for at in kept),
+        max(1, low - overhead),
+        max(1, high - overhead),
+    )
+
+    if not text or len(text) + overhead > high:
+        return None
+
+    return written.replace("{v}", text, 1), plain_form, day
+
+
+CADENCE_LEAN = 3
+"""How much more likely a shape of the length a sentence would rather be is.
+
+For a sentence that leans one way.
+"""
+
+
 def _leads(
     language: WordLanguage,
     data: SentenceLanguageData,
@@ -2956,7 +3425,7 @@ def _invents_lead(
         groups = [data.calendar.copula] if data.calendar is not None else []
     elif any(part.slot == "state" for part in frame.parts):
         groups = _state_groups_for(
-            language, data, settings.vocabulary, themes, frame, plan, draw.beat
+            language, data, settings.vocabulary, themes, frame, plan, draw.beat, draw.reaction
         )
     else:
         groups = _verb_groups_for(
@@ -2971,6 +3440,33 @@ def _invents_lead(
         )
 
     return not any(_leads(language, data, settings, group, themes) for group in groups)
+
+
+def _fallback_verbs(
+    data: SentenceLanguageData, frame: SentenceFrame, beat: BeatDraw | None
+) -> list[VerbGroup]:
+    """Whatever verb the language can head this shape with, when nothing narrower fits.
+
+    And, for a story's step, a verb of the step's own field before any other: a cooking
+    step whose thing no cooking verb takes by its traits still cooks it, where any
+    transitive verb at all wrote `forgot the pea` in the middle of a meal.
+    """
+    wants_object = _takes_object(frame)
+    wants_destination = any(part.slot == "destination" for part in frame.parts)
+    fitting = [
+        group
+        for group in data.verbs
+        if (group.object is not None) == wants_object
+        and (group.requires is None or any(part.slot == group.requires for part in frame.parts))
+        and (not wants_destination or group.requires == "destination")
+    ]
+    own = (
+        [group for group in fitting if group.field in beat.fields]
+        if beat is not None and beat.fields
+        else []
+    )
+
+    return own or fitting
 
 
 def _compose(
@@ -2997,14 +3493,12 @@ def _compose(
     follow = draw.follow
     beat = draw.beat
     lexicon = WORD_DATA[language]
-    themes = tuple(requested) or WORD_THEMES
+    themes = _placed_themes(frame, tuple(requested) or WORD_THEMES)
     # A shape with a `state` part is headed by one and a shape with a `verb` part by
     # that; a shape with neither is a copular one, which equates its subject to the date
     # or the clock it carries and takes the language's copula for a predicate.
     copular = not any(part.slot in ("state", "verb") for part in frame.parts)
     headed = copular or any(part.slot == "state" for part in frame.parts)
-    wants_object = _takes_object(frame)
-    wants_destination = any(part.slot == "destination" for part in frame.parts)
     # A shape whose predicate has nothing to say about the requested subject only
     # gets this far when no shape of the language did, so the fallback is the same
     # best effort every other narrowing here makes.
@@ -3089,7 +3583,9 @@ def _compose(
         states = (
             [data.calendar.copula]
             if copular and data.calendar is not None
-            else _state_groups_for(language, data, settings.vocabulary, themes, frame, plan, beat)
+            else _state_groups_for(
+                language, data, settings.vocabulary, themes, frame, plan, beat, draw.reaction
+            )
             or list(data.states)
         )
         state_group = pick(
@@ -3107,13 +3603,7 @@ def _compose(
             plan,
             beat,
             _subject_noun_of(frame, plan, follow),
-        ) or [
-            group
-            for group in data.verbs
-            if (group.object is not None) == wants_object
-            and (group.requires is None or any(part.slot == group.requires for part in frame.parts))
-            and (not wants_destination or group.requires == "destination")
-        ]
+        ) or _fallback_verbs(data, frame, beat)
         verb_group = pick([group for group in verbs if leads(group)] or verbs if leading else verbs)
         chosen = verb_group
         base = verb_group.words
@@ -3123,8 +3613,7 @@ def _compose(
     # Index-aligned with the plain words, which is what lets a required word be
     # translated rather than written out in the wrong form.
     predicates = _form_of(
-        state_group,
-        verb_group,
+        chosen,
         draw.mark,
         draw.style,
         draw.tense,
@@ -3328,23 +3817,48 @@ def _compose(
     # The caller's required words this sentence writes.
     placed_words: list[Requirement] = []
     drawn: dict[SentenceSlot, Phrase] = {}
+    # The nouns its subject, its place and its destination stand on, which none of the
+    # others may stand on too.
+    seats: set[str] = set()
     subject: Phrase | None = None
     named = False
     # The phase of the day this sentence named, if it named one.
     day_at = -1
     # A pronoun says nothing about its own gender, and neither does a name carried
-    # over, so what agrees with either agrees with the noun it stands for.
+    # over, so what agrees with either agrees with the noun it stands for. A reaction is
+    # about nobody, and agrees with nobody: Russian `было тихо`.
     carries_name = any(
         word and part.slot == "subject" for word, part in zip(proper, parts, strict=True)
     )
     gender: WordGender | None = (
         follow.topic.gender
-        if follow is not None and (pronoun is not None or carries_name)
+        if follow is not None
+        and not _is_impersonal(frame)
+        and (pronoun is not None or carries_name)
         else None
     )
     # A clitic is written in front of the verb, and paid for here because it belongs to
     # no part's share of the range.
     clitic = reference.text if reference is not None and reference.clitic else ""
+    # Whatever does what the predicate says: the subject drawn, or the topic a pronoun or
+    # a dropped subject stands for.
+    doer: NounClass | None = (
+        (follow.topic.noun_class if follow is not None else None)
+        if pronoun is not None
+        else THEME_CLASS[subject_theme]
+    )
+    # And what is said beside the predicate, if anything: `먹고 싶었다`, `did not eat`,
+    # `没吃`.
+    auxiliary = _auxiliary_for(
+        data,
+        chosen,
+        "copula" if copular else "state" if headed else "verb",
+        frame,
+        plan,
+        draw,
+        doer,
+        clitic,
+    )
     used = (
         len(close)
         + len(open_mark)
@@ -3455,7 +3969,10 @@ def _compose(
                     or (room >= bounds["modifier"][0] + space and chance(modify_chance))
                 )
             )
-            built = _noun_phrase(
+
+            # Drawn again when it lands on a noun another part of the sentence holds.
+            draw_phrase = partial(
+                _noun_phrase,
                 language,
                 data,
                 theme,
@@ -3490,6 +4007,21 @@ def _compose(
                 ),
                 settled=settled,
             )
+
+            # A sentence does not put one noun where it is and where it happens —
+            # `水星在水星上`, `공원에서 공원이` — so a subject, a place or a destination that
+            # drew a noun another of them holds is drawn again before it is kept.
+            seated = part.slot in (subject_slot, "place", "destination")
+            built = draw_phrase()
+            again = 0
+
+            while again < RESEAT_ATTEMPTS and seated and required is None and built.noun in seats:
+                built = draw_phrase()
+                again += 1
+
+            if seated:
+                seats.add(built.noun)
+
             phrase = built.text
 
             if built.modified:
@@ -3532,29 +4064,67 @@ def _compose(
             if predicate_required is not None:
                 placed_words.append(predicate_required)
 
-            phrase, plain_form, named_day = _predicate_for(
-                part.slot,
-                lexicon,
-                data,
-                base,
-                predicates,
-                predicate_required,
-                gender,
-                part_low,
-                part_high,
-                (
-                    draw.avoid | {word for word in base if " " in word}
-                    if part.slot == "verb" and inverted
-                    else draw.avoid
-                ),
-                draw.tense,
-                draw.day_at,
-                # The first sentence of a result may set its scene in any time it
-                # likes; the ones after it only move the day forward.
-                follow is None and draw.link != "second",
-                THEME_CLASS[subject_theme],
-                draw.beat is not None,
-                verb_group.field if verb_group is not None else None,
+            # A pronoun standing where the object stood goes inside a verb of two words
+            # rather than after it — `brought it along`, never `brought along it` — so a
+            # sentence with one steers away from such a verb where it has another, the way
+            # a pronoun after its verb does.
+            pronoun_object = reference is not None and not referred_out and reference.text != ""
+            avoid = (
+                draw.avoid | {word for word in base if " " in word}
+                if part.slot == "verb" and (inverted or pronoun_object)
+                else draw.avoid
+            )
+
+            def draw_with(
+                pool_base: WordPool,
+                pool: WordPool,
+                low_at: int,
+                high_at: int,
+                slot: SentenceSlot = part.slot,
+                required: Requirement | None = predicate_required,
+                agreeing: WordGender | None = gender,
+                avoiding: frozenset[str] = avoid,
+            ) -> tuple[str, str, int]:
+                return _predicate_for(
+                    slot,
+                    lexicon,
+                    data,
+                    pool_base,
+                    pool,
+                    required,
+                    agreeing,
+                    low_at,
+                    high_at,
+                    avoiding,
+                    draw.tense,
+                    draw.day_at,
+                    # The first sentence of a result may set its scene in any time it
+                    # likes; the ones after it only move the day forward.
+                    follow is None and draw.link != "second",
+                    THEME_CLASS[subject_theme],
+                    draw.beat is not None,
+                    verb_group.field if verb_group is not None else None,
+                )
+
+            # An auxiliary is written around the predicate, and its share of the room
+            # comes out of the predicate's: what is left is what the predicate is drawn
+            # against. One that still does not fit gives way to the plain predicate. A
+            # step that does not come off keeps what denies it whatever the room: told
+            # without it, it would say the opposite.
+            helped: tuple[str, str, int] | None = None
+
+            if auxiliary is not None and part.slot in ("verb", "state"):
+                helped = _helped_predicate(
+                    auxiliary, chosen, predicates, draw, part_low, part_high, draw_with
+                )
+
+                if helped is None and beat is not None and beat.fails:
+                    helped = _helped_predicate(
+                        auxiliary, chosen, predicates, draw, part_low, sys.maxsize, draw_with
+                    )
+
+            phrase, plain_form, named_day = (
+                helped if helped is not None else draw_with(base, predicates, part_low, part_high)
             )
 
             if plain_form:
@@ -3566,12 +4136,17 @@ def _compose(
             # A past-tense verb in a language whose verb does not change is written with
             # the language's own mark beside it — once per sentence, so the second clause
             # of one goes without — and one whose verb agrees with its subject in the
-            # past is agreed with it.
+            # past is agreed with it. A particle that cannot stand beside the mark leaves
+            # it out: `没吃`, never `没吃了`.
             if part.slot == "verb" and past:
-                if mark is not None and mark.head and draw.link != "second":
+                marked = not (
+                    helped is not None and auxiliary is not None and auxiliary.drops_past_mark
+                )
+
+                if mark is not None and mark.head and draw.link != "second" and marked:
                     phrase = mark.head + data.space + phrase
 
-                if mark is not None and mark.tail:
+                if mark is not None and mark.tail and marked:
                     phrase += mark.tail
 
                 if (
@@ -3658,6 +4233,7 @@ def _compose(
         if "object" in drawn
         else (ObjectMention(reference.noun, False) if reference is not None else None),
         tuple(placed_words),
+        draw.reaction is not None,
     )
 
 
@@ -3743,7 +4319,13 @@ OPENER_DAMP = 0.4
 Two in a row read as a list of asides rather than as a paragraph.
 """
 
-CONNECTIVE_KINDS: tuple[ConnectiveKind, ...] = ("additive", "temporal", "contrastive", "causal")
+CONNECTIVE_KINDS: tuple[ConnectiveKind, ...] = (
+    "additive",
+    "temporal",
+    "contrastive",
+    "causal",
+    "turn",
+)
 """Every claim a connective can make, in the order the datasets write them."""
 
 REFERENCE_WEIGHT = {"repeat": 25, "pronoun": 40, "fresh": 35}
@@ -3929,6 +4511,17 @@ def _opener_for(
     return pick(usable) if usable and chance(CONNECTIVE_CHANCE * damp) else ""
 
 
+def _says_when(data: SentenceLanguageData, opener: str) -> bool:
+    """Whether a sentence's opener says when already.
+
+    `later`, `잠시 후`, and the ones that say something new came along just then —
+    `그때`, `just then`.
+    """
+    return opener != "" and (
+        opener in data.connectives.get("temporal", ()) or opener in data.connectives.get("turn", ())
+    )
+
+
 def _connectives_of(
     data: SentenceLanguageData,
     follow: Follow,
@@ -3937,10 +4530,12 @@ def _connectives_of(
 ) -> WordPool:
     """The connectives whose claim about the sentence before this one can be true.
 
-    Three of the four always can. What `causal` claims is that this sentence follows from
+    Three of the five always can. What `causal` claims is that this sentence follows from
     the last, which needs the two of them to be about the same thing and this one to be
     telling rather than asking. A story has already decided what each of its sentences
-    may claim, and hands the kinds in.
+    may claim, and hands the kinds in; a paragraph with no story lets every kind in that
+    the two sentences can carry — and `turn` only where something new has come along,
+    which in a paragraph is a fresh subject.
     """
     follows = follow.reference != "fresh" and mark in ("statement", "trailing")
     wanted = CONNECTIVE_KINDS if allowed is None else tuple(allowed)
@@ -3948,7 +4543,8 @@ def _connectives_of(
     return tuple(
         word
         for kind in wanted
-        if follows or kind != "causal"
+        if (follows or kind != "causal")
+        and (kind != "turn" or allowed is not None or follow.reference == "fresh")
         for word in data.connectives.get(kind, ())
     )
 
@@ -4297,15 +4893,34 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
 
         for budget in budgets:
             type_, mark = _kind_for(data, settled, room, budget, flow)
-            follow = None if topic is None else _follow_for(data, topic, scene, flow.repeated)
-            item = scene.get("object")
             last = built[-1] if built else None
+            # A sentence that follows something done is now and then a reaction to it:
+            # `정말 다행이었다`, `It was delicious`.
+            reaction = _reaction_after(data, settled, last, type_, budget, room)
+            # And the one after a reaction names the topic again, because the reaction
+            # spoke of the moment and a pronoun after it would stand for that.
+            follow = (
+                None
+                if topic is None
+                else Follow(topic, "repeat", "", scene)
+                if last is not None and last.reaction
+                else _follow_for(data, topic, scene, flow.repeated)
+            )
+            item = scene.get("object")
             draw = Draw(
                 budget,
                 type_,
                 mark,
                 _quote_for(data, type_, settings.quote),
-                _opener_for(data, mark, follow, budget[1], shortest, flow),
+                _opener_for(
+                    data,
+                    mark,
+                    follow,
+                    budget[1],
+                    shortest,
+                    flow,
+                    REACTION_LINKS if reaction is not None else None,
+                ),
                 _style_for(type_, settings.style, voice),
                 frozenset(spent),
                 frozenset(described),
@@ -4316,13 +4931,16 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
                 None,
                 max((one.day_at for one in built), default=-1),
                 object=_object_reference_for(language, data, item.word, False, last.object.named)
-                if item is not None
+                if reaction is None
+                and item is not None
                 and last is not None
                 and last.object is not None
                 and last.object.noun == item.word
                 else None,
                 dated=_time_spent(built, settings.sentences),
                 owed=tuple(paragraph.owed),
+                reaction=reaction,
+                cadence=None if reaction is not None else _cadence_for(built),
             )
             one, opened = _draw_one(paragraph, draw)
 
@@ -4394,6 +5012,102 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             )
 
     return tell_paragraph()
+
+
+PARAGRAPH_REACTION_CHANCE = 20
+"""How often a sentence of a paragraph is a reaction to the one before it.
+
+Where the language can write one and the sentence before was not one already.
+"""
+
+REACTION_LINKS: tuple[ConnectiveKind, ...] = ("causal", "contrastive")
+"""What a reaction may open on: what makes it follow, or what it cuts against.
+
+`그래서 다행이었다`, `하지만 아쉬웠다` — and never `그리고`, which makes the moment one more
+thing that happened.
+"""
+
+
+def _reactable(
+    data: SentenceLanguageData,
+    settings: Settings,
+    budget: tuple[int, int],
+    room: dict[str, tuple[int, int]],
+) -> bool:
+    """Whether a result can carry a reaction at all.
+
+    The caller left its shapes and its kinds to the generator — a reaction has no subject
+    to carry a slot beside, no word of the caller's to place, and it is told rather than
+    asked — and the range leaves a sentence room to be that short.
+    """
+    return (
+        settings.slots == "all"
+        and settings.shape == "all"
+        and not settings.typed
+        and not settings.include
+        and any(_frame_range(frame, data, room)[1] >= budget[0] for frame in _reaction_frames(data))
+    )
+
+
+def _reaction_after(
+    data: SentenceLanguageData,
+    settings: Settings,
+    last: Built | None,
+    type_: SentenceType,
+    budget: tuple[int, int],
+    room: dict[str, tuple[int, int]],
+) -> Reaction | None:
+    """The reaction a paragraph's next sentence is, or None for an ordinary one.
+
+    Only after a narrated sentence, only as one, and never straight after another.
+    """
+    if (
+        last is None
+        or last.reaction
+        or type_ not in ("statement", "exclamation")
+        or last.type in QUOTED_TYPES
+        or not _reactable(data, settings, budget, room)
+    ):
+        return None
+
+    answered: Reaction = last.field if last.field is not None else "ambient"
+
+    return (
+        answered if _reactions_for(data, answered) and chance(PARAGRAPH_REACTION_CHANCE) else None
+    )
+
+
+CADENCE_CHANCE = 65
+"""How often a sentence leans against the length of the ones before it."""
+
+
+def _cadence_for(built: Sequence[Built]) -> Cadence:
+    """Whether the next sentence would rather be short or long.
+
+    After a long one, a short one; after two short ones in a row, a long one. A paragraph
+    whose sentences are all one length reads as a list of them, whatever they say.
+    """
+    if not built:
+        return None
+
+    last = built[-1]
+    mean = sum(len(one.sentence) for one in built) / len(built)
+    before = built[-2] if len(built) > 1 else None
+
+    if (
+        len(last.slots) >= 4 or (before is not None and len(last.sentence) > mean * 1.25)
+    ) and chance(CADENCE_CHANCE):
+        return "short"
+
+    if (
+        len(last.slots) <= 2
+        and before is not None
+        and len(before.slots) <= 2
+        and chance(CADENCE_CHANCE)
+    ):
+        return "long"
+
+    return None
 
 
 # --- Telling a story --------------------------------------------------------
@@ -4521,7 +5235,7 @@ def _story_for(telling: Telling) -> Found | None:
     hero_themes = _subject_themes_for(settings, None)
     hero_classes = tuple(dict.fromkeys(THEME_CLASS[theme] for theme in hero_themes))
     candidates = list(stories_for(data, hero_classes, settings.story))
-    longest = _natural_span(data, data.frames, telling.room)[1]
+    longest = _natural_span(data, _personal_frames(data), telling.room)[1]
     joinable = telling.budgets[0][1] >= longest * JOIN_ROOM
 
     while candidates:
@@ -4540,7 +5254,17 @@ def _story_for(telling: Telling) -> Found | None:
         # A story is spoken in only where the caller left the kinds to it: a story told
         # on its own terms is prose, and a caller who asked for every kind gets the
         # register they asked for.
-        planned = plan(data, story, hero, item, settings.sentences, joinable, not settings.typed)
+        planned = plan(
+            data,
+            story,
+            hero,
+            item,
+            settings.sentences,
+            joinable,
+            not settings.typed,
+            _reactable(data, settings, telling.budgets[0], telling.room),
+            _denies(data, telling.tense),
+        )
 
         if planned is not None:
             # The hero's themes: the ones asked for, in the hero's class, and — where the
@@ -4782,6 +5506,7 @@ def _tell_story(telling: Telling) -> Result | None:
             # sentence that is not about the hero.
             state=beat.before if step.kind == "act" else None,
             nameless=step.kind == "other" and step.actor != "item",
+            fails=beat.fails,
         )
 
     def saying_for(budget: tuple[int, int], pool: WordPool) -> tuple[Built, SentenceMark] | None:
@@ -4849,6 +5574,9 @@ def _tell_story(telling: Telling) -> Result | None:
         nonlocal topic, day_at, placed, hero_last
         scene = beat.step.kind == "scene"
         aside = beat.step.kind == "other"
+        # A reaction to what the sentence before did, with no subject of its own. Only
+        # once the story has a hero for it to be about.
+        reacting = beat.reaction is not None and topic is not None
 
         # Somebody answers the line before. Not a sentence of the story's own, and not
         # drawn: written whole, at the level the line was said in. Only after a line that
@@ -4895,7 +5623,7 @@ def _tell_story(telling: Telling) -> Result | None:
         dated = _time_spent(built, len(beats)) or (
             beat.join == "second"
             and previous is not None
-            and (opened_before in data.connectives.get("temporal", ()) or "time" in previous.slots)
+            and (_says_when(data, opened_before) or "time" in previous.slots)
         )
         # A line the hero says or thinks, in their own voice: the first person where the
         # language writes one, a level a person speaks at, and nothing in front of it —
@@ -4959,7 +5687,7 @@ def _tell_story(telling: Telling) -> Result | None:
             type_ = pick_weighted(kinds, lambda kind: STORY_KIND_WEIGHT.get(kind, 1))
             mark = cast("SentenceMark", type_)
 
-        pinned = {} if commented is not None else pinned_for(beat)
+        pinned = {} if commented is not None or reacting else pinned_for(beat)
         # The sentence this one follows: the first clause for a second one, and the
         # sentence before for a whole one. What it named is what this one may refer to
         # rather than name again.
@@ -4983,6 +5711,10 @@ def _tell_story(telling: Telling) -> Result | None:
             shared = _topic_of(previous) or topic
 
             follow = Follow(shared, "pronoun", "", pinned) if shared is not None else None
+        elif reacting:
+            # A reaction writes no subject, and the hero is still who the story is about.
+            assert topic is not None
+            follow = Follow(topic, "pronoun", "", pinned)
         elif scene:
             # The scene is the one sentence whose subject is not the hero: the place the
             # story is happening in, named in full.
@@ -5083,10 +5815,23 @@ def _tell_story(telling: Telling) -> Result | None:
                 nameless=True,
             )
             if asked
+            else BeatDraw(
+                headed_by_state=True,
+                fields=(),
+                describes=False,
+                condition=None,
+                wants=(),
+                prefers=(),
+                item=None,
+                places=DESTINATION_THEMES,
+                subject=(),
+                nameless=True,
+            )
+            if reacting
             else beat_draw(beat, commented),
             beat.join,
             day_at,
-            object=reference,
+            object=None if reacting else reference,
             dated=dated,
             speech=data.speech if line else listener if asked else None,
             spoken=spoken,
@@ -5100,6 +5845,10 @@ def _tell_story(telling: Telling) -> Result | None:
                     and any(each is placed_word for placed_word in previous.placed)
                 )
             ),
+            reaction=beat.reaction if reacting else None,
+            # A clause of a two-clause sentence is as long as the two of them make it, and
+            # a reaction as short as what it says.
+            cadence=_cadence_for(built) if beat.join is None and not reacting else None,
         )
         one, opened = _draw_one(telling, draw)
 
@@ -5112,6 +5861,7 @@ def _tell_story(telling: Telling) -> Result | None:
             and not scene
             and not aside
             and not spoken
+            and not reacting
             and beat.join is None
             and _distance_from(len(one.sentence), budget) > 1
         ):
@@ -5195,10 +5945,12 @@ def _tell_story(telling: Telling) -> Result | None:
         )
         day_at = max(day_at, one.day_at)
 
-        if topic is None and not scene and not aside and commented is None:
+        if topic is None and not scene and not aside and commented is None and not reacting:
             topic = _topic_of(one)
 
-        hero_last = not scene and not aside and commented is None
+        # And after a reaction the hero is named again too: `It was delicious. It took
+        # another` has lost track of who `it` is.
+        hero_last = not scene and not aside and commented is None and not reacting
 
         return Told(one, type_, mark, opened, follow)
 
@@ -5430,7 +6182,7 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     beat = draw.beat
     data = SENTENCE_DATA[language]
     bounds = _room_for(language, settings.include_name)
-    allowed = _frames_for(data, settings, _mood_for(draw.mark), beat)
+    allowed = _frames_for(data, settings, _mood_for(draw.mark), beat, draw.reaction is not None)
     requested = (
         beat.subject
         if beat is not None and beat.subject is not None
@@ -5467,9 +6219,10 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
 
     # A result that has reached the last phase of its day has no later one to name, so a
     # sentence after that carries no time at all rather than a wrong one. And a sentence
-    # that opens on `later` or `잠시후` has said when already: `잠시후 한낮에` says it twice.
+    # that opens on `later` or `잠시 후` has said when already: `잠시 후 한낮에` says it
+    # twice.
     spent = follow is not None and draw.day_at >= len(data.times.day) - 1
-    dated = draw.dated or draw.opener in data.connectives.get("temporal", ())
+    dated = draw.dated or _says_when(data, draw.opener)
     timeless = (
         [frame for frame in allowed if not any(part.slot == "time" for part in frame.parts)]
         # A line somebody says names no time either, and a shape with a time part is left
@@ -5485,7 +6238,8 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     # clause of one sentence, which its first clause carries. An object the sentence
     # before named, which this one leaves out, counts as a phrase gone too.
     dropped = (
-        draw.link != "second"
+        draw.reaction is None
+        and draw.link != "second"
         and follow is not None
         and follow.reference == "pronoun"
         and follow.pronoun == ""
@@ -5533,7 +6287,14 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
 
         if any(part.slot == "state" for part in frame.parts):
             return _has_state_group(
-                language, data, settings.vocabulary, requested, frame, plan, beat
+                language,
+                data,
+                settings.vocabulary,
+                _placed_themes(frame, requested),
+                frame,
+                plan,
+                beat,
+                draw.reaction,
             )
 
         return _has_verb_group(
@@ -5541,26 +6302,61 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
             data,
             settings.vocabulary,
             frame,
-            requested,
+            _placed_themes(frame, requested),
             plan,
             beat,
             _subject_noun_of(frame, plan, follow),
         )
 
+    # Whether a shape can be built, asked once per shape and held for every attempt.
+    known: dict[int, bool] = {}
+
+    def builds(frame: SentenceFrame) -> bool:
+        answer = known.get(id(frame))
+
+        if answer is None:
+            answer = buildable(frame)
+            known[id(frame)] = answer
+
+        return answer
+
     # Prefer a shape that can land inside the range, then one that has somewhere to
     # put every word the caller required, and settle for any of them after that.
-    fitting = [
+    # Whether a shape can be built is asked of the shape drawn rather than of every one in
+    # range: `buildable` walks the verb groups of the language, and asking it of all of
+    # them was a fifth of what a sentence took. A shape that cannot be built is drawn out
+    # and the draw made again, which lands on the same shapes with the same odds as
+    # filtering them first.
+    usable: list[SentenceFrame] = [
         frame
         for frame in frames
         if _frame_range(frame, data, bounds)[1] >= low
         and _frame_range(frame, data, bounds)[0] <= high
-        and buildable(frame)
     ]
-    # Only asked for when nothing fits. `buildable` walks every verb group of the
-    # language against the shape, and computing it every time cost a quarter of what a
-    # Korean paragraph took to answer a question it usually never asks.
-    loose = [] if fitting else [frame for frame in frames if buildable(frame)]
-    usable = fitting or loose or frames
+    # Whether `usable` still has to be asked: not once nothing could be built and any
+    # shape at all is what is left.
+    checking = True
+
+    def draw_from(
+        pool: list[SentenceFrame], weigh: Callable[[SentenceFrame], float]
+    ) -> tuple[SentenceFrame, list[SentenceFrame]] | None:
+        # One buildable shape out of `pool`, and what is left of the pool once the shapes
+        # drawn on the way that could not be built are out of it.
+        if not checking:
+            return (_pick_frame(pool, weigh), pool) if pool else None
+
+        left = pool
+
+        while left:
+            frame = _pick_frame(left, weigh)
+
+            if builds(frame):
+                return frame, left
+
+            left = [each for each in left if each is not frame]
+
+        return None
+
     # `_compose` leads with a subject on the `starts_with` character where the shape
     # opens on its subject, and a shape whose predicates take no subject on it has to
     # invent one: `かヌゾが…` at `realism="real"`, while another shape had a real word.
@@ -5585,30 +6381,54 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     best_distance = None
     best_too_long = False
 
-    def weigh(candidate: SentenceFrame, attempt: int) -> int:
+    def weigh(candidate: SentenceFrame, attempt: int) -> float:
         # After a miss, a shape whose own range runs past the requested one in the
         # direction that was missed is four times as likely. A story's sentence is
         # better for carrying what the story would rather it carried — the place it is
-        # all happening in — and for saying a little more than the bare subject and verb.
-        weight = 1
+        # all happening in. And a sentence that would rather be short or long than what
+        # came before it leans that way, which is what keeps a paragraph from going on in
+        # one length; one with no lean that is a story's is better for saying a little
+        # more than the bare subject and verb.
+        weight: float = 1
 
         if attempt > 0 and best_distance:
             own_low, own_high = _frame_range(candidate, data, bounds)
 
             weight *= 4 if (own_low <= low if best_too_long else own_high >= high) else 1
 
-        if beat is not None:
-            if any(part.slot in beat.prefers for part in candidate.parts):
-                weight *= 3
+        if beat is not None and any(part.slot in beat.prefers for part in candidate.parts):
+            weight *= 3
 
-            if len(candidate.parts) >= 3:
-                weight *= 2
+        parts = len(candidate.parts)
+
+        if draw.cadence == "short":
+            weight *= CADENCE_LEAN if parts <= 2 else 1
+        elif draw.cadence == "long":
+            weight *= CADENCE_LEAN if parts >= 4 else 1.5 if parts == 3 else 1
+        elif beat is not None and parts >= 3:
+            weight *= 2
 
         return weight
 
     for attempt in range(FIT_ATTEMPTS):
         at = attempt
-        frame = _pick_frame(usable, lambda candidate: weigh(candidate, at))  # noqa: B023
+
+        def weighed(candidate: SentenceFrame) -> float:
+            return weigh(candidate, at)  # noqa: B023
+
+        picked = draw_from(usable, weighed)
+
+        # Nothing in range can be built: any shape that can, and failing that any.
+        if picked is None:
+            loose = [frame for frame in frames if builds(frame)]
+            usable = loose or list(frames)
+            checking = bool(loose)
+            picked = draw_from(usable, weighed)
+
+        assert picked is not None
+        # What the draw learned stays learned: a shape that could not be built is not
+        # drawn again on the next attempt.
+        frame, usable = picked
 
         if steered:
             left = usable
@@ -5623,8 +6443,13 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
                     break
 
                 drawn = frame
-                left = [each for each in left if each is not drawn]
-                frame = _pick_frame(left, lambda candidate: weigh(candidate, at))  # noqa: B023
+                following = draw_from([each for each in left if each is not drawn], weighed)
+
+                if following is None:
+                    break
+
+                frame, left = following
+
         built = _compose(
             language,
             data,

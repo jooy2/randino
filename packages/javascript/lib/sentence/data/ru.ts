@@ -156,13 +156,24 @@ export const RU: SentenceLanguageData = {
 		},
 		// What somebody shows, split by what it shows — see the Korean data. Every
 		// past is imperfective and closes on `л` or `лся`, for the agreement.
+		// What anything with a face can show, and beside each group what takes hands,
+		// shoulders or words and is a person's alone.
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			condition: 'content',
 			...tensed(
-				`смеётся улыбается напевает хихикает хохочет ухмыляется свистит ликует кивает подмигивает сияет усмехается мурлычет`,
-				`смеялся улыбался напевал хихикал хохотал ухмылялся свистел ликовал кивал подмигивал сиял усмехался мурлыкал`
+				`смеётся улыбается хихикает хохочет ухмыляется сияет усмехается мурлычет`,
+				`смеялся улыбался хихикал хохотал ухмылялся сиял усмехался мурлыкал`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'content',
+			...tensed(
+				`напевает свистит ликует кивает подмигивает`,
+				`напевал свистел ликовал кивал подмигивал`
 			)
 		},
 		{
@@ -170,8 +181,17 @@ export const RU: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			condition: 'restless',
 			...tensed(
-				`плачет вздыхает бормочет всхлипывает рыдает стонет ворчит хмурится фыркает морщится хмыкает кряхтит охает ойкает дрожит вздрагивает ёжится бледнеет`,
-				`плакал вздыхал бормотал всхлипывал рыдал стонал ворчал хмурился фыркал морщился хмыкал кряхтел охал ойкал дрожал вздрагивал ёжился бледнел`
+				`плачет всхлипывает рыдает стонет фыркает дрожит вздрагивает ёжится бледнеет`,
+				`плакал всхлипывал рыдал стонал фыркал дрожал вздрагивал ёжился бледнел`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			condition: 'restless',
+			...tensed(
+				`вздыхает бормочет ворчит хмурится морщится хмыкает кряхтит охает ойкает`,
+				`вздыхал бормотал ворчал хмурился морщился хмыкал кряхтел охал ойкал`
 			)
 		},
 		{
@@ -193,9 +213,14 @@ export const RU: SentenceLanguageData = {
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`кричит восклицает ахает чихает икает краснеет визжит лепечет шмыгает пыхтит оглядывается`,
-				`кричал восклицал ахал чихал икал краснел визжал лепетал шмыгал пыхтел оглядывался`
+				`кричит ахает чихает икает визжит шмыгает пыхтит оглядывается`,
+				`кричал ахал чихал икал визжал шмыгал пыхтел оглядывался`
 			)
+		},
+		{
+			field: 'express',
+			subject: ['person'],
+			...tensed(`восклицает краснеет лепечет`, `восклицал краснел лепетал`)
 		},
 		{
 			field: 'talk',
@@ -513,7 +538,32 @@ export const RU: SentenceLanguageData = {
 			words: words(
 				`тёплый холодный больной жёсткий мягкий шершавый гладкий бледный сильный онемевший тяжёлый`
 			)
-		}
+		},
+		// A reaction says what the moment was like, with nobody to say it of: the
+		// neuter word a Russian sentence with no subject is written in, and `было`
+		// in the past — `Было тихо`, `Очень вкусно`. Each group answers what the
+		// sentence before did, and the last fits after anything.
+		{ subject: [], impersonal: true, after: ['find', 'arrive'], words: words(`здорово удачно`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['find', 'look'],
+			words: words(`странно удивительно любопытно`)
+		},
+		{ subject: [], impersonal: true, after: ['lose'], words: words(`обидно жаль досадно`) },
+		{ subject: [], impersonal: true, after: ['eat', 'cook', 'drink'], words: words(`вкусно`) },
+		{ subject: [], impersonal: true, after: ['meet', 'talk'], words: words(`приятно весело`) },
+		{ subject: [], impersonal: true, after: ['rest', 'sleep'], words: words(`уютно спокойно`) },
+		{ subject: [], impersonal: true, after: ['make', 'tend', 'sell'], words: words(`приятно`) },
+		{
+			subject: [],
+			impersonal: true,
+			after: ['rise', 'go', 'move', 'play'],
+			words: words(`весело свежо`)
+		},
+		{ subject: [], impersonal: true, after: ['search', 'wait'], words: words(`скучно тоскливо`) },
+		{ subject: [], impersonal: true, after: ['think'], words: words(`странно`) },
+		{ subject: [], impersonal: true, words: words(`тихо холодно тепло прохладно спокойно темно`) }
 	],
 	// Masculine singular, the form `agreement` reshapes.
 	modifiers: [
@@ -698,7 +748,9 @@ export const RU: SentenceLanguageData = {
 			`затем наконец потом тем_временем вскоре немного_погодя чуть_позже тут_же в_тот_миг спустя_время`
 		),
 		contrastive: words(`но однако а зато всё_же напротив тем_не_менее впрочем и_всё_таки`),
-		causal: words(`поэтому в_итоге значит следовательно оттого стало_быть по_этой_причине`)
+		causal: words(`поэтому в_итоге значит следовательно оттого стало_быть по_этой_причине`),
+		// Something new coming along: somebody else, the weather, the place changing.
+		turn: words(`внезапно в_этот_момент как_вдруг именно_тогда`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -780,6 +832,9 @@ export const RU: SentenceLanguageData = {
 	// Russian noun changes its own ending for both, and the endings are the noun's
 	// own rather than a rule the pools could carry. A state in the past takes
 	// `был`, which `pastAgreement` turns into `была` and `было`.
+	// A Russian negative is `не` in front of the verb, and the verb keeps every
+	// form it had, its agreement with the subject included: `не бежала`.
+	auxiliaries: [{ kind: 'negative', template: 'не {v}' }],
 	frames: [
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
@@ -846,6 +901,9 @@ export const RU: SentenceLanguageData = {
 				{ slot: 'manner' }
 			],
 			weight: 10
-		}
+		},
+		// A reaction, with no subject at all: `Было тихо.`, `Очень вкусно.`
+		{ parts: [{ slot: 'state', pastHead: 'было' }], weight: 8 },
+		{ parts: [{ slot: 'degree' }, { slot: 'state', pastHead: 'было' }], weight: 8 }
 	]
 };
