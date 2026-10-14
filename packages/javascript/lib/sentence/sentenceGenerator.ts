@@ -1610,11 +1610,11 @@ function pickFrame(
 }
 
 /**
- * The verb group one sentence uses: transitive exactly when the shape has an
- * object, able to take the subject the shape will be given, and — when a word
- * was required — the group that word belongs to.
+ * Whether a verb group can head one sentence: transitive exactly when the shape
+ * has an object, able to take the subject the shape will be given, and — when a
+ * word was required — the group that word belongs to.
  */
-function verbGroupsFor(
+function verbGroupTest(
 	language: WordLanguage,
 	data: SentenceLanguageData,
 	vocabulary: RandVocabulary,
@@ -1623,7 +1623,7 @@ function verbGroupsFor(
 	plan: Plan,
 	beat: BeatDraw | null = null,
 	subjectNoun: string | null = null
-): readonly VerbGroup[] {
+): (group: VerbGroup) => boolean {
 	// A quantity is an object with a number on it, and an amount is an object of
 	// the class money belongs to — unless the quantity is what the sentence is
 	// about, in which case it is the subject and the verb takes nothing.
@@ -1636,7 +1636,7 @@ function verbGroupsFor(
 	// verb of the field it settled on.
 	const fields = beat?.fields.length ? beat.fields : frame.fields;
 
-	const usable = data.verbs.filter((group) => {
+	return (group) => {
 		if (Boolean(group.object) !== wantsObject) {
 			return false;
 		}
@@ -1702,13 +1702,48 @@ function verbGroupsFor(
 			subjectThemesOf(group, themes, language, data, vocabulary).length > 0 &&
 			(!group.object || objectThemesOf(group, beat, language, data, vocabulary).length > 0)
 		);
-	});
+	};
+}
 
+/** The verb groups one sentence may use: every group `verbGroupTest` lets through. */
+function verbGroupsFor(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	vocabulary: RandVocabulary,
+	frame: SentenceFrame,
+	themes: readonly WordTheme[],
+	plan: Plan,
+	beat: BeatDraw | null = null,
+	subjectNoun: string | null = null
+): readonly VerbGroup[] {
+	const usable = data.verbs.filter(
+		verbGroupTest(language, data, vocabulary, frame, themes, plan, beat, subjectNoun)
+	);
 	// And where some group shows what is true of the hero, those are what the
 	// sentence says: the hero laughs after the meal rather than sneezing after it.
 	const showing = beat?.state ? usable.filter((group) => group.condition) : [];
 
 	return showing.length ? showing : usable;
+}
+
+/**
+ * Whether some verb group can head the shape, which is all a shape needs to be
+ * worth drawing. It stops at the first group that can: filtering every group of
+ * the language for every shape a sentence weighed was over half of its time.
+ */
+function hasVerbGroup(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	vocabulary: RandVocabulary,
+	frame: SentenceFrame,
+	themes: readonly WordTheme[],
+	plan: Plan,
+	beat: BeatDraw | null,
+	subjectNoun: string | null
+): boolean {
+	return data.verbs.some(
+		verbGroupTest(language, data, vocabulary, frame, themes, plan, beat, subjectNoun)
+	);
 }
 
 /** Whether a group takes a noun of this theme as its subject. */
@@ -2056,7 +2091,7 @@ function objectThemesOf(
 }
 
 /** The same, for a shape headed by an adjective rather than a verb. */
-function stateGroupsFor(
+function stateGroupTest(
 	language: WordLanguage,
 	data: SentenceLanguageData,
 	vocabulary: RandVocabulary,
@@ -2064,11 +2099,11 @@ function stateGroupsFor(
 	frame: SentenceFrame,
 	plan: Plan,
 	beat: BeatDraw | null = null
-): readonly StateGroup[] {
+): (group: StateGroup) => boolean {
 	const subject = requiredAt(frame, plan, 'subject');
 	const state = requiredAt(frame, plan, 'state');
 
-	return data.states.filter((group) => {
+	return (group) => {
 		if (state && !group.words.includes(state.word)) {
 			return false;
 		}
@@ -2085,7 +2120,33 @@ function stateGroupsFor(
 		}
 
 		return subjectThemesOf(group, themes, language, data, vocabulary).length > 0;
-	});
+	};
+}
+
+/** The state groups one sentence may use: every group `stateGroupTest` lets through. */
+function stateGroupsFor(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	vocabulary: RandVocabulary,
+	themes: readonly WordTheme[],
+	frame: SentenceFrame,
+	plan: Plan,
+	beat: BeatDraw | null = null
+): readonly StateGroup[] {
+	return data.states.filter(stateGroupTest(language, data, vocabulary, themes, frame, plan, beat));
+}
+
+/** Whether some state group can head the shape, stopping at the first one that can. */
+function hasStateGroup(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	vocabulary: RandVocabulary,
+	themes: readonly WordTheme[],
+	frame: SentenceFrame,
+	plan: Plan,
+	beat: BeatDraw | null
+): boolean {
+	return data.states.some(stateGroupTest(language, data, vocabulary, themes, frame, plan, beat));
 }
 
 /* --- Building one sentence ------------------------------------------------- */
@@ -2551,9 +2612,8 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 		}
 
 		return frame.parts.some((part) => part.slot === 'state')
-			? stateGroupsFor(language, data, settings.vocabulary, requested, frame, plan, draw.beat)
-					.length > 0
-			: verbGroupsFor(
+			? hasStateGroup(language, data, settings.vocabulary, requested, frame, plan, draw.beat)
+			: hasVerbGroup(
 					language,
 					data,
 					settings.vocabulary,
@@ -2562,7 +2622,7 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 					plan,
 					draw.beat,
 					subjectNounOf(frame, plan, follow)
-				).length > 0;
+				);
 	};
 	// Prefer a shape that can land inside the range, then one that has somewhere to
 	// put every word the caller required, and settle for any of them after that.

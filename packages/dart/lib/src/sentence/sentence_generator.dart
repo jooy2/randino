@@ -1769,10 +1769,10 @@ SentenceFrame _pickFrame(List<SentenceFrame> frames, [int Function(SentenceFrame
   return frames.last;
 }
 
-/// The verb groups one sentence may use: transitive exactly when the shape has
-/// an object, able to take the subject the shape will be given, and — when a
-/// word was required — the group that word belongs to.
-List<VerbGroup> _verbGroupsFor(
+/// Whether a verb group can head one sentence: transitive exactly when the
+/// shape has an object, able to take the subject the shape will be given, and —
+/// when a word was required — the group that word belongs to.
+bool Function(VerbGroup group) _verbGroupTest(
   WordLanguage language,
   SentenceLanguageData data,
   RandVocabulary vocabulary,
@@ -1795,60 +1795,75 @@ List<VerbGroup> _verbGroupsFor(
   // verb of the field it settled on.
   final fields = beat != null && beat.fields.isNotEmpty ? beat.fields : frame.fields;
 
+  return (group) {
+    if ((group.object != null) != wantsObject) return false;
+    if (fields != null && !fields.contains(group.field)) return false;
+
+    // A group that needs a part is drawn only for a shape that has it — and a
+    // shape that has a destination is drawn only for the groups that go
+    // somewhere, because `leaves to the market` is what the rest of the field
+    // writes there.
+    final requires = group.requires;
+
+    if (requires != null && !frame.parts.any((part) => part.slot == requires)) return false;
+    if (wantsDestination && requires != SentenceSlot.destination) return false;
+    if (wantsMoney && (group.object == null || !_moneyFields.contains(group.field))) {
+      return false;
+    }
+    if (verb != null && !group.words.contains(verb.word)) return false;
+
+    final subjectTheme = subject?.theme;
+
+    if (subjectTheme != null &&
+        !_acceptsSubject(group.subject, group.subjectThemes, subjectTheme)) {
+      return false;
+    }
+
+    if (subjectNoun != null && !_acceptsNoun(data, group, subjectNoun)) return false;
+
+    final objectTheme = object?.theme;
+
+    if (objectTheme != null && !_acceptsObject(group, objectTheme)) return false;
+    if (object != null && !_acceptsObjectNoun(data, group, object.word)) return false;
+
+    final item = beat?.item;
+
+    if (item != null && group.object != null && !_acceptsObject(group, item)) return false;
+
+    // A group that shows a condition is drawn only for a hero it is true of —
+    // and, for somebody else in a story whose state nobody knows, only where
+    // it shows nothing worse than being pleased: a passer-by may smile, and
+    // never clutches their stomach.
+    final condition = group.condition;
+
+    if (beat != null && condition != null) {
+      final state = beat.state;
+
+      if (state != null ? !state.contains(condition) : condition != Condition.content) {
+        return false;
+      }
+    }
+
+    return _subjectThemesOf(language, data, group, themes, vocabulary).isNotEmpty &&
+        (group.object == null ||
+            _objectThemesOf(language, data, group, beat, vocabulary).isNotEmpty);
+  };
+}
+
+/// The verb groups one sentence may use: every group [_verbGroupTest] lets
+/// through.
+List<VerbGroup> _verbGroupsFor(
+  WordLanguage language,
+  SentenceLanguageData data,
+  RandVocabulary vocabulary,
+  SentenceFrame frame,
+  List<WordTheme> themes,
+  _Plan plan, [
+  _BeatDraw? beat,
+  String? subjectNoun,
+]) {
   final usable = data.verbs
-      .where((group) {
-        if ((group.object != null) != wantsObject) return false;
-        if (fields != null && !fields.contains(group.field)) return false;
-
-        // A group that needs a part is drawn only for a shape that has it — and a
-        // shape that has a destination is drawn only for the groups that go
-        // somewhere, because `leaves to the market` is what the rest of the field
-        // writes there.
-        final requires = group.requires;
-
-        if (requires != null && !frame.parts.any((part) => part.slot == requires)) return false;
-        if (wantsDestination && requires != SentenceSlot.destination) return false;
-        if (wantsMoney && (group.object == null || !_moneyFields.contains(group.field))) {
-          return false;
-        }
-        if (verb != null && !group.words.contains(verb.word)) return false;
-
-        final subjectTheme = subject?.theme;
-
-        if (subjectTheme != null &&
-            !_acceptsSubject(group.subject, group.subjectThemes, subjectTheme)) {
-          return false;
-        }
-
-        if (subjectNoun != null && !_acceptsNoun(data, group, subjectNoun)) return false;
-
-        final objectTheme = object?.theme;
-
-        if (objectTheme != null && !_acceptsObject(group, objectTheme)) return false;
-        if (object != null && !_acceptsObjectNoun(data, group, object.word)) return false;
-
-        final item = beat?.item;
-
-        if (item != null && group.object != null && !_acceptsObject(group, item)) return false;
-
-        // A group that shows a condition is drawn only for a hero it is true of —
-        // and, for somebody else in a story whose state nobody knows, only where
-        // it shows nothing worse than being pleased: a passer-by may smile, and
-        // never clutches their stomach.
-        final condition = group.condition;
-
-        if (beat != null && condition != null) {
-          final state = beat.state;
-
-          if (state != null ? !state.contains(condition) : condition != Condition.content) {
-            return false;
-          }
-        }
-
-        return _subjectThemesOf(language, data, group, themes, vocabulary).isNotEmpty &&
-            (group.object == null ||
-                _objectThemesOf(language, data, group, beat, vocabulary).isNotEmpty);
-      })
+      .where(_verbGroupTest(language, data, vocabulary, frame, themes, plan, beat, subjectNoun))
       .toList(growable: false);
   // And where some group shows what is true of the hero, those are what the
   // sentence says: the hero laughs after the meal rather than sneezing after it.
@@ -1859,6 +1874,23 @@ List<VerbGroup> _verbGroupsFor(
 
   return showing.isNotEmpty ? showing : usable;
 }
+
+/// Whether some verb group can head the shape, which is all a shape needs to be
+/// worth drawing. It stops at the first group that can: filtering every group
+/// of the language for every shape a sentence weighed was over half of its
+/// time.
+bool _hasVerbGroup(
+  WordLanguage language,
+  SentenceLanguageData data,
+  RandVocabulary vocabulary,
+  SentenceFrame frame,
+  List<WordTheme> themes,
+  _Plan plan,
+  _BeatDraw? beat,
+  String? subjectNoun,
+) => data.verbs.any(
+  _verbGroupTest(language, data, vocabulary, frame, themes, plan, beat, subjectNoun),
+);
 
 /// Whether a group takes a noun of this theme as its subject.
 bool _acceptsSubject(List<NounClass> classes, List<WordTheme>? named, WordTheme theme) {
@@ -2160,7 +2192,7 @@ List<WordTheme> _objectThemesOf(
 }
 
 /// The same, for a shape headed by an adjective rather than a verb.
-List<StateGroup> _stateGroupsFor(
+bool Function(StateGroup group) _stateGroupTest(
   WordLanguage language,
   SentenceLanguageData data,
   RandVocabulary vocabulary,
@@ -2172,26 +2204,50 @@ List<StateGroup> _stateGroupsFor(
   final subject = _requiredAt(frame, plan, SentenceSlot.subject);
   final state = _requiredAt(frame, plan, SentenceSlot.state);
 
-  return data.states
-      .where((group) {
-        if (state != null && !group.words.contains(state.word)) return false;
+  return (group) {
+    if (state != null && !group.words.contains(state.word)) return false;
 
-        // A story's description says what is true of the hero just now, and a
-        // plain trait where nothing is: `배고프다` where the hero is hungry, and
-        // never `배부르다` there.
-        if (beat != null && beat.describes && group.condition != beat.condition) return false;
+    // A story's description says what is true of the hero just now, and a
+    // plain trait where nothing is: `배고프다` where the hero is hungry, and
+    // never `배부르다` there.
+    if (beat != null && beat.describes && group.condition != beat.condition) return false;
 
-        final subjectTheme = subject?.theme;
+    final subjectTheme = subject?.theme;
 
-        if (subjectTheme != null &&
-            !_acceptsSubject(group.subject, group.subjectThemes, subjectTheme)) {
-          return false;
-        }
+    if (subjectTheme != null &&
+        !_acceptsSubject(group.subject, group.subjectThemes, subjectTheme)) {
+      return false;
+    }
 
-        return _subjectThemesOf(language, data, group, themes, vocabulary).isNotEmpty;
-      })
-      .toList(growable: false);
+    return _subjectThemesOf(language, data, group, themes, vocabulary).isNotEmpty;
+  };
 }
+
+/// The state groups one sentence may use: every group [_stateGroupTest] lets
+/// through.
+List<StateGroup> _stateGroupsFor(
+  WordLanguage language,
+  SentenceLanguageData data,
+  RandVocabulary vocabulary,
+  List<WordTheme> themes,
+  SentenceFrame frame,
+  _Plan plan, [
+  _BeatDraw? beat,
+]) => data.states
+    .where(_stateGroupTest(language, data, vocabulary, themes, frame, plan, beat))
+    .toList(growable: false);
+
+/// Whether some state group can head the shape, stopping at the first one that
+/// can.
+bool _hasStateGroup(
+  WordLanguage language,
+  SentenceLanguageData data,
+  RandVocabulary vocabulary,
+  List<WordTheme> themes,
+  SentenceFrame frame,
+  _Plan plan,
+  _BeatDraw? beat,
+) => data.states.any(_stateGroupTest(language, data, vocabulary, themes, frame, plan, beat));
 
 /* --- Building one sentence ------------------------------------------------- */
 
@@ -3621,7 +3677,7 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
     }
 
     return frame.parts.any((part) => part.slot == SentenceSlot.state)
-        ? _stateGroupsFor(
+        ? _hasStateGroup(
           language,
           data,
           settings.vocabulary,
@@ -3629,8 +3685,8 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
           frame,
           placement.plan,
           draw.beat,
-        ).isNotEmpty
-        : _verbGroupsFor(
+        )
+        : _hasVerbGroup(
           language,
           data,
           settings.vocabulary,
@@ -3639,7 +3695,7 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
           placement.plan,
           draw.beat,
           _subjectNounOf(frame, placement.plan, follow),
-        ).isNotEmpty;
+        );
   }
 
   // Prefer a shape that can land inside the range, then one that has somewhere

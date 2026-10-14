@@ -1970,7 +1970,7 @@ def _object_themes_of(
     )
 
 
-def _verb_groups_for(
+def _verb_group_test(
     language: WordLanguage,
     data: SentenceLanguageData,
     vocabulary: RandVocabulary,
@@ -1979,8 +1979,8 @@ def _verb_groups_for(
     plan: Plan,
     beat: BeatDraw | None = None,
     subject_noun: str | None = None,
-) -> list[VerbGroup]:
-    """The verb groups one sentence may use.
+) -> Callable[[VerbGroup], bool]:
+    """Whether a verb group can head one sentence.
 
     Transitive exactly when the shape has an object, able to take the subject the shape
     will be given, of the field a story step settled on, and — when a word was required —
@@ -1998,45 +1998,44 @@ def _verb_groups_for(
     # A shape that goes somewhere wants a verb that goes, and a story step wants a verb
     # of the field it settled on.
     fields = beat.fields if beat is not None and beat.fields else frame.fields
-    usable = []
 
-    for group in data.verbs:
+    def test(group: VerbGroup) -> bool:
         if (group.object is not None) != wants_object:
-            continue
+            return False
         if fields is not None and group.field not in fields:
-            continue
+            return False
         # A group that needs a part is drawn only for a shape that has it — and a shape
         # that has a destination is drawn only for the groups that go somewhere, because
         # `leaves to the market` is what the rest of the field writes there.
         if group.requires is not None and not any(
             part.slot == group.requires for part in frame.parts
         ):
-            continue
+            return False
         if wants_destination and group.requires != "destination":
-            continue
+            return False
         if wants_money and (group.object is None or group.field not in MONEY_FIELDS):
-            continue
+            return False
         if verb is not None and verb.word not in group.words:
-            continue
+            return False
         if (
             subject is not None
             and subject.theme is not None
             and not _accepts_subject(group, subject.theme)
         ):
-            continue
+            return False
         if subject_noun is not None and not _accepts_noun(data, group, subject_noun):
-            continue
+            return False
         if obj is not None and obj.theme is not None and not _accepts_object(group, obj.theme):
-            continue
+            return False
         if obj is not None and not _accepts_object_noun(data, group, obj.word):
-            continue
+            return False
         if (
             beat is not None
             and beat.item is not None
             and group.object is not None
             and not _accepts_object(group, beat.item)
         ):
-            continue
+            return False
         # A group that shows a condition is drawn only for a hero it is true of — and,
         # for somebody else in a story whose state nobody knows, only where it shows
         # nothing worse than being pleased: a passer-by may smile, and never clutches
@@ -2044,17 +2043,29 @@ def _verb_groups_for(
         if beat is not None and group.condition is not None:
             if beat.state is not None:
                 if group.condition not in beat.state:
-                    continue
+                    return False
             elif group.condition != "content":
-                continue
-        if not _subject_themes_of(language, data, group, themes, vocabulary):
-            continue
-        if group.object is not None and not _object_themes_of(
-            language, data, group, beat, vocabulary
-        ):
-            continue
+                return False
+        return bool(_subject_themes_of(language, data, group, themes, vocabulary)) and (
+            group.object is None or bool(_object_themes_of(language, data, group, beat, vocabulary))
+        )
 
-        usable.append(group)
+    return test
+
+
+def _verb_groups_for(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    vocabulary: RandVocabulary,
+    frame: SentenceFrame,
+    themes: Sequence[WordTheme],
+    plan: Plan,
+    beat: BeatDraw | None = None,
+    subject_noun: str | None = None,
+) -> list[VerbGroup]:
+    """The verb groups one sentence may use: every group `_verb_group_test` lets through."""
+    test = _verb_group_test(language, data, vocabulary, frame, themes, plan, beat, subject_noun)
+    usable = [group for group in data.verbs if test(group)]
 
     # And where some group shows what is true of the hero, those are what the sentence
     # says: the hero laughs after the meal rather than sneezing after it.
@@ -2065,6 +2076,26 @@ def _verb_groups_for(
     )
 
     return showing or usable
+
+
+def _has_verb_group(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    vocabulary: RandVocabulary,
+    frame: SentenceFrame,
+    themes: Sequence[WordTheme],
+    plan: Plan,
+    beat: BeatDraw | None,
+    subject_noun: str | None,
+) -> bool:
+    """Whether some verb group can head the shape, which is all a shape needs to be drawn.
+
+    It stops at the first group that can: filtering every group of the language for every
+    shape a sentence weighed was over half of its time.
+    """
+    test = _verb_group_test(language, data, vocabulary, frame, themes, plan, beat, subject_noun)
+
+    return any(test(group) for group in data.verbs)
 
 
 def _accepts_subject(group: VerbGroup | StateGroup, theme: WordTheme) -> bool:
@@ -2271,6 +2302,38 @@ def _subject_noun_of(frame: SentenceFrame, plan: Plan, follow: Follow | None) ->
     return follow.topic.noun if follow is not None and follow.reference != "fresh" else None
 
 
+def _state_group_test(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    vocabulary: RandVocabulary,
+    themes: Sequence[WordTheme],
+    frame: SentenceFrame,
+    plan: Plan,
+    beat: BeatDraw | None = None,
+) -> Callable[[StateGroup], bool]:
+    """The same, for a shape headed by an adjective rather than a verb."""
+    subject = _required_at(frame, plan, "subject")
+    state = _required_at(frame, plan, "state")
+
+    def test(group: StateGroup) -> bool:
+        if state is not None and state.word not in group.words:
+            return False
+        # A story's description says what is true of the hero just now, and a plain
+        # trait where nothing is: `배고프다` where the hero is hungry, and never
+        # `배부르다` there.
+        if beat is not None and beat.describes and group.condition != beat.condition:
+            return False
+        if (
+            subject is not None
+            and subject.theme is not None
+            and not _accepts_subject(group, subject.theme)
+        ):
+            return False
+        return bool(_subject_themes_of(language, data, group, themes, vocabulary))
+
+    return test
+
+
 def _state_groups_for(
     language: WordLanguage,
     data: SentenceLanguageData,
@@ -2280,31 +2343,25 @@ def _state_groups_for(
     plan: Plan,
     beat: BeatDraw | None = None,
 ) -> list[StateGroup]:
-    """The same, for a shape headed by an adjective rather than a verb."""
-    subject = _required_at(frame, plan, "subject")
-    state = _required_at(frame, plan, "state")
-    usable = []
+    """The state groups one sentence may use: every group `_state_group_test` lets through."""
+    test = _state_group_test(language, data, vocabulary, themes, frame, plan, beat)
 
-    for group in data.states:
-        if state is not None and state.word not in group.words:
-            continue
-        # A story's description says what is true of the hero just now, and a plain
-        # trait where nothing is: `배고프다` where the hero is hungry, and never
-        # `배부르다` there.
-        if beat is not None and beat.describes and group.condition != beat.condition:
-            continue
-        if (
-            subject is not None
-            and subject.theme is not None
-            and not _accepts_subject(group, subject.theme)
-        ):
-            continue
-        if not _subject_themes_of(language, data, group, themes, vocabulary):
-            continue
+    return [group for group in data.states if test(group)]
 
-        usable.append(group)
 
-    return usable
+def _has_state_group(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    vocabulary: RandVocabulary,
+    themes: Sequence[WordTheme],
+    frame: SentenceFrame,
+    plan: Plan,
+    beat: BeatDraw | None,
+) -> bool:
+    """Whether some state group can head the shape, stopping at the first one that can."""
+    test = _state_group_test(language, data, vocabulary, themes, frame, plan, beat)
+
+    return any(test(group) for group in data.states)
 
 
 # --- Building one sentence --------------------------------------------------
@@ -5475,21 +5532,19 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
             return bool(_themes_for_classes(requested, classes))
 
         if any(part.slot == "state" for part in frame.parts):
-            return bool(
-                _state_groups_for(language, data, settings.vocabulary, requested, frame, plan, beat)
+            return _has_state_group(
+                language, data, settings.vocabulary, requested, frame, plan, beat
             )
 
-        return bool(
-            _verb_groups_for(
-                language,
-                data,
-                settings.vocabulary,
-                frame,
-                requested,
-                plan,
-                beat,
-                _subject_noun_of(frame, plan, follow),
-            )
+        return _has_verb_group(
+            language,
+            data,
+            settings.vocabulary,
+            frame,
+            requested,
+            plan,
+            beat,
+            _subject_noun_of(frame, plan, follow),
         )
 
     # Prefer a shape that can land inside the range, then one that has somewhere to
