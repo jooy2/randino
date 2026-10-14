@@ -87,7 +87,7 @@ List<DiskSizeDetail> generateDiskSizeDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<_Drawn, DiskSizeDetail>(
       count: count,
       unique: unique,
       startsWith: '',

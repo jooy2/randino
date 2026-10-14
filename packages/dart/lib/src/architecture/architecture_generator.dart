@@ -24,6 +24,10 @@ List<String> aliasesOf(String architecture, String written) => List<String>.unmo
   ].where((name) => name != written),
 );
 
+/// One result a call may land on: an architecture, on the platform it was drawn
+/// for.
+typedef _Drawn = ({SystemPlatform platform, String architecture});
+
 /// What `randArchitecture` and `randArchitectureDetails` both do.
 List<ArchitectureDetail> generateArchitectureDetails({
   SystemPlatform? platform,
@@ -50,7 +54,7 @@ List<ArchitectureDetail> generateArchitectureDetails({
   ].where((each) => each.architectures.isNotEmpty).toList(growable: false);
 
   // The platform first, so a null one is half desktops and half phones.
-  final outcomes = <Outcome<({SystemPlatform platform, String architecture})>>[
+  final outcomes = <Outcome<_Drawn>>[
     for (final (platform: each, :architectures) in candidates)
       for (final (index, share)
           in shares(architectures, (one) => architectureData[one]!.weights[each]!).indexed)
@@ -62,7 +66,7 @@ List<ArchitectureDetail> generateArchitectureDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<_Drawn, ArchitectureDetail>(
       count: count,
       unique: unique,
       startsWith: '',

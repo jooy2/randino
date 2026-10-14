@@ -52,7 +52,7 @@ List<DeviceDetail> generateDeviceDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<DeviceEntry, DeviceDetail>(
       count: count,
       unique: unique,
       startsWith: '',

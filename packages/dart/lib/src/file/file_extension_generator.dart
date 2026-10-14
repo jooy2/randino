@@ -26,7 +26,7 @@ List<FileExtensionDetail> generateFileExtensionDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<FileExtensionEntry, FileExtensionDetail>(
       count: count,
       unique: unique,
       startsWith: '',

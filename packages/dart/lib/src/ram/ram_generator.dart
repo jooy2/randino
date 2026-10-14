@@ -111,7 +111,7 @@ List<RamDetail> generateRamDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<_Drawn, RamDetail>(
       count: count,
       unique: unique,
       startsWith: '',

@@ -86,7 +86,7 @@ List<AgeDetail> generateAgeDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<int, AgeDetail>(
       count: count,
       unique: unique,
       startsWith: '',

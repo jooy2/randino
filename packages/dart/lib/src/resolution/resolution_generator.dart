@@ -35,7 +35,7 @@ List<ResolutionDetail> generateResolutionDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<ResolutionEntry, ResolutionDetail>(
       count: count,
       unique: unique,
       startsWith: '',

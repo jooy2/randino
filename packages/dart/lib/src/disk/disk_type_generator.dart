@@ -8,6 +8,10 @@ import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
 
+/// One result a call may land on: a kind of storage, on the platform it was
+/// drawn for.
+typedef _Drawn = ({SystemPlatform platform, DiskType code});
+
 /// What `randDiskType` and `randDiskTypeDetails` both do.
 List<DiskTypeDetail> generateDiskTypeDetails({
   SystemPlatform? platform,
@@ -19,7 +23,7 @@ List<DiskTypeDetail> generateDiskTypeDetails({
 
   // The platform first, so a null one is half desktops and half phones, and
   // eMMC — which both use — is drawn by the platform it came up for.
-  final outcomes = <Outcome<({SystemPlatform platform, DiskType code})>>[];
+  final outcomes = <Outcome<_Drawn>>[];
 
   for (final each in platforms) {
     final weights = diskTypeWeights[each]!;
@@ -35,7 +39,7 @@ List<DiskTypeDetail> generateDiskTypeDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<_Drawn, DiskTypeDetail>(
       count: count,
       unique: unique,
       startsWith: '',

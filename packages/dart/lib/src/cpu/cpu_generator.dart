@@ -47,7 +47,7 @@ List<CpuDetail> generateCpuDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<CpuEntry, CpuDetail>(
       count: count,
       unique: unique,
       startsWith: '',

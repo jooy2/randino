@@ -35,7 +35,7 @@ List<AppStoreDetail> generateAppStoreDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<AppStoreEntry, AppStoreDetail>(
       count: count,
       unique: unique,
       startsWith: '',

@@ -810,7 +810,7 @@ void main() {
         (entry: 'twice', weight: 1),
       ];
       List<String> from(List<Outcome<String>> list, {String startsWith = '', int count = 10}) =>
-          collectFrom(
+          collectFrom<String, String>(
             count: count,
             unique: true,
             startsWith: startsWith,
@@ -830,7 +830,7 @@ void main() {
 
       expect(from(blank), <String>['a']);
       expect(
-        collectFrom(
+        collectFrom<String, String>(
           count: 3,
           unique: false,
           startsWith: '',
@@ -843,7 +843,7 @@ void main() {
 
       // Each result is built for itself, so two that came up on one entry are
       // two objects, the way two draws were.
-      final built = collectFrom(
+      final built = collectFrom<String, List<String>>(
         count: 2,
         unique: false,
         startsWith: '',

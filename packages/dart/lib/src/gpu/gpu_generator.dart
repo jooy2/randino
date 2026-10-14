@@ -48,7 +48,7 @@ List<GpuDetail> generateGpuDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<GpuEntry, GpuDetail>(
       count: count,
       unique: unique,
       startsWith: '',

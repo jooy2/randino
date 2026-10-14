@@ -65,7 +65,7 @@ List<GenderDetail> generateGenderDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<_Drawn, GenderDetail>(
       count: count,
       unique: unique,
       startsWith: '',

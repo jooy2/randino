@@ -24,7 +24,7 @@ List<MimeTypeDetail> generateMimeTypeDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<MimeTypeEntry, MimeTypeDetail>(
       count: count,
       unique: unique,
       startsWith: '',

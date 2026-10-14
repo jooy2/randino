@@ -124,7 +124,7 @@ List<OsDetail> generateOsDetails({
 
   return withRandom(
     random,
-    () => collectFrom(
+    () => collectFrom<_Drawn, OsDetail>(
       count: count,
       unique: unique,
       startsWith: '',
