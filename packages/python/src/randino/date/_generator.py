@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from typing import NamedTuple
 
-from randino._internal.generate import collect, resolve_option, resolve_optional
+from randino._internal.generate import collect, keep, resolve_option, resolve_optional
 from randino._internal.utils import clamp, pick, rand_int, with_random
 from randino._types import DateDetail, DateInput, DateUnit, WordLanguage, WordLanguageOption
 from randino.date.data import (
@@ -272,40 +272,74 @@ def _write(token: str, moment: datetime, names: DateNames, offset: int) -> str:
     """What one token of a format writes for `moment`, in the names of one language.
 
     `offset` is the minutes east of UTC the date was read at. UTC is `Z` to `Z`, which is
-    what keeps the default format the string JavaScript's `toISOString` writes.
+    what keeps the default format the string JavaScript's `toISOString` writes. Only the
+    token asked for is worked out: a table of every token for every token written was most
+    of what a date cost.
     """
-    twelve = moment.hour % 12 or 12
-    half = 0 if moment.hour < 12 else 1
-    written = {
-        "YYYY": f"{moment.year:04d}",
-        "YY": f"{moment.year % 100:02d}",
-        "MMMM": names.months[moment.month - 1],
-        "MMM": names.months_short[moment.month - 1],
-        "dddd": names.weekdays[moment.isoweekday() - 1],
-        "ddd": names.weekdays_short[moment.isoweekday() - 1],
-        "MM": f"{moment.month:02d}",
-        "M": str(moment.month),
-        "DD": f"{moment.day:02d}",
-        "D": str(moment.day),
-        "HH": f"{moment.hour:02d}",
-        "H": str(moment.hour),
-        "hh": f"{twelve:02d}",
-        "h": str(twelve),
-        "mm": f"{moment.minute:02d}",
-        "m": str(moment.minute),
-        "ss": f"{moment.second:02d}",
-        "s": str(moment.second),
-        "SSS": f"{moment.microsecond // 1000:03d}",
-        "A": names.meridiem[half],
-        "Z": _zone(offset, colon=True) if offset else "Z",
-        "ZZ": _zone(offset, colon=False),
-    }
-
-    return written.get(token, names.meridiem_lower[half])
+    match token:
+        case "YYYY":
+            return f"{moment.year:04d}"
+        case "YY":
+            return f"{moment.year % 100:02d}"
+        case "MMMM":
+            return names.months[moment.month - 1]
+        case "MMM":
+            return names.months_short[moment.month - 1]
+        case "dddd":
+            return names.weekdays[moment.isoweekday() - 1]
+        case "ddd":
+            return names.weekdays_short[moment.isoweekday() - 1]
+        case "MM":
+            return f"{moment.month:02d}"
+        case "M":
+            return str(moment.month)
+        case "DD":
+            return f"{moment.day:02d}"
+        case "D":
+            return str(moment.day)
+        case "HH":
+            return f"{moment.hour:02d}"
+        case "H":
+            return str(moment.hour)
+        case "hh":
+            return f"{moment.hour % 12 or 12:02d}"
+        case "h":
+            return str(moment.hour % 12 or 12)
+        case "mm":
+            return f"{moment.minute:02d}"
+        case "m":
+            return str(moment.minute)
+        case "ss":
+            return f"{moment.second:02d}"
+        case "s":
+            return str(moment.second)
+        case "SSS":
+            return f"{moment.microsecond // 1000:03d}"
+        case "A":
+            return names.meridiem[0 if moment.hour < 12 else 1]
+        case "Z":
+            return _zone(offset, colon=True) if offset else "Z"
+        case "ZZ":
+            return _zone(offset, colon=False)
+        case _:
+            return names.meridiem_lower[0 if moment.hour < 12 else 1]
 
 
 def read_format(format: str) -> tuple[_Piece, ...]:
-    """`format` read once, left to right.
+    """`format` read once, left to right, and kept for the calls after.
+
+    A call of one date read its format again every time, trying every token at every
+    character, which cost more than the date.
+    """
+    return keep(_FORMATS, format, lambda: _read_format(format))
+
+
+_FORMATS: dict[str, tuple[_Piece, ...]] = {}
+"""Each format read, by the format."""
+
+
+def _read_format(format: str) -> tuple[_Piece, ...]:
+    """`format` read left to right.
 
     Text in brackets is written as it is, and so is anything that is not a token, a `[`
     with no `]` after it included. A scan rather than a regular expression: matching a

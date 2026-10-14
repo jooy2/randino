@@ -9,6 +9,7 @@
 - A call for one result from `rand_organization` takes a twelfth of the time it did: each language's plan for a set of options is worked out once and kept.
 - `rand_modifier` takes a tenth of the time it did, `rand_word` and the themed word functions half or less and `rand_name` between a half and a quarter, because a draw no longer copies, measures or filters its pool again.
 - Every draw is cheaper. The standard generator's numbers were checked on the way out the way a caller's own source is, which cost fifteen times the draw; with no `random` passed they are handed on as they are, and `rand_suffix` and `rand_phone` take half to two thirds of the time they did.
+- `rand_date` takes a fifth of the time it did: a format is read once and kept, and each token is worked out on its own rather than beside every other token.
 
 ## 1.5.0 (2026-10-11)
 
