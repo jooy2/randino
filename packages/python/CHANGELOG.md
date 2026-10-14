@@ -8,6 +8,7 @@
 - `rand_sentence` is more than twice as fast. A shape it might draw was kept only after every verb group of the language had been checked against it; it is kept now at the first group that can head it.
 - A call for one result from `rand_organization` takes a twelfth of the time it did: each language's plan for a set of options is worked out once and kept.
 - `rand_modifier` takes a tenth of the time it did, `rand_word` and the themed word functions half or less and `rand_name` between a half and a quarter, because a draw no longer copies, measures or filters its pool again.
+- Every draw is cheaper. The standard generator's numbers were checked on the way out the way a caller's own source is, which cost fifteen times the draw; with no `random` passed they are handed on as they are, and `rand_suffix` and `rand_phone` take half to two thirds of the time they did.
 
 ## 1.5.0 (2026-10-11)
 

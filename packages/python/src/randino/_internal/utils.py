@@ -34,14 +34,24 @@ def random() -> float:
         A number in `[0, 1)`.
     """
     source = _source.get()
-    value = source() if source is not None else _random.random()
+
+    # The standard generator always hands back a number in range, and every draw of the
+    # package comes through here: checking its answer cost fifteen times the draw.
+    if source is None:
+        return _random.random()
+
+    value = source()
 
     # Only a number is a draw: a string that spells one is not, the way it is not in
     # JavaScript, and a `bool` is an `int` here and no number either.
-    if isinstance(value, int | float) and not isinstance(value, bool) and 0.0 <= value < 1.0:
+    if isinstance(value, _NUMBER) and not isinstance(value, bool) and 0.0 <= value < 1.0:
         return float(value)
 
     return 0.0
+
+
+_NUMBER = (int, float)
+"""What a source may hand back, as a tuple built once rather than a union per draw."""
 
 
 @contextmanager
