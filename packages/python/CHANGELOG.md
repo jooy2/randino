@@ -7,6 +7,7 @@
 - `rand_word`, and `rand_nickname` and `rand_sentence` with it, measure each pool once rather than on every draw. `rand_word(count=1000)` takes less than half the time it did, and `rand_word(language="vi", starts_with="ư", unique=True, count=2000)` about one second where it took three.
 - `rand_sentence` is more than twice as fast. A shape it might draw was kept only after every verb group of the language had been checked against it; it is kept now at the first group that can head it.
 - A call for one result from `rand_organization` takes a twelfth of the time it did: each language's plan for a set of options is worked out once and kept.
+- `rand_modifier` takes a tenth of the time it did, `rand_word` and the themed word functions half or less and `rand_name` between a half and a quarter, because a draw no longer copies, measures or filters its pool again.
 
 ## 1.5.0 (2026-10-11)
 

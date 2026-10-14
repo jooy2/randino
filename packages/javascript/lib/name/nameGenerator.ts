@@ -76,9 +76,54 @@ const nativeOf = (item: string | NameToken): string => (typeof item === 'string'
 
 /** Pool items whose native form begins with `prefix` (case-insensitive). */
 function startingWith(pool: NamePool, prefix: string): NamePool {
-	const lower = prefix.toLowerCase();
+	if (!prefix) {
+		return pool;
+	}
 
-	return pool.filter((item) => nativeOf(item).toLowerCase().startsWith(lower));
+	const held = prefixed.get(pool);
+
+	if (held?.prefix === prefix) {
+		return held.items;
+	}
+
+	const lower = prefix.toLowerCase();
+	const items = pool.filter((item) => nativeOf(item).toLowerCase().startsWith(lower));
+
+	prefixed.set(pool, { prefix, items });
+
+	return items;
+}
+
+// What a pool holds on one first character, kept per pool for the last character
+// asked: a call asks every draw the same one.
+const prefixed = new WeakMap<NamePool, { prefix: string; items: NamePool }>();
+
+// Each pool by the length of its names, in pool order, so a draw reads the
+// lengths a range holds rather than filtering the pool for them twice.
+const byLength = new WeakMap<NamePool, ReadonlyMap<number, NamePool>>();
+
+function lengthsOf(pool: NamePool): ReadonlyMap<number, NamePool> {
+	let groups = byLength.get(pool);
+
+	if (!groups) {
+		const built = new Map<number, NamePool[number][]>();
+
+		for (const item of pool) {
+			const length = nativeOf(item).length;
+			const group = built.get(length);
+
+			if (group) {
+				group.push(item);
+			} else {
+				built.set(length, [item]);
+			}
+		}
+
+		groups = built;
+		byLength.set(pool, groups);
+	}
+
+	return groups;
 }
 
 /** The shortest and longest item a pool holds, in characters of the native form. */
@@ -336,25 +381,29 @@ function curatedGiven(
 		return null;
 	}
 
-	let candidates: NamePool = pool.filter((item) => {
-		const length = nativeOf(item).length;
+	const leading = startingWith(pool, prefix);
+	const groups = lengthsOf(leading);
+	// In the order the pool first holds each length, which is the order the draw
+	// below reads them in.
+	const available = new Set([...groups.keys()].filter((length) => length >= min && length <= max));
 
-		return length >= min && length <= max;
-	});
-
-	if (prefix) {
-		candidates = startingWith(candidates, prefix);
-	}
-
-	if (!candidates.length) {
+	if (!available.size) {
 		return null;
 	}
 
-	const available = new Set(candidates.map((item) => nativeOf(item).length));
 	const length = pickGivenLength(data, min, max, available);
-	const fitting = candidates.filter((item) => nativeOf(item).length === length);
+	const fitting = available.has(length) ? groups.get(length)! : null;
 
-	return pickEntry(fitting.length ? fitting : candidates, data, 'given');
+	return pickEntry(
+		fitting ??
+			leading.filter((item) => {
+				const each = nativeOf(item).length;
+
+				return each >= min && each <= max;
+			}),
+		data,
+		'given'
+	);
 }
 
 /**

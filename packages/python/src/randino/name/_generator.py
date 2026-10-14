@@ -112,10 +112,62 @@ def native_of(item: str | NameToken) -> str:
 
 
 def starting_with(pool: NamePool, prefix: str) -> NamePool:
-    """Pool items whose native form begins with `prefix` (case-insensitive)."""
-    lower = prefix.lower()
+    """Pool items whose native form begins with `prefix` (case-insensitive).
 
-    return tuple(item for item in pool if native_of(item).lower().startswith(lower))
+    Kept per pool for the last character asked, since a call asks every draw the same one,
+    and the pool itself for no character at all.
+    """
+    if not prefix:
+        return pool
+
+    held = _prefixed.get(id(pool))
+
+    if held is not None and held[0] is pool and held[1] == prefix:
+        return held[2]
+
+    lower = prefix.lower()
+    items = tuple(item for item in pool if native_of(item).lower().startswith(lower))
+
+    if len(_prefixed) >= _POOLS_KEPT:
+        _prefixed.clear()
+
+    _prefixed[id(pool)] = (pool, prefix, items)
+
+    return items
+
+
+_prefixed: dict[int, tuple[NamePool, str, NamePool]] = {}
+"""What a pool holds on one first character, keyed on the pool's identity and held with
+it, the way `word._generator._prefixed` holds one, so the identity stays its own."""
+
+_by_length: dict[int, tuple[NamePool, dict[int, NamePool]]] = {}
+"""Each pool by the length of its names, in pool order, held the same way."""
+
+_POOLS_KEPT = 512
+"""How many pools each table holds before it is emptied: a pool narrowed for one call is
+held too, and the tables would otherwise grow with every call."""
+
+
+def _lengths_of(pool: NamePool) -> dict[int, NamePool]:
+    """`pool` by the length of its names, in the order the pool first holds each length."""
+    held = _by_length.get(id(pool))
+
+    if held is not None and held[0] is pool:
+        return held[1]
+
+    built: dict[int, list[str | NameToken]] = {}
+
+    for item in pool:
+        built.setdefault(len(native_of(item)), []).append(item)
+
+    groups = {length: tuple(items) for length, items in built.items()}
+
+    if len(_by_length) >= _POOLS_KEPT:
+        _by_length.clear()
+
+    _by_length[id(pool)] = (pool, groups)
+
+    return groups
 
 
 def span_of(pool: NamePool) -> tuple[int, int]:
@@ -337,19 +389,23 @@ def curated_given(
     if pool is None:
         return None
 
-    candidates: NamePool = tuple(item for item in pool if low <= len(native_of(item)) <= high)
+    leading = starting_with(pool, prefix)
+    groups = _lengths_of(leading)
+    # Put in the order the pool first holds each length, the order the draw below reads
+    # them in.
+    available = {length for length in groups if low <= length <= high}
 
-    if prefix:
-        candidates = starting_with(candidates, prefix)
-
-    if not candidates:
+    if not available:
         return None
 
-    available = {len(native_of(item)) for item in candidates}
     length = pick_given_length(data, low, high, available)
-    fitting = tuple(item for item in candidates if len(native_of(item)) == length)
+    fitting = groups[length] if length in available else None
 
-    return pick_entry(fitting or candidates, data, "given")
+    return pick_entry(
+        fitting or tuple(item for item in leading if low <= len(native_of(item)) <= high),
+        data,
+        "given",
+    )
 
 
 def pick_given_length(

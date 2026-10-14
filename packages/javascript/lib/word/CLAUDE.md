@@ -2,6 +2,10 @@
 
 Notes on how the word pools and `randWord` behaves and why, for whoever changes it. They describe the npm package, which is the source of truth, and hold for the Dart and Python ports too: a behaviour that lands in one lands in all three. The repository's own `CLAUDE.md` covers everything that is not one generator's.
 
+## A draw reads a pool, it does not rework it
+
+A pool is a module constant, so what is worked out from one is kept with it: its bounds (`poolBounds`), what it holds on a first character (`startingWith`), the adjectives and actions joined (`modifiersOf`), and a name pool by the length of its names (`lengthsOf` in `name/`). `pickWord` draws straight from the pool when the range takes all of it, which is every call that names no length. Working any of these out again per draw copied the pool each time, and `randModifier` was forty times slower for it. A cache keyed on a pool's identity needs a pool that keeps its identity, which is why `randModifier` joins its data once per language rather than spreading it into a fresh object per call.
+
 ## Adding a word language
 
 Every name language now has word pools too (`ko`, `en`, `ja`, `zh`, `vi`, `es`, `it`, `de`, `ru`), and neither word order nor agreement is a bar any more:

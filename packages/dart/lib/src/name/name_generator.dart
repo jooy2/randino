@@ -79,9 +79,48 @@ const int _lastWeightDefault = 1;
 
 /// Pool items whose native form begins with [prefix] (case-insensitive).
 NamePool _startingWith(NamePool pool, String prefix) {
-  final lower = prefix.toLowerCase();
+  if (prefix.isEmpty) {
+    return pool;
+  }
 
-  return pool.where((item) => item.n.toLowerCase().startsWith(lower)).toList(growable: false);
+  final held = _prefixed[pool];
+
+  if (held != null && held.$1 == prefix) {
+    return held.$2;
+  }
+
+  final lower = prefix.toLowerCase();
+  final items = pool
+      .where((item) => item.n.toLowerCase().startsWith(lower))
+      .toList(growable: false);
+
+  _prefixed[pool] = (prefix, items);
+
+  return items;
+}
+
+// What a pool holds on one first character, kept per pool for the last
+// character asked: a call asks every draw the same one.
+final Expando<(String, NamePool)> _prefixed = Expando<(String, NamePool)>('prefixed');
+
+// Each pool by the length of its names, in pool order, so a draw reads the
+// lengths a range holds rather than filtering the pool for them twice.
+final Expando<Map<int, NamePool>> _byLength = Expando<Map<int, NamePool>>('byLength');
+
+Map<int, NamePool> _lengthsOf(NamePool pool) {
+  final cached = _byLength[pool];
+
+  if (cached != null) {
+    return cached;
+  }
+
+  final built = <int, NamePool>{};
+
+  for (final item in pool) {
+    (built[item.n.length] ??= <NameEntry>[]).add(item);
+  }
+
+  return _byLength[pool] = built;
 }
 
 /// The shortest and longest item a pool holds, in characters of the native form.
@@ -311,23 +350,30 @@ _Entry? _curatedGiven(NameLanguageData data, bool isMale, int min, int max, Stri
     return null;
   }
 
-  var candidates = pool
-      .where((item) => item.n.length >= min && item.n.length <= max)
-      .toList(growable: false);
+  final leading = _startingWith(pool, prefix);
+  final groups = _lengthsOf(leading);
+  // In the order the pool first holds each length, which is the order the draw
+  // below reads them in.
+  final available = {
+    for (final length in groups.keys)
+      if (length >= min && length <= max) length,
+  };
 
-  if (prefix.isNotEmpty) {
-    candidates = _startingWith(candidates, prefix);
-  }
-
-  if (candidates.isEmpty) {
+  if (available.isEmpty) {
     return null;
   }
 
-  final available = candidates.map((item) => item.n.length).toSet();
   final length = _pickGivenLength(data, min, max, available);
-  final fitting = candidates.where((item) => item.n.length == length).toList(growable: false);
+  final fitting = available.contains(length) ? groups[length] : null;
 
-  return _pickEntry(fitting.isNotEmpty ? fitting : candidates, data, NamePart.given);
+  return _pickEntry(
+    fitting ??
+        leading
+            .where((item) => item.n.length >= min && item.n.length <= max)
+            .toList(growable: false),
+    data,
+    NamePart.given,
+  );
 }
 
 /// How many syllables the given name should have. Inside the lengths the

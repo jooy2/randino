@@ -6,6 +6,7 @@
 - A call for one result from `randOs`, `randAge` or another system value takes a fraction of the time it did — `randOs()` a third or less, `randAge()` under a tenth — because each set of options lists its catalog once and keeps the list for the calls after. A small `unique` call is faster the same way.
 - `randSentence` is about three times as fast. A shape it might draw was kept only after every verb group of the language had been checked against it; it is kept now at the first group that can head it.
 - A call for one result from `randOrganization` is about four times as fast: each language's plan for a set of options is worked out once and kept.
+- `randModifier` takes a fortieth of the time it did, `randWord` and the themed word functions a fifth or less, `randNickname` about a quarter and `randName` between a third and a sixth, because a draw no longer copies, measures or filters its pool again.
 
 ## 1.5.0 (2026-10-11)
 

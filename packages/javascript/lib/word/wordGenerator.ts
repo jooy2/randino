@@ -56,8 +56,23 @@ export function modifiersOf(
 		return data.adjectives;
 	}
 
-	return kind === 'action' ? data.actions : [...data.adjectives, ...data.actions];
+	if (kind === 'action') {
+		return data.actions;
+	}
+
+	// Joined once per language and kept: a fresh array on every draw was measured
+	// again, and filtered again, by everything that read it after.
+	let both = modifierCache.get(data);
+
+	if (!both) {
+		both = [...data.adjectives, ...data.actions];
+		modifierCache.set(data, both);
+	}
+
+	return both;
 }
+
+const modifierCache = new WeakMap<Pick<WordLanguageData, 'adjectives' | 'actions'>, WordPool>();
 
 /**
  * Whether a modifier follows the noun rather than leading it, which the
@@ -129,16 +144,27 @@ export function agree(
 
 /** Shortest and longest word in a pool. */
 export function poolBounds(pool: WordPool): readonly [number, number] {
-	let min = Infinity;
-	let max = 0;
+	let bounds = boundsCache.get(pool);
 
-	for (const word of pool) {
-		min = Math.min(min, word.length);
-		max = Math.max(max, word.length);
+	if (!bounds) {
+		let min = Infinity;
+		let max = 0;
+
+		for (const word of pool) {
+			min = Math.min(min, word.length);
+			max = Math.max(max, word.length);
+		}
+
+		bounds = [min === Infinity ? 1 : min, max || 1];
+		boundsCache.set(pool, bounds);
 	}
 
-	return [min === Infinity ? 1 : min, max || 1];
+	return bounds;
 }
+
+// A word draws a theme and measures its pool on every attempt, so the bounds are
+// kept with the pool.
+const boundsCache = new WeakMap<WordPool, readonly [number, number]>();
 
 /**
  * Shortest and longest entry of a pool, counting an empty entry as the zero it is.
@@ -399,6 +425,14 @@ export function pickWord(pool: WordPool, min: number, max: number, prefix: strin
 
 	if (!candidates.length) {
 		return null;
+	}
+
+	// A range the whole pool fits is the common case — it is what a call that names
+	// no length gets — and filtering for it copied the pool on every draw.
+	const [shortest, longest] = poolBounds(candidates);
+
+	if (shortest >= min && longest <= max) {
+		return pick(candidates);
 	}
 
 	const fitting = candidates.filter((word) => word.length >= min && word.length <= max);

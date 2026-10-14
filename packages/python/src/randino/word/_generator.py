@@ -64,14 +64,28 @@ FIT_ATTEMPTS = 12
 def modifiers_of(data: WordLanguageData, kind: ModifierKind | Literal["all"] = "all") -> WordPool:
     """Return the decorating pool one draw may use.
 
-    A word for what the noun is like, one for what it is doing, or either. Built per
-    call: every draw already walks the pool it is given, so holding this one would save
-    nothing worth the bookkeeping.
+    A word for what the noun is like, one for what it is doing, or either. Both together
+    are joined once per language and kept: a fresh tuple on every draw was measured again,
+    and filtered again, by everything that read it after.
     """
     if kind == "adjective":
         return data.adjectives
 
-    return data.actions if kind == "action" else (*data.adjectives, *data.actions)
+    if kind == "action":
+        return data.actions
+
+    both = _MODIFIER_CACHE.get(id(data))
+
+    if both is None:
+        both = (*data.adjectives, *data.actions)
+        _MODIFIER_CACHE[id(data)] = both
+
+    return both
+
+
+# Keyed on `id()` for the reason `_THEME_CACHE` is: every `WordLanguageData` is part of
+# `WORD_DATA`, which lives as long as the process.
+_MODIFIER_CACHE: dict[int, WordPool] = {}
 
 
 def agree(data: WordLanguageData, word: str, gender: WordGender | None) -> str:
@@ -481,6 +495,13 @@ def pick_word(pool: WordPool, low: int, high: int, prefix: str) -> str | None:
 
     if not candidates:
         return None
+
+    # A range the whole pool fits is the common case — it is what a call that names no
+    # length gets — and filtering for it copied the pool on every draw.
+    shortest, longest = pool_bounds(candidates)
+
+    if shortest >= low and longest <= high:
+        return pick(candidates)
 
     fitting = tuple(word for word in candidates if low <= len(word) <= high)
 

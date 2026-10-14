@@ -56,6 +56,27 @@ function languageOf(value: string): WordLanguageOption {
 	return 'en';
 }
 
+// The modifiers alone, and the genders of the nouns where the modifier agrees with
+// one: the rest of a language's nouns are no business of a decorator's. Put
+// together once per language, so the caches that key on a language's data find
+// it again on the next call.
+const decoratorData = new Map<WordLanguage, ReturnType<typeof joinData>>();
+
+function joinData(language: WordLanguage) {
+	return { ...MODIFIER_DATA[language], nounGender: NOUN_GENDERS[language] };
+}
+
+function dataOf(language: WordLanguage): ReturnType<typeof joinData> {
+	let data = decoratorData.get(language);
+
+	if (!data) {
+		data = joinData(language);
+		decoratorData.set(language, data);
+	}
+
+	return data;
+}
+
 /**
  * Draw one modifier, the separator to use, which side of the value it goes, and
  * the particle between them.
@@ -70,9 +91,7 @@ function draw(
 	const named = resolveOptional(options.language, WORD_LANGUAGE_OPTIONS);
 	const requested = named ?? (value ? languageOf(value) : 'all');
 	const language = drawLanguage(requested, WORD_LANGUAGES);
-	// The modifiers alone, and the genders of the nouns where the modifier agrees with
-	// one: the rest of a language's nouns are no business of a decorator's.
-	const data = { ...MODIFIER_DATA[language], nounGender: NOUN_GENDERS[language] };
+	const data = dataOf(language);
 	const pool = modifiersOf(data, options.kind ?? 'all');
 	const [min, max] = poolBounds(pool);
 	const { word } = drawWord(data, pool, resolveRealism(options.realism), min, max, '');

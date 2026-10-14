@@ -27,8 +27,16 @@ const int _fitAttempts = 12;
 WordPool modifiersOf(WordLanguageData data, [ModifierKind? kind]) => switch (kind) {
   ModifierKind.adjective => data.adjectives,
   ModifierKind.action => data.actions,
-  null => <String>[...data.adjectives, ...data.actions],
+  // Joined once per language and kept: a fresh list on every draw was measured
+  // again, and filtered again, by everything that read it after.
+  null =>
+    _bothModifiers[data] ??= List<String>.unmodifiable(<String>[
+      ...data.adjectives,
+      ...data.actions,
+    ]),
 };
+
+final Expando<WordPool> _bothModifiers = Expando<WordPool>('modifiers');
 
 /// A modifier reshaped to agree with a noun of [gender].
 ///
@@ -168,6 +176,12 @@ String _fittingPiece(WordPool pool, int low, int high) {
 
 /// Shortest and longest word in [pool].
 LengthRange poolBounds(WordPool pool) {
+  final cached = _bounds[pool];
+
+  if (cached != null) {
+    return cached;
+  }
+
   var min = 1 << 30;
   var max = 0;
 
@@ -176,8 +190,12 @@ LengthRange poolBounds(WordPool pool) {
     if (word.length > max) max = word.length;
   }
 
-  return LengthRange(min == 1 << 30 ? 1 : min, max == 0 ? 1 : max);
+  return _bounds[pool] = LengthRange(min == 1 << 30 ? 1 : min, max == 0 ? 1 : max);
 }
+
+// A word draws a theme and measures its pool on every attempt, so the bounds are
+// kept with the pool.
+final Expando<LengthRange> _bounds = Expando<LengthRange>('bounds');
 
 /// The themes one draw may use. A null [theme] means every one of them.
 List<WordTheme> themesOf(WordTheme? theme) => theme == null ? wordThemes : <WordTheme>[theme];
@@ -367,6 +385,14 @@ String? pickWord(WordPool pool, int min, int max, String prefix) {
 
   if (candidates.isEmpty) {
     return null;
+  }
+
+  // A range the whole pool fits is the common case — it is what a call that
+  // names no length gets — and filtering for it copied the pool on every draw.
+  final span = poolBounds(candidates);
+
+  if (span.min >= min && span.max <= max) {
+    return pick(candidates);
   }
 
   final fitting = candidates
