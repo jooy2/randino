@@ -298,12 +298,13 @@ rand_suffix("MistyOwl", random=SystemRandom().random)  # 'MistyOwl_k3Rm9'
 ::: lang js
 
 ```javascript
-// Any seeded generator will do; there is none in the standard library.
-const seeded = (seed) => () => /* … */;
+import { randName, seededRandom } from 'randino';
 
-randName({ language: 'en', count: 3, random: seeded(42) });
-// ['Easton Bryant', 'Pearl Fenwick', 'Callum Bradley'] — every time
+randName({ language: 'en', count: 3, random: seededRandom(42) });
+// ['Stephanie Lee', 'Abigale Edwards', 'Wayne Bradshaw'] — every time
 ```
+
+The standard library has no seeded generator, so the package carries one: [`seededRandom`](../random/seeded-random).
 
 :::
 

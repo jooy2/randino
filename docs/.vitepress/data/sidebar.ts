@@ -15,8 +15,9 @@
  * split here is by what a function *is*, one level down inside **API**:
  * **Generators** hand back names, words, sentences and the rest out of nothing,
  * **Decorators** attach something to a string you already have, and
- * **Utilities** answer a question about a language. The folder a page sits in
- * decides nothing but its URL.
+ * **Utilities** answer a question about a language, or hand over something an
+ * option takes (`seededRandom`). The folder a page sits in decides nothing but
+ * its URL.
  *
  * **Generators** is the one that goes a level deeper, into **General** — one
  * function per kind of value — **System**, the values a sample machine is
@@ -231,7 +232,8 @@ export const SIDEBAR: SidebarGroup[] = [
 						en: 'sentenceLengthRange',
 						ko: 'sentenceLengthRange'
 					},
-					{ path: 'word/word-length-range', en: 'wordLengthRange', ko: 'wordLengthRange' }
+					{ path: 'word/word-length-range', en: 'wordLengthRange', ko: 'wordLengthRange' },
+					{ path: 'random/seeded-random', en: 'seededRandom', ko: 'seededRandom' }
 				]
 			}
 		]

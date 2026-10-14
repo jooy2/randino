@@ -298,12 +298,13 @@ rand_suffix("MistyOwl", random=SystemRandom().random)  # 'MistyOwl_k3Rm9'
 ::: lang js
 
 ```javascript
-// 시드를 받는 생성기는 표준 라이브러리에 없으니 직접 준비합니다.
-const seeded = (seed) => () => /* … */;
+import { randName, seededRandom } from 'randino';
 
-randName({ language: 'en', count: 3, random: seeded(42) });
-// ['Easton Bryant', 'Pearl Fenwick', 'Callum Bradley'] — 언제나 같습니다
+randName({ language: 'en', count: 3, random: seededRandom(42) });
+// ['Stephanie Lee', 'Abigale Edwards', 'Wayne Bradshaw'] — 언제나 같습니다
 ```
+
+표준 라이브러리에는 시드를 받는 생성기가 없어서 패키지에 하나를 넣어 두었습니다: [`seededRandom`](../random/seeded-random).
 
 :::
 

@@ -133,6 +133,7 @@ describe('base test', () => {
 			'randVersion',
 			'randWeather',
 			'randWord',
+			'seededRandom',
 			'sentenceLengthRange',
 			'wordLengthRange'
 		]);

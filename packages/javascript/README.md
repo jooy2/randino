@@ -776,6 +776,8 @@ sentenceLengthRange('ko'); // [5, 53]
 wordLengthRange('ko'); // [1, 4]
 ```
 
+`seededRandom(seed)` is a seeded source for the `random` option, since the standard library has none: `randName({ count: 3, random: seededRandom(42) })` writes the same three names every run.
+
 `NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `OS_FAMILY_CODES`, `DEVICE_TYPES`, `DEVICE_VENDORS`, `RAM_UNITS`, `RAM_TYPES`, `DISK_TYPES`, `DISK_UNITS`, `ARCHITECTURES`, `ARCHITECTURE_NAMINGS`, `VERSION_FORMATS`, `FILE_CATEGORIES`, `MIME_TOP_LEVELS`, `CPU_VENDORS` and `GPU_VENDORS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_SENTENCE_COUNT_MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
