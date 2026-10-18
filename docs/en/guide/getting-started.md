@@ -58,7 +58,7 @@ pip install randino
 
 ### What it weighs in a browser bundle {#bundle-size}
 
-The package declares `sideEffects: false`, so a bundler drops the pools nothing reaches — and the pools are nearly all of it. What one import costs, minified and gzipped:
+The package declares `sideEffects: false` and marks every call it makes on import `/*#__PURE__*/`, so a bundler drops the pools nothing reaches whether it reads the field or not — and the pools are nearly all of it. What one import costs, minified and gzipped:
 
 | Import                                                          | gzipped    |
 | --------------------------------------------------------------- | ---------- |
