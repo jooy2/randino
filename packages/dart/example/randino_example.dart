@@ -164,13 +164,14 @@ void _organizations() {
 void _fiction() {
   print('-- fiction ----------------------------------------------------');
 
-  print(randFictionalName(language: {WordLanguage.en}, count: 3)); // [Alice, Arsis, Emily]
-  print(randFictionalCountry(language: {WordLanguage.ko}, count: 3)); // [에들린 왕국, 글래시아, 카스타비아 제국]
-  print(randFictionalDistrict(language: {WordLanguage.ko}, includeKind: true)); // [그루거 파크]
-  print(
-    randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.ko, WordLanguage.ja}).first,
-  );
-  // FictionalNameDetail(Artemis, female, en, {en: Artemis, ko: 아르테미스, ja: アルテミス})
+  print(randFictionalName(language: WordLanguage.en, count: 3)); // [Alice, Arsis, Emily]
+  print(randFictionalCountry(language: WordLanguage.ko, count: 3)); // [에들린 왕국, 글래시아, 카스타비아 제국]
+  print(randFictionalDistrict(language: WordLanguage.ko, includeKind: true)); // [그루거 파크]
+  // One character in every language a game ships in, keyed by language.
+  print(randFictionalNameForms({WordLanguage.ko, WordLanguage.en, WordLanguage.ja}));
+  // [{WordLanguage.ko: 아르테미스, WordLanguage.en: Artemis, WordLanguage.ja: アルテミス}]
+  print(randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.ko}).first);
+  // FictionalNameDetail(Artemis, female, en, {en: Artemis, ko: 아르테미스})
 }
 
 /// Dates drawn evenly from a range, written out in UTC or one part at a time.

@@ -1001,18 +1001,19 @@ class FictionalNameDetail {
     required this.forms,
   });
 
-  /// What `randFictionalName` returns: the name in [language].
+  /// The name in [language]: what `randFictionalName` returns.
   final String name;
 
   /// The gender the given name was drawn for.
   final NameGender gender;
 
-  /// The language [name] is written in.
+  /// The language [name] is written in: the one drawn, or the first of a set.
   final WordLanguage language;
 
   /// The same name in every language the call asked for, in the order it asked
-  /// for them: `{en: Artemis, ko: 아르테미스}`. The languages written in Latin
-  /// letters write a name the way English does.
+  /// for them — what `randFictionalNameForms` returns: `{en: Artemis, ko:
+  /// 아르테미스}`. A null language asks for all nine. The languages written in
+  /// Latin letters write a name the way English does.
   final Map<WordLanguage, String> forms;
 
   @override
@@ -1212,7 +1213,7 @@ class FictionalPlaceDetail {
     required this.forms,
   });
 
-  /// What the value form returns: the place in [language], its kind and all.
+  /// The place in [language], its kind and all: what the value form returns.
   final String place;
 
   /// The place's own name in [language], without its kind: `에들린` for
@@ -1226,11 +1227,12 @@ class FictionalPlaceDetail {
   /// district.
   final LocationLevel level;
 
-  /// The language [place] is written in.
+  /// The language [place] is written in: the one drawn, or the first of a set.
   final WordLanguage language;
 
   /// The same place in every language the call asked for, in the order it
-  /// asked for them: `{en: Kingdom of Edlin, ko: 에들린 왕국}`.
+  /// asked for them — what the `…Forms` function returns: `{en: Kingdom of
+  /// Edlin, ko: 에들린 왕국}`. A null language asks for all nine.
   final Map<WordLanguage, String> forms;
 
   @override

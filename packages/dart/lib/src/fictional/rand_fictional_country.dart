@@ -4,33 +4,32 @@ import 'package:randino/src/fictional/place_generator.dart';
 import 'package:randino/src/types.dart';
 
 /// Generate the names of countries that do not exist, for the map of a story or
-/// a game. A place may carry the kind it is beside its name — left null,
-/// [includeKind] decides that per place.
+/// a game. A country may carry the kind of state it is beside its name — left
+/// null, [includeKind] decides that per country, and a country's kind is
+/// translated outside English unless [kindStyle] says otherwise.
 ///
 /// A name is spelled in Latin letters first and written by its sound in every
-/// other language, and the kind in each language's own words. A [language] set
-/// draws one language per place, in the order it was written, and a null or
-/// empty one draws from every language. [kindStyle] says how a kind is written
-/// outside English; left null, it depends on the level — see
-/// [FictionalKindStyle].
+/// other language, and the kind in each language's own words. A null
+/// [language], the default, draws a language per place.
 ///
 /// [startsWith] reads the place's name, not a kind written in front of it, and
-/// [minLength] and [maxLength] the whole place.
+/// [minLength] and [maxLength] the whole place. [randFictionalCountryForms]
+/// writes every place in several languages at once.
 ///
 /// ```dart
-/// randFictionalCountry(language: {WordLanguage.en}, count: 3);
-/// // [Kingdom of Edlin, Glacia, Valoria Empire]
-/// randFictionalCountry(language: {WordLanguage.ko}, count: 3);
-/// // [에들린 왕국, 글래시아, 발로리아 제국]
+/// randFictionalCountry(language: WordLanguage.en, count: 3);
+/// // [Kingdom of Edlin, Glacia, Castavia Empire]
+/// randFictionalCountry(language: WordLanguage.ko, count: 3);
+/// // [에들린 왕국, 글래시아, 카스타비아 제국]
 /// randFictionalCountry(
-///   language: {WordLanguage.ko},
+///   language: WordLanguage.ko,
 ///   kindStyle: FictionalKindStyle.borrowed,
 ///   includeKind: true,
 /// );
 /// // [에들린 킹덤]
 /// ```
 List<String> randFictionalCountry({
-  Set<WordLanguage>? language,
+  WordLanguage? language,
   bool? includeKind,
   FictionalKindStyle? kindStyle,
   int count = 1,
@@ -46,7 +45,7 @@ List<String> randFictionalCountry({
 }) => [
   for (final detail in generateFictionalPlaceDetails(
     LocationLevel.country,
-    language: language,
+    language: language == null ? null : {language},
     includeKind: includeKind,
     kindStyle: kindStyle,
     count: count,

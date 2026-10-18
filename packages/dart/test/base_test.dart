@@ -175,14 +175,19 @@ void main() {
           'randEmotion',
           'randFictionalCity',
           'randFictionalCityDetails',
+          'randFictionalCityForms',
           'randFictionalCountry',
           'randFictionalCountryDetails',
+          'randFictionalCountryForms',
           'randFictionalDistrict',
           'randFictionalDistrictDetails',
+          'randFictionalDistrictForms',
           'randFictionalName',
           'randFictionalNameDetails',
+          'randFictionalNameForms',
           'randFictionalRegion',
           'randFictionalRegionDetails',
+          'randFictionalRegionForms',
           'randFileExtension',
           'randFileExtensionDetails',
           'randFinance',
@@ -348,17 +353,25 @@ void main() {
       expect(organizationIndustries, hasLength(10));
 
       // A fictional name or place is one name in every language at once, so its
-      // detail writes it in each language the call asked for.
+      // detail writes it in each language the call asked for, and a `…Forms`
+      // call, which in Dart is a function of its own, returns it in each.
+      const both = {WordLanguage.ko, WordLanguage.en};
+
       expect(randFictionalName(), hasLength(1));
       expect(randFictionalNameDetails()[0].forms.keys, wordLanguages);
+      expect(randFictionalNameForms(both).single.keys, both);
       expect(randFictionalCountry(), hasLength(1));
       expect(randFictionalCountryDetails()[0].level, LocationLevel.country);
+      expect(randFictionalCountryForms(both).single.keys, both);
       expect(randFictionalRegion(), hasLength(1));
       expect(randFictionalRegionDetails()[0].level, LocationLevel.region);
+      expect(randFictionalRegionForms(both).single.keys, both);
       expect(randFictionalCity(), hasLength(1));
       expect(randFictionalCityDetails()[0].level, LocationLevel.city);
+      expect(randFictionalCityForms(both).single.keys, both);
       expect(randFictionalDistrict(), hasLength(1));
       expect(randFictionalDistrictDetails()[0].level, LocationLevel.district);
+      expect(randFictionalDistrictForms(both).single.keys, both);
 
       // A phone number is written by its country, one country per word
       // language.
@@ -524,6 +537,13 @@ void main() {
         ).join('|'),
       );
       twice(() => randFictionalCity(count: 5, maxLength: 12, random: Random(42)).join('|'));
+      twice(
+        () => randFictionalNameForms(
+          {WordLanguage.ko, WordLanguage.en},
+          count: 5,
+          random: Random(42),
+        ).join('|'),
+      );
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());
       twice(() => randModifierAll(const ['사자', '여우'], random: Random(42)).join());
 
@@ -617,30 +637,45 @@ void main() {
         'randFictionalCityDetails':
             ({required int count, Random? random}) =>
                 randFictionalCityDetails(count: count, random: random),
+        'randFictionalCityForms':
+            ({required int count, Random? random}) =>
+                randFictionalCityForms(const {}, count: count, random: random),
         'randFictionalCountry':
             ({required int count, Random? random}) =>
                 randFictionalCountry(count: count, random: random),
         'randFictionalCountryDetails':
             ({required int count, Random? random}) =>
                 randFictionalCountryDetails(count: count, random: random),
+        'randFictionalCountryForms':
+            ({required int count, Random? random}) =>
+                randFictionalCountryForms(const {}, count: count, random: random),
         'randFictionalDistrict':
             ({required int count, Random? random}) =>
                 randFictionalDistrict(count: count, random: random),
         'randFictionalDistrictDetails':
             ({required int count, Random? random}) =>
                 randFictionalDistrictDetails(count: count, random: random),
+        'randFictionalDistrictForms':
+            ({required int count, Random? random}) =>
+                randFictionalDistrictForms(const {}, count: count, random: random),
         'randFictionalName':
             ({required int count, Random? random}) =>
                 randFictionalName(count: count, random: random),
         'randFictionalNameDetails':
             ({required int count, Random? random}) =>
                 randFictionalNameDetails(count: count, random: random),
+        'randFictionalNameForms':
+            ({required int count, Random? random}) =>
+                randFictionalNameForms(const {}, count: count, random: random),
         'randFictionalRegion':
             ({required int count, Random? random}) =>
                 randFictionalRegion(count: count, random: random),
         'randFictionalRegionDetails':
             ({required int count, Random? random}) =>
                 randFictionalRegionDetails(count: count, random: random),
+        'randFictionalRegionForms':
+            ({required int count, Random? random}) =>
+                randFictionalRegionForms(const {}, count: count, random: random),
         'randFileExtension':
             ({required int count, Random? random}) =>
                 randFileExtension(count: count, random: random),

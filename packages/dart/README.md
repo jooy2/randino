@@ -293,23 +293,23 @@ A null `type` draws a kind per result, companies most often. An `industry` is wr
 
 ## Fictional names and places
 
-Names for the characters of a story or a game, and the countries, regions, cities and districts of its map. A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language: `Artemis` is `아르테미스` and `アルテミス`. Several languages draw one per result, and the `…Details` functions write each result in all of them.
+Names for the characters of a story or a game, and the countries, regions, cities and districts of its map. A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language: `Artemis` is `아르테미스` and `アルテミス`. The `…Forms` functions return each result in several languages at once, keyed by language, for a game that shows one character to every player in the player's own language.
 
 ```dart
-randFictionalName(language: {WordLanguage.en}, count: 3); // [Alice, Arsis, Emily]
-randFictionalName(language: {WordLanguage.ko}, includeSurname: true); // [엘라라 블랙우드]
-randFictionalCountry(language: {WordLanguage.ko}, count: 3); // [에들린 왕국, 글래시아, 카스타비아 제국]
-randFictionalDistrict(language: {WordLanguage.ko}, count: 2); // [그루거 파크, 이블린 베이]
+randFictionalName(language: WordLanguage.en, count: 3); // [Alice, Arsis, Emily]
+randFictionalName(language: WordLanguage.ko, includeSurname: true); // [엘라라 블랙우드]
+randFictionalCountry(language: WordLanguage.ko, count: 3); // [에들린 왕국, 글래시아, 카스타비아 제국]
+randFictionalDistrict(language: WordLanguage.ko, count: 2); // [그루거 파크, 이블린 베이]
 
-randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.ko, WordLanguage.ja}).first.forms;
-// {WordLanguage.en: Artemis, WordLanguage.ko: 아르테미스, WordLanguage.ja: アルテミス}
+randFictionalNameForms({WordLanguage.ko, WordLanguage.en, WordLanguage.ja});
+// [{WordLanguage.ko: 아르테미스, WordLanguage.en: Artemis, WordLanguage.ja: アルテミス}]
 ```
 
 `randFictionalRegion` and `randFictionalCity` fill in the levels between. Every place function takes the same parameters:
 
 | Parameter                 | Type                  | Default              |
 | ------------------------- | --------------------- | -------------------- |
-| `language`                | `Set<WordLanguage>?`  | `null` — every one   |
+| `language`                | `WordLanguage?`       | `null` — every one   |
 | `includeKind`             | `bool?`               | `null` — drawn       |
 | `kindStyle`               | `FictionalKindStyle?` | `null` — by level    |
 | `count`                   | `int`                 | `1`                  |
@@ -318,7 +318,7 @@ randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.ko, WordLangua
 | `startsWith`              | `String?`             | `null`               |
 | `unique`                  | `bool`                | `false`              |
 
-`randFictionalName` takes `gender` and `includeSurname` (default `false`) in place of the two kind parameters. A set keeps the order it was written in, and that is the order of a detail's `forms`. The kind is written in each language's words: a country's or a region's is translated (`에들린 왕국`) and a city's or a district's keeps the English word (`그루거 파크`); `FictionalKindStyle.borrowed` or `.translated` writes every kind one way (`에들린 킹덤`). `RandRealism.invented` builds names out of syllables and English halves, tens of thousands of them, none of which is a real country or a famous character or place.
+`randFictionalName` takes `gender` and `includeSurname` (default `false`) in place of the two kind parameters. Each function has a `…Forms` twin that takes a set of languages first and returns a map per result, keyed in the order the set was written in, and a `…Details` twin whose `language` is a set for the same reason. A result of several languages is drawn in the first, which is the one `startsWith` and the length range read. The kind is written in each language's words: a country's or a region's is translated (`에들린 왕국`) and a city's or a district's keeps the English word (`그루거 파크`); `FictionalKindStyle.borrowed` or `.translated` writes every kind one way (`에들린 킹덤`). `RandRealism.invented` builds names out of syllables and English halves, tens of thousands of them, none of which is a real country or a famous character or place.
 
 ## Dates
 
@@ -703,6 +703,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `randModifier('Owl')`             | `randModifier(value: 'Owl')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |
 | `include: 'lion'` or `['lion']`    | `include: ['lion']` — a list either way        |
+| `randFictionalName({ language: ['ko', 'en'] })` | `randFictionalNameForms({WordLanguage.ko, WordLanguage.en})`, and the same `…Forms` for each place |
 
 The last two are the same limitation twice: Dart has neither overloads nor union types, so one function cannot return `List<String>` for one argument and `List<NameDetail>` for another. Where npm and PyPI pick the shape with an option, pub.dev picks it with a second function.
 

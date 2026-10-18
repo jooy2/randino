@@ -13,7 +13,21 @@ const int sample = 60;
 
 typedef PlaceGenerator =
     List<String> Function({
-      Set<WordLanguage>? language,
+      WordLanguage? language,
+      bool? includeKind,
+      FictionalKindStyle? kindStyle,
+      int count,
+      RandRealism realism,
+      int? minLength,
+      int? maxLength,
+      String? startsWith,
+      bool unique,
+      Random? random,
+    });
+
+typedef PlaceFormsGenerator =
+    List<Map<WordLanguage, String>> Function(
+      Set<WordLanguage> languages, {
       bool? includeKind,
       FictionalKindStyle? kindStyle,
       int count,
@@ -44,6 +58,13 @@ const Map<LocationLevel, PlaceGenerator> places = <LocationLevel, PlaceGenerator
   LocationLevel.region: randFictionalRegion,
   LocationLevel.city: randFictionalCity,
   LocationLevel.district: randFictionalDistrict,
+};
+
+const Map<LocationLevel, PlaceFormsGenerator> placeForms = <LocationLevel, PlaceFormsGenerator>{
+  LocationLevel.country: randFictionalCountryForms,
+  LocationLevel.region: randFictionalRegionForms,
+  LocationLevel.city: randFictionalCityForms,
+  LocationLevel.district: randFictionalDistrictForms,
 };
 
 const Map<LocationLevel, PlaceDetailGenerator> placeDetails = <LocationLevel, PlaceDetailGenerator>{
@@ -113,7 +134,7 @@ void main() {
       for (final language in wordLanguages) {
         for (final realism in [RandRealism.real, RandRealism.invented]) {
           for (final name in randFictionalName(
-            language: {language},
+            language: language,
             realism: realism,
             includeSurname: true,
             count: sample,
@@ -136,42 +157,66 @@ void main() {
       }
     });
 
-    test(
-      '`forms` holds every language asked for, in the order asked, and `name` is one of them',
-      () {
-        final asked = <WordLanguage>[
-          WordLanguage.ru,
-          WordLanguage.ko,
-          WordLanguage.en,
-          WordLanguage.ja,
-        ];
-        final seen = <WordLanguage>{};
+    test('a set returns every name in every language of it, keyed in the order asked', () {
+      const asked = <WordLanguage>[
+        WordLanguage.ru,
+        WordLanguage.ko,
+        WordLanguage.en,
+        WordLanguage.ja,
+      ];
+      final forms = randFictionalNameForms(asked.toSet(), includeSurname: true, count: sample);
 
-        for (final detail in randFictionalNameDetails(language: asked.toSet(), count: sample)) {
-          expect(detail.forms.keys.toList(), asked);
-          expect(asked, contains(detail.language));
-          expect(detail.name, detail.forms[detail.language]);
-          seen.add(detail.language);
+      expect(forms, hasLength(sample));
+
+      for (final form in forms) {
+        expect(form.keys.toList(), asked);
+
+        for (final language in asked) {
+          expect(form[language], matches(script[language]!), reason: '${language.name} $form');
         }
+      }
 
-        // The value form draws a language per name from the set.
-        expect(seen.length, greaterThan(1));
+      // The detail is the same, drawn in the first language of the set.
+      for (final detail in randFictionalNameDetails(language: asked.toSet(), count: sample)) {
+        expect(detail.forms.keys.toList(), asked);
+        expect(detail.language, WordLanguage.ru);
+        expect(detail.name, detail.forms[WordLanguage.ru]);
+      }
 
-        final one = randFictionalNameDetails(language: {WordLanguage.ko})[0];
+      // One language, and null, are strings, and null draws a language per name.
+      final seen = <WordLanguage>{};
 
-        expect(one.forms.keys.toList(), [WordLanguage.ko]);
-        expect(randFictionalNameDetails()[0].forms.keys.toList(), wordLanguages);
-      },
-    );
+      for (final detail in randFictionalNameDetails(count: sample)) {
+        expect(detail.forms.keys.toList(), wordLanguages);
+        expect(detail.name, detail.forms[detail.language]);
+        seen.add(detail.language);
+      }
+
+      expect(seen.length, greaterThan(1));
+
+      // Every name of a sample in Latin letters would be one language, or five
+      // that share them; a null language writes some in other scripts as well.
+      final names = randFictionalName(count: sample);
+
+      expect(names.any(script[WordLanguage.en]!.hasMatch), isTrue, reason: '$names');
+      expect(names.any((name) => !script[WordLanguage.en]!.hasMatch(name)), isTrue);
+      expect(randFictionalNameDetails(language: {WordLanguage.ko})[0].forms.keys.toList(), [
+        WordLanguage.ko,
+      ]);
+    });
 
     test('reads an empty language set as every language, and a repeated one once', () {
+      expect(randFictionalNameForms({})[0].keys.toList(), wordLanguages);
       expect(randFictionalNameDetails(language: {})[0].forms.keys.toList(), wordLanguages);
+      // An empty set is every language as a set, the way an empty list is in the
+      // other two packages: drawn in the first of them.
+      expect(randFictionalNameDetails(language: {}, count: 20).map((d) => d.language).toSet(), {
+        wordLanguages.first,
+      });
       expect(
-        randFictionalNameDetails(
-          language: {
-            ...const [WordLanguage.ko, WordLanguage.ko, WordLanguage.en],
-          },
-        )[0].forms.keys.toList(),
+        randFictionalNameForms({
+          ...const [WordLanguage.ko, WordLanguage.ko, WordLanguage.en],
+        })[0].keys.toList(),
         [WordLanguage.ko, WordLanguage.en],
       );
     });
@@ -210,14 +255,14 @@ void main() {
         final joiner = joiners[language] ?? ' ';
 
         for (final name in randFictionalName(
-          language: {language},
+          language: language,
           includeSurname: true,
           count: sample,
         )) {
           expect(name.split(joiner), hasLength(2), reason: name);
         }
 
-        for (final name in randFictionalName(language: {language}, count: sample)) {
+        for (final name in randFictionalName(language: language, count: sample)) {
           expect(name, isNot(contains(joiner)));
         }
       }
@@ -232,7 +277,7 @@ void main() {
       ]) {
         for (final realism in realisms) {
           final names = randFictionalName(
-            language: {language},
+            language: language,
             startsWith: prefix,
             realism: realism,
             count: sample,
@@ -249,7 +294,7 @@ void main() {
       // Japanese spells a made-up name in katakana, so a hiragana prefix is read
       // as one.
       for (final name in randFictionalName(
-        language: {WordLanguage.ja},
+        language: WordLanguage.ja,
         startsWith: 'あ',
         count: sample,
       )) {
@@ -259,20 +304,38 @@ void main() {
       // A character no language writes is answered with nothing.
       expect(randFictionalName(startsWith: '!', count: 3), isEmpty);
 
-      // And a language that does not write it is left out of a set.
-      for (final detail in randFictionalNameDetails(
-        language: {WordLanguage.ko, WordLanguage.en},
-        startsWith: 'B',
+      // A language that does not write it is left out of a null language.
+      for (final detail in randFictionalNameDetails(startsWith: 'B', count: sample)) {
+        expect(latinLanguages, contains(detail.language));
+      }
+
+      // A set is read in its first language, and the rest only write the name.
+      for (final form in randFictionalNameForms(
+        {WordLanguage.ko, WordLanguage.en},
+        startsWith: '아',
         count: sample,
       )) {
-        expect(detail.language, WordLanguage.en);
+        expect(form[WordLanguage.ko], startsWith('아'));
       }
+
+      expect(
+        randFictionalNameForms({WordLanguage.ko, WordLanguage.en}, startsWith: 'B', count: 3),
+        isEmpty,
+      );
+      expect(
+        randFictionalNameDetails(
+          language: {WordLanguage.ko, WordLanguage.en},
+          startsWith: 'B',
+          count: 3,
+        ),
+        isEmpty,
+      );
     });
 
     test('keeps to a length range the pools can meet', () {
       for (final language in wordLanguages) {
         for (final name in randFictionalName(
-          language: {language},
+          language: language,
           minLength: 4,
           maxLength: 6,
           count: sample,
@@ -288,6 +351,15 @@ void main() {
       // Only the CJK languages write a name of two characters.
       for (final detail in randFictionalNameDetails(maxLength: 2, count: sample)) {
         expect(detail.name.length, lessThanOrEqualTo(2), reason: detail.name);
+      }
+
+      // A set is measured in its first language, whatever the rest come out at.
+      for (final form in randFictionalNameForms(
+        {WordLanguage.ko, WordLanguage.en},
+        maxLength: 2,
+        count: sample,
+      )) {
+        expect(form[WordLanguage.ko]!.length, lessThanOrEqualTo(2), reason: '$form');
       }
     });
 
@@ -353,6 +425,43 @@ void main() {
       for (final generate in placeDetails.values) {
         expect(generate(count: 9), hasLength(9));
       }
+
+      for (final generate in placeForms.values) {
+        expect(generate({WordLanguage.ko, WordLanguage.en}, count: 9), hasLength(9));
+        expect(generate({}, count: -1), isEmpty);
+      }
+    });
+
+    test('a set returns every place in every language of it, keyed in the order asked', () {
+      const asked = <WordLanguage>[
+        WordLanguage.zh,
+        WordLanguage.ko,
+        WordLanguage.es,
+        WordLanguage.en,
+      ];
+
+      for (final level in LocationLevel.values) {
+        final forms = placeForms[level]!(asked.toSet(), includeKind: true, count: sample);
+
+        expect(forms, hasLength(sample));
+
+        for (final form in forms) {
+          expect(form.keys.toList(), asked);
+
+          for (final language in asked) {
+            expect(
+              form[language],
+              matches(script[language]!),
+              reason: '${level.name} ${language.name} $form',
+            );
+          }
+        }
+
+        for (final detail in placeDetails[level]!(language: asked.toSet(), count: sample)) {
+          expect(detail.language, WordLanguage.zh);
+          expect(detail.place, detail.forms[WordLanguage.zh]);
+        }
+      }
     });
 
     test('writes each language in its own script', () {
@@ -360,7 +469,7 @@ void main() {
         for (final language in wordLanguages) {
           for (final kindStyle in kindStyles) {
             for (final place in generate(
-              language: {language},
+              language: language,
               kindStyle: kindStyle,
               realism: RandRealism.mixed,
               count: sample,
@@ -419,12 +528,12 @@ void main() {
 
     test('writes a country’s kind translated and a district’s borrowed, unless told otherwise', () {
       final country = randFictionalCountry(
-        language: {WordLanguage.ko},
+        language: WordLanguage.ko,
         includeKind: true,
         count: sample,
       );
       final district = randFictionalDistrict(
-        language: {WordLanguage.ko},
+        language: WordLanguage.ko,
         includeKind: true,
         count: sample,
       );
@@ -433,7 +542,7 @@ void main() {
       expect(district.any(RegExp(r'(파크|베이|힐스|스퀘어|마켓)$').hasMatch), isTrue);
       expect(
         randFictionalCountry(
-          language: {WordLanguage.ko},
+          language: WordLanguage.ko,
           includeKind: true,
           kindStyle: FictionalKindStyle.borrowed,
           count: sample,
@@ -442,7 +551,7 @@ void main() {
       );
       expect(
         randFictionalDistrict(
-          language: {WordLanguage.ko},
+          language: WordLanguage.ko,
           includeKind: true,
           kindStyle: FictionalKindStyle.translated,
           count: sample,
@@ -511,7 +620,7 @@ void main() {
           WordLanguage.ru,
         ]) {
           for (final place in generate(
-            language: {language},
+            language: language,
             minLength: 8,
             maxLength: 14,
             count: sample,

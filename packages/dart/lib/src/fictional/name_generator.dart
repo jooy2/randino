@@ -239,9 +239,14 @@ _Drawn? _generateOne(WordLanguage language, _Settings settings) {
   return best;
 }
 
-/// What `randFictionalName` and `randFictionalNameDetails` both do.
+/// What `randFictionalName`, `randFictionalNameForms` and
+/// `randFictionalNameDetails` all do.
+///
+/// [listed] draws every name in the first language of [language] and writes it
+/// in the rest; otherwise each name is drawn in one language of it.
 List<FictionalNameDetail> generateFictionalNameDetails({
   Set<WordLanguage>? language,
+  bool listed = false,
   NameGender? gender,
   bool includeSurname = false,
   int count = 1,
@@ -256,6 +261,7 @@ List<FictionalNameDetail> generateFictionalNameDetails({
   final settings = _Settings(
     base: resolveBase(
       language: language,
+      listed: listed,
       startsWith: startsWith,
       minLength: minLength,
       maxLength: maxLength,

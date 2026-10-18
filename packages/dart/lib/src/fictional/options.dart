@@ -12,8 +12,8 @@ import 'package:randino/src/word/data/index.dart';
 /// language for a null or empty [language].
 ///
 /// A set keeps the order it was written in, so `{WordLanguage.ru,
-/// WordLanguage.ko}` is the order of a detail's `forms`, and a language named
-/// twice is written once.
+/// WordLanguage.ko}` is the order of a detail's `forms` and of a `…Forms`
+/// call's maps, and a language named twice is written once.
 List<WordLanguage> resolveFictionalLanguages(Set<WordLanguage>? language) =>
     language == null || language.isEmpty
         ? wordLanguages
@@ -33,10 +33,11 @@ final class FictionalBase {
     required this.bounds,
   });
 
-  /// The languages a result may be written in. Empty when none can answer.
+  /// The languages a result may be drawn in. Empty when none can answer.
   final List<WordLanguage> languages;
 
-  /// The languages every result is written in for the detail's `forms`.
+  /// The languages every result is written in, for the detail's `forms` and a
+  /// `…Forms` call's maps.
   final List<WordLanguage> forms;
 
   /// The one character a result's name has to start with, or empty for none.
@@ -46,12 +47,20 @@ final class FictionalBase {
   final LengthRange? bounds;
 }
 
-/// The languages, the prefix and the length range of a call. A language that
-/// does not write the requested character is left out, and so is one whose own
-/// range cannot meet the one asked for while another's can — [rangeOf] is that
-/// language's range for this call.
+/// The languages, the prefix and the length range of a call.
+///
+/// Unless [listed], [language] holds the languages each result is drawn in, one
+/// per result: a language that does not write the requested character is left
+/// out, and so is one whose own range cannot meet the one asked for while
+/// another's can — [rangeOf] is that language's range for this call.
+///
+/// A [listed] call asks for every result in every language of [language], so
+/// each result is drawn in the first and written in the rest: the first is the
+/// one [startsWith] and the length range read, the way a game's own language is
+/// the one its fields are sized for.
 FictionalBase resolveBase({
   required Set<WordLanguage>? language,
+  required bool listed,
   required String? startsWith,
   required int? minLength,
   required int? maxLength,
@@ -59,10 +68,15 @@ FictionalBase resolveBase({
 }) {
   final forms = resolveFictionalLanguages(language);
   final prefix = resolvePrefix(startsWith);
-  final writing = languagesWriting<WordLanguage>(null, forms, prefix);
+  final writing = languagesWriting<WordLanguage>(
+    null,
+    listed ? forms.sublist(0, 1) : forms,
+    prefix,
+  );
 
   return FictionalBase(
-    languages: languagesFitting<WordLanguage>(writing, minLength, maxLength, rangeOf),
+    languages:
+        listed ? writing : languagesFitting<WordLanguage>(writing, minLength, maxLength, rangeOf),
     forms: forms,
     prefix: prefix,
     bounds:

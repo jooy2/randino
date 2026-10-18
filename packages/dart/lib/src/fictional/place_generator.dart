@@ -366,11 +366,15 @@ _Drawn? _generateOne(WordLanguage language, _Settings settings) {
   return best;
 }
 
-/// What the four fictional place generators and their detail forms all do, for
-/// the places on [level].
+/// What the four fictional place generators and their `…Forms` and detail forms
+/// all do, for the places on [level].
+///
+/// [listed] draws every place in the first language of [language] and writes it
+/// in the rest; otherwise each place is drawn in one language of it.
 List<FictionalPlaceDetail> generateFictionalPlaceDetails(
   LocationLevel level, {
   Set<WordLanguage>? language,
+  bool listed = false,
   bool? includeKind,
   FictionalKindStyle? kindStyle,
   int count = 1,
@@ -385,6 +389,7 @@ List<FictionalPlaceDetail> generateFictionalPlaceDetails(
   final settings = _Settings(
     base: resolveBase(
       language: language,
+      listed: listed,
       startsWith: startsWith,
       minLength: minLength,
       maxLength: maxLength,

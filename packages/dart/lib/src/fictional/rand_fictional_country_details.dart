@@ -3,9 +3,15 @@ import 'dart:math';
 import 'package:randino/src/fictional/place_generator.dart';
 import 'package:randino/src/types.dart';
 
-/// [randFictionalCountry], along with what each place was built from: the place
-/// and its name in the language drawn for it, its kind, and the same place in
-/// each language of [language] under `forms`.
+/// [randFictionalCountry], along with each place's name and kind: the place and
+/// its name in its language, its kind, and the same place in every language
+/// asked for under `forms`.
+///
+/// A null [language] draws a language per place, the way
+/// [randFictionalCountry] does, and `forms` holds all nine. A set, an empty one being every language,
+/// draws every place in its first language and writes it in each language of the set, the
+/// way [randFictionalCountryForms] does: `place`, `name` and `language` are the
+/// first, and `forms` is the whole set in its order.
 ///
 /// Dart has neither overloads nor union types, so the detail form is its own
 /// function rather than the `output` option the npm and PyPI packages take.
@@ -35,6 +41,7 @@ List<FictionalPlaceDetail> randFictionalCountryDetails({
 }) => generateFictionalPlaceDetails(
   LocationLevel.country,
   language: language,
+  listed: language != null,
   includeKind: includeKind,
   kindStyle: kindStyle,
   count: count,

@@ -9,20 +9,21 @@ import 'package:randino/src/types.dart';
 ///
 /// A name is spelled in Latin letters first, English and British names among
 /// them, and written by its sound in every other language: `Artemis` is
-/// `아르테미스` in Korean and `アルテミス` in Japanese. A [language] set draws one
-/// language per name, in the order it was written, and a null or empty one
-/// draws from every language. A null [gender] picks one per name, and
+/// `아르테미스` in Korean and `アルテミス` in Japanese. A null [language], the
+/// default, draws a language per name. A null [gender] picks one per name, and
 /// [includeSurname] follows the given name with a family name (`Elara
 /// Blackwood`): a character in a story or a game is usually known by one name.
 ///
+/// [randFictionalNameForms] writes every name in several languages at once.
+///
 /// ```dart
-/// randFictionalName(language: {WordLanguage.en}, count: 3); // [Alice, Theron, Elara]
-/// randFictionalName(language: {WordLanguage.ko}, gender: NameGender.female, count: 3);
-/// // [앨리스, 트리아, 에밀리]
-/// randFictionalName(language: {WordLanguage.ja}, includeSurname: true); // [エララ・ブラックウッド]
+/// randFictionalName(language: WordLanguage.en, count: 3); // [Alice, Arsis, Emily]
+/// randFictionalName(language: WordLanguage.ko, gender: NameGender.female, count: 3);
+/// // [앨리스, 트리아, 베리]
+/// randFictionalName(language: WordLanguage.ja, includeSurname: true); // [アスター・シンクレア]
 /// ```
 List<String> randFictionalName({
-  Set<WordLanguage>? language,
+  WordLanguage? language,
   NameGender? gender,
   bool includeSurname = false,
   int count = 1,
@@ -37,7 +38,7 @@ List<String> randFictionalName({
   Random? random,
 }) => [
   for (final detail in generateFictionalNameDetails(
-    language: language,
+    language: language == null ? null : {language},
     gender: gender,
     includeSurname: includeSurname,
     count: count,
