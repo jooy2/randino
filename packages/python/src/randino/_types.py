@@ -657,14 +657,16 @@ class OrganizationDetail:
 
 
 FictionalLanguageOption = WordLanguageOption | Sequence[WordLanguage]
-"""The languages a fictional name or place is written in: one, several, or `"all"` of them.
+"""The languages a fictional name or place is written in: one, `"all"`, or a list of them.
 
-A fictional name is one name however it is written — `Artemis`, `아르테미스`, `アルテミス` —
-so a sequence does two things at once. The value form writes each result in one language
-of the sequence, drawn per result the way `"all"` draws one; the detail form also writes
-every result in every language of the sequence, under `forms`, in the order given. A
-language named twice counts once, and a sequence that names none of the nine is every one
-of them.
+One language writes every result in it, and `"all"` writes each result in one language
+drawn for it, the way every generator's `"all"` does. A list, or a tuple, asks for every
+result in every language of it at once: a fictional name is one name however it is
+written — `Artemis`, `아르테미스`, `アルテミス` — and a game shows the same character to
+every player in the player's own language. The value form then returns a dict per result,
+keyed by language in the order of the list, and the first language of the list is the one
+`starts_with` and the length range read. A language named twice counts once, and a list
+that names none of the nine is every one of them.
 """
 
 
@@ -673,19 +675,20 @@ class FictionalNameDetail:
     """A generated fictional name, written in every language the call asked for."""
 
     name: str
-    """What the value form returns: the name in `language`."""
+    """The name in `language`: what a call of one language returns."""
 
     gender: NameGender
     """The gender the given name was drawn for."""
 
     language: WordLanguage
-    """The language `name` is written in."""
+    """The language `name` is written in: the one drawn, or the first of a list."""
 
     forms: dict[WordLanguage, str]
     """The same name in every language the call asked for, in the order it asked for them.
 
-    `{"en": "Artemis", "ko": "아르테미스"}`. The languages written in Latin letters write a
-    name the way English does.
+    What a call with a list returns: `{"en": "Artemis", "ko": "아르테미스"}`. `"all"` asks
+    for all nine. The languages written in Latin letters write a name the way English
+    does.
     """
 
 
@@ -779,7 +782,7 @@ class FictionalPlaceDetail:
     """A generated fictional place, written in every language the call asked for."""
 
     place: str
-    """What the value form returns: the place in `language`, its kind and all."""
+    """The place in `language`, its kind and all: what a call of one language returns."""
 
     name: str
     """The place's own name in `language`, without its kind: `에들린` for `에들린 왕국`."""
@@ -791,12 +794,13 @@ class FictionalPlaceDetail:
     """Which level of a map the place is: a country, a region, a city or a district."""
 
     language: WordLanguage
-    """The language `place` is written in."""
+    """The language `place` is written in: the one drawn, or the first of a list."""
 
     forms: dict[WordLanguage, str]
     """The same place in every language the call asked for, in the order it asked for them.
 
-    `{"en": "Kingdom of Edlin", "ko": "에들린 왕국"}`.
+    What a call with a list returns: `{"en": "Kingdom of Edlin", "ko": "에들린 왕국"}`.
+    `"all"` asks for all nine.
     """
 
 

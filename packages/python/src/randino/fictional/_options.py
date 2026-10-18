@@ -3,7 +3,7 @@
 The languages a call writes in, and the prefix as each script spells it.
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from randino._internal.generate import (
@@ -36,6 +36,15 @@ def resolve_fictional_languages(option: object) -> tuple[WordLanguage, ...]:
     return tuple(dict.fromkeys(resolve_many(option, WORD_LANGUAGES, WORD_LANGUAGES)))
 
 
+def is_listed(option: object) -> bool:
+    """Whether `language` is a list of languages rather than one, or `"all"`.
+
+    A list or a tuple is, and so is any other sequence but a string: it asks for every
+    result in every language of it at once.
+    """
+    return isinstance(option, Sequence) and not isinstance(option, str)
+
+
 def prefix_in(prefix: str, script: int) -> str:
     """`starts_with` as a script spells it.
 
@@ -50,10 +59,10 @@ class FictionalBase:
     """What every fictional generator works out from the options before it draws."""
 
     languages: tuple[WordLanguage, ...]
-    """The languages a result may be written in. Empty when none can answer."""
+    """The languages a result may be drawn in. Empty when none can answer."""
 
     forms: tuple[WordLanguage, ...]
-    """The languages every result is written in for the detail's `forms`."""
+    """The languages every result is written in, for the detail's `forms` and a list's dicts."""
 
     prefix: str
     """The first character asked for, or `""`."""
@@ -72,8 +81,13 @@ def resolve_base(
 ) -> FictionalBase:
     """The languages, the prefix and the length range of a call.
 
-    A language that does not write the requested character is left out, and so is one
-    whose own range cannot meet the one asked for while another's can.
+    One language, or `"all"`, is the language each result is drawn in, and a language
+    that does not write the requested character is left out, and so is one whose own range
+    cannot meet the one asked for while another's can.
+
+    A list asks for every result in every language of it, so each result is drawn in the
+    first and written in the rest: the first is the one `starts_with` and the length range
+    read, the way a game's own language is the one its fields are sized for.
 
     Args:
         language: The caller's `language`.
@@ -89,10 +103,11 @@ def resolve_base(
     prefix = resolve_prefix(starts_with)
     low = resolve_length(min_length)
     high = resolve_length(max_length)
-    writing = languages_writing("all", forms, prefix)
+    listed = is_listed(language)
+    writing = languages_writing("all", forms[:1] if listed else forms, prefix)
 
     return FictionalBase(
-        languages=languages_fitting(writing, low, high, range_of),
+        languages=writing if listed else languages_fitting(writing, low, high, range_of),
         forms=forms,
         prefix=prefix,
         bounds=None

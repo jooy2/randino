@@ -62,6 +62,13 @@ def place_details(level: LocationLevel, **options: Any) -> list[FictionalPlaceDe
     return generate(output="detail", **options)
 
 
+def place_forms(level: LocationLevel, **options: Any) -> list[dict[WordLanguage, str]]:
+    """The list form of a level's generator: one dict per place, keyed by language."""
+    generate = cast(Callable[..., list[dict[WordLanguage, str]]], PLACES[level])
+
+    return generate(**options)
+
+
 def seeded(seed: int = 7) -> Callable[[], float]:
     """A source that makes the same draws every time it is made, for comparing two calls."""
     state = seed
@@ -157,20 +164,39 @@ def test_writes_a_name_in_latin_letters_the_same_way_in_every_language_that_uses
             assert detail.forms[language] == detail.forms["en"]
 
 
-def test_forms_holds_every_language_asked_for_in_order_and_name_is_one_of_them() -> None:
+def test_a_list_returns_every_name_in_every_language_of_it_keyed_in_the_order_asked() -> None:
     asked: list[WordLanguage] = ["ru", "ko", "en", "ja"]
-    seen: set[WordLanguage] = set()
+    forms = rand_fictional_name(language=asked, include_surname=True, count=SAMPLE)
 
+    assert len(forms) == SAMPLE
+
+    for form in forms:
+        assert list(form) == asked
+
+        for language in asked:
+            assert SCRIPT[language].fullmatch(form[language]), (language, form[language])
+
+    # A tuple is a list too.
+    assert list(rand_fictional_name(language=("ja", "en"))[0]) == ["ja", "en"]
+
+    # The detail is the same, drawn in the first language of the list.
     for detail in rand_fictional_name(language=asked, count=SAMPLE, output="detail"):
         assert list(detail.forms) == asked
-        assert detail.language in asked
+        assert detail.language == "ru"
+        assert detail.name == detail.forms["ru"]
+
+    # One language, and `"all"`, are strings, and `"all"` draws a language per name.
+    seen: set[WordLanguage] = set()
+
+    for detail in rand_fictional_name(count=SAMPLE, output="detail"):
+        assert list(detail.forms) == list(WORD_LANGUAGES)
         assert detail.name == detail.forms[detail.language]
         seen.add(detail.language)
 
-    # The value form draws a language per name from the list.
     assert len(seen) > 1
+    assert all(isinstance(name, str) for name in rand_fictional_name(count=5))
+    assert all(isinstance(name, str) for name in rand_fictional_name(language="ko", count=5))
     assert list(rand_fictional_name(language="ko", output="detail")[0].forms) == ["ko"]
-    assert list(rand_fictional_name(output="detail")[0].forms) == list(WORD_LANGUAGES)
 
 
 def test_reads_an_unknown_or_empty_language_list_as_every_language_and_a_repeated_one_once() -> (
@@ -178,13 +204,10 @@ def test_reads_an_unknown_or_empty_language_list_as_every_language_and_a_repeate
 ):
     loose: Any = rand_fictional_name
 
-    assert list(loose(language=[], output="detail")[0].forms) == list(WORD_LANGUAGES)
+    assert list(rand_fictional_name(language=[])[0]) == list(WORD_LANGUAGES)
     assert list(loose(language="xx", output="detail")[0].forms) == list(WORD_LANGUAGES)
-    assert list(loose(language=[None, "xx"], output="detail")[0].forms) == list(WORD_LANGUAGES)
-    assert list(rand_fictional_name(language=["ko", "ko", "en"], output="detail")[0].forms) == [
-        "ko",
-        "en",
-    ]
+    assert list(loose(language=[None, "xx"])[0]) == list(WORD_LANGUAGES)
+    assert list(rand_fictional_name(language=["ko", "ko", "en"])[0]) == ["ko", "en"]
 
 
 def test_real_draws_given_names_and_surnames_from_the_pools_of_the_right_gender() -> None:
@@ -246,11 +269,15 @@ def test_starts_with_is_the_first_character_in_the_language_the_name_is_written_
     # A character no language writes is answered with nothing.
     assert rand_fictional_name(starts_with="!", count=3) == []
 
-    # And a language that does not write it is left out of a list.
-    for detail in rand_fictional_name(
-        language=["ko", "en"], starts_with="B", count=SAMPLE, output="detail"
-    ):
-        assert detail.language == "en"
+    # A language that does not write it is left out of `"all"`.
+    for detail in rand_fictional_name(starts_with="B", count=SAMPLE, output="detail"):
+        assert detail.language in LATIN_LANGUAGES, detail.language
+
+    # A list is read in its first language, and the rest only write the name.
+    for form in rand_fictional_name(language=["ko", "en"], starts_with="아", count=SAMPLE):
+        assert form["ko"].startswith("아"), form["ko"]
+
+    assert rand_fictional_name(language=["ko", "en"], starts_with="B", count=3) == []
 
 
 def test_a_name_keeps_to_a_length_range_the_pools_can_meet() -> None:
@@ -266,6 +293,10 @@ def test_a_name_keeps_to_a_length_range_the_pools_can_meet() -> None:
     # Only the CJK languages write a name of two characters.
     for detail in rand_fictional_name(max_length=2, count=SAMPLE, output="detail"):
         assert len(detail.name) <= 2, detail.name
+
+    # A list is measured in its first language, whatever the rest come out at.
+    for form in rand_fictional_name(language=["ko", "en"], max_length=2, count=SAMPLE):
+        assert len(form["ko"]) <= 2, form["ko"]
 
 
 def test_unique_never_returns_the_same_name_twice_in_any_language() -> None:
@@ -292,6 +323,34 @@ def test_returns_exactly_count_places_on_every_level() -> None:
         assert len(PLACES[level]()) == 1
         assert len(PLACES[level](count=9)) == 9
         assert PLACES[level](count=-1) == []
+
+
+def test_a_list_returns_every_place_in_every_language_of_it_keyed_in_the_order_asked() -> None:
+    asked: list[WordLanguage] = ["zh", "ko", "es", "en"]
+
+    for level in LEVELS:
+        forms = place_forms(level, language=asked, include_kind=True, count=SAMPLE)
+
+        assert len(forms) == SAMPLE
+
+        for form in forms:
+            assert list(form) == asked
+
+            for language in asked:
+                assert SCRIPT[language].fullmatch(form[language]), (level, language, form)
+
+        for detail in place_details(level, language=asked, count=SAMPLE):
+            assert detail.language == "zh"
+            assert detail.place == detail.forms["zh"]
+
+    # The functions' own types follow the list: `form["ko"]` is a string.
+    form = rand_fictional_district(language=["ko", "en"])[0]
+
+    assert isinstance(form["ko"], str)
+    assert isinstance(form["en"], str)
+    assert isinstance(rand_fictional_country(language=("ko", "en"))[0]["en"], str)
+    assert isinstance(rand_fictional_region(language=["ko"])[0]["ko"], str)
+    assert isinstance(rand_fictional_city(language=["ru", "en"])[0]["ru"], str)
 
 
 def test_writes_each_place_in_its_language_s_own_script() -> None:

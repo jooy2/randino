@@ -313,7 +313,7 @@ rand_organization(language="ko", type="company", output="detail")
 
 ## Fictional names and places
 
-Names for the characters of a story or a game, and the countries, regions, cities and districts of its map. A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language: `Artemis` is `아르테미스` and `アルテミス`. A sequence of languages draws one per result, and the detail form writes each result in all of them.
+Names for the characters of a story or a game, and the countries, regions, cities and districts of its map. A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language: `Artemis` is `아르테미스` and `アルテミス`. A list of languages returns each result in every one of them, keyed by code, for a game that shows one character to every player in the player's own language.
 
 ```python
 from randino import rand_fictional_country, rand_fictional_district, rand_fictional_name
@@ -323,9 +323,10 @@ rand_fictional_name(language="ko", include_surname=True)  # ['엘라라 블랙�
 rand_fictional_country(language="ko", count=3)  # ['에들린 왕국', '글래시아', '카스타비아 제국']
 rand_fictional_district(language="ko", count=2)  # ['그루거 파크', '이블린 베이']
 
-rand_fictional_name(language=["en", "ko", "ja"], output="detail")
-# [FictionalNameDetail(name='Artemis', gender='female', language='en',
-#                      forms={'en': 'Artemis', 'ko': '아르테미스', 'ja': 'アルテミス'})]
+rand_fictional_name(language=["ko", "en", "ja"])
+# [{'ko': '아르테미스', 'en': 'Artemis', 'ja': 'アルテミス'}]
+rand_fictional_district(language=["ko", "en"], include_kind=True)
+# [{'ko': '이블린 베이', 'en': 'Evelyn Bay'}]
 ```
 
 `rand_fictional_region` and `rand_fictional_city` fill in the levels between. Every place function takes the same arguments:
@@ -342,7 +343,7 @@ rand_fictional_name(language=["en", "ko", "ja"], output="detail")
 | `unique`                    | `bool`                       | `False`   |
 | `output`                    | `"value" \| "detail"`        | `"value"` |
 
-`rand_fictional_name` takes `gender` and `include_surname` (default `False`) in place of the two kind arguments. The kind is written in each language's words: a country's or a region's is translated (`에들린 왕국`) and a city's or a district's keeps the English word (`그루거 파크`); `kind_style="borrowed"` or `"translated"` writes every kind one way (`에들린 킹덤`). `realism="invented"` builds names out of syllables and English halves, tens of thousands of them, none of which is a real country or a famous character or place.
+`rand_fictional_name` takes `gender` and `include_surname` (default `False`) in place of the two kind arguments. With a list of languages, a result is drawn in the first, which is the one `starts_with` and the length range read. The kind is written in each language's words: a country's or a region's is translated (`에들린 왕국`) and a city's or a district's keeps the English word (`그루거 파크`); `kind_style="borrowed"` or `"translated"` writes every kind one way (`에들린 킹덤`). `realism="invented"` builds names out of syllables and English halves, tens of thousands of them, none of which is a real country or a famous character or place.
 
 ## Dates
 
