@@ -155,6 +155,47 @@
 	accent-color: var(--vp-c-brand-1);
 }
 
+/* The fiction tab takes several languages at once, so they are a row of
+   checkboxes the width of the grid rather than one more select. */
+.randino-demo-languages {
+	grid-column: 1 / -1;
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.randino-demo-languages legend {
+	margin-bottom: 5px;
+	padding: 0;
+	font-size: 12px;
+}
+
+.randino-demo-languages legend code {
+	padding: 1px 5px;
+	border-radius: 4px;
+	background-color: var(--vp-c-default-soft);
+	color: var(--vp-c-text-1);
+	font-size: 11.5px;
+}
+
+.randino-demo-language-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 16px;
+}
+
+.randino-demo-language-list .randino-demo-check {
+	height: 28px;
+}
+
+.randino-demo-hint {
+	margin: 2px 0 0;
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--vp-c-text-3);
+}
+
 /* An option the current language has nothing to do with — Korean has no middle
    name — is left visible and dimmed rather than removed, so the grid does not
    reflow every time the language changes. */

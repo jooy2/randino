@@ -31,6 +31,11 @@ import {
 	randDiskSize,
 	randDiskType,
 	randDistrict,
+	randFictionalCity,
+	randFictionalCountry,
+	randFictionalDistrict,
+	randFictionalName,
+	randFictionalRegion,
 	randFileExtension,
 	randGender,
 	randGpu,
@@ -107,6 +112,7 @@ const TABS = [
 	'age',
 	'gender',
 	'organization',
+	'fiction',
 	'date',
 	'phone',
 	'system'
@@ -121,6 +127,7 @@ const TAB_LABELS = {
 	age: 'demoAges',
 	gender: 'demoGenders',
 	organization: 'demoOrganizations',
+	fiction: 'demoFiction',
 	date: 'demoDates',
 	phone: 'demoPhones',
 	system: 'demoSystem'
@@ -252,6 +259,26 @@ const organization = reactive({
 	type: 'all',
 	industry: 'all',
 	includeLegalForm: '',
+	count: 8,
+	realism: 'real',
+	minLength: '',
+	maxLength: '',
+	startsWith: '',
+	unique: false
+});
+
+/**
+ * The fiction tab. `languages` is a list, because the generators take one: none
+ * picked is every language, one is that language, and several draw one per
+ * result while the detail writes all of them.
+ */
+const fiction = reactive({
+	fn: 'randFictionalName',
+	languages: ['en'],
+	gender: 'all',
+	includeSurname: false,
+	includeKind: '',
+	kindStyle: '',
 	count: 8,
 	realism: 'real',
 	minLength: '',
@@ -538,6 +565,18 @@ function drawMachine(platform) {
  */
 const companyPossible = computed(() => ['all', 'company'].includes(organization.type));
 
+/** The five fictional generators, by the name picked. */
+const FICTIONAL_FUNCTIONS = {
+	randFictionalName,
+	randFictionalCountry,
+	randFictionalRegion,
+	randFictionalCity,
+	randFictionalDistrict
+};
+
+/** Whether the fiction tab draws names, which take a gender and a surname rather than a kind. */
+const fictionalName = computed(() => fiction.fn === 'randFictionalName');
+
 /** `randLocation` and the four that hand back one level of it, by the name picked. */
 const LOCATION_FUNCTIONS = { randLocation, randCountry, randRegion, randCity, randDistrict };
 
@@ -671,6 +710,29 @@ const options = computed(() => {
 		if (num(organization.maxLength) !== undefined) out.maxLength = num(organization.maxLength);
 		if (organization.startsWith) out.startsWith = organization.startsWith;
 		if (organization.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'fiction') {
+		// In the order the picker lists them, which is the order `forms` keeps.
+		const languages = WORD_LANGUAGES.filter((code) => fiction.languages.includes(code));
+
+		if (languages.length === 1) out.language = languages[0];
+		if (languages.length > 1) out.language = languages;
+		// A name takes a gender and a surname, a place a kind; neither takes the other's.
+		if (fictionalName.value && fiction.gender !== 'all') out.gender = fiction.gender;
+		if (fictionalName.value && fiction.includeSurname) out.includeSurname = true;
+		if (!fictionalName.value && fiction.includeKind) {
+			out.includeKind = fiction.includeKind === 'on';
+		}
+		if (!fictionalName.value && fiction.kindStyle) out.kindStyle = fiction.kindStyle;
+		if (fiction.count !== 1) out.count = Number(fiction.count);
+		if (fiction.realism !== 'real') out.realism = fiction.realism;
+		if (num(fiction.minLength) !== undefined) out.minLength = num(fiction.minLength);
+		if (num(fiction.maxLength) !== undefined) out.maxLength = num(fiction.maxLength);
+		if (fiction.startsWith) out.startsWith = fiction.startsWith;
+		if (fiction.unique) out.unique = true;
 
 		return out;
 	}
@@ -944,6 +1006,21 @@ function generate() {
 		} else {
 			items = randOrganization(config);
 		}
+	} else if (tab.value === 'fiction') {
+		const draw = FICTIONAL_FUNCTIONS[fiction.fn];
+
+		if (details.value) {
+			const drawn = draw({ ...config, output: 'detail' });
+
+			// The same name or place in every language asked for, one entry a language.
+			items = drawn.map((detail) => (fictionalName.value ? detail.name : detail.place));
+			meta = drawn.map((detail) => [
+				fictionalName.value ? ['gender', detail.gender] : ['kind', String(detail.kind)],
+				...Object.entries(detail.forms)
+			]);
+		} else {
+			items = draw(config);
+		}
 	} else if (tab.value === 'location') {
 		const draw = LOCATION_FUNCTIONS[place.fn];
 
@@ -1022,10 +1099,10 @@ function generate() {
 // Not in `setup`: see the note at the top about SSR.
 onMounted(generate);
 
-// Switching tab, turning details on or picking another location function is a
-// different question, so it is asked straight away rather than leaving the
-// previous answer on screen.
-watch([tab, details, () => place.fn, () => system.platform], generate);
+// Switching tab, turning details on or picking another location or fictional
+// function is a different question, so it is asked straight away rather than
+// leaving the previous answer on screen.
+watch([tab, details, () => place.fn, () => fiction.fn, () => system.platform], generate);
 
 /**
  * Whether an empty location result is the level missing rather than a filter
@@ -1134,7 +1211,12 @@ const code = computed(() => {
 		return systemCode();
 	}
 
-	const generator = tab.value === 'location' ? place.fn : GENERATORS[tab.value];
+	const generator =
+		tab.value === 'location'
+			? place.fn
+			: tab.value === 'fiction'
+				? fiction.fn
+				: GENERATORS[tab.value];
 	const call = `${generator}(${objectLiteral(generatorOptions.value)})`;
 
 	if (!decorating.value) {
@@ -1540,6 +1622,94 @@ async function copy() {
 
 				<label class="randino-demo-check">
 					<input v-model="organization.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'fiction'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span>{{ t(locale, 'demoFunction') }}</span>
+					<select v-model="fiction.fn">
+						<option v-for="item in Object.keys(FICTIONAL_FUNCTIONS)" :key="item" :value="item">
+							{{ item }}
+						</option>
+					</select>
+				</label>
+
+				<fieldset class="randino-demo-languages">
+					<legend><code>language</code></legend>
+					<div class="randino-demo-language-list">
+						<label v-for="code_ in WORD_LANGUAGES" :key="code_" class="randino-demo-check">
+							<input v-model="fiction.languages" type="checkbox" :value="code_" />
+							<span>{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}</span>
+						</label>
+					</div>
+					<p class="randino-demo-hint">{{ t(locale, 'demoFictionLanguages') }}</p>
+				</fieldset>
+
+				<label class="randino-demo-field" :class="{ 'is-off': !fictionalName }">
+					<span><code>gender</code></span>
+					<select v-model="fiction.gender" :disabled="!fictionalName">
+						<option value="all">all</option>
+						<option value="male">male</option>
+						<option value="female">female</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field" :class="{ 'is-off': fictionalName }">
+					<span><code>includeKind</code></span>
+					<select v-model="fiction.includeKind" :disabled="fictionalName">
+						<option value="">random</option>
+						<option value="on">on</option>
+						<option value="off">off</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field" :class="{ 'is-off': fictionalName }">
+					<span><code>kindStyle</code></span>
+					<select v-model="fiction.kindStyle" :disabled="fictionalName">
+						<option value="">—</option>
+						<option value="borrowed">borrowed</option>
+						<option value="translated">translated</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="fiction.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>realism</code></span>
+					<select v-model="fiction.realism">
+						<option value="real">real</option>
+						<option value="mixed">mixed</option>
+						<option value="invented">invented</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>minLength</code></span>
+					<input v-model="fiction.minLength" type="number" min="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>maxLength</code></span>
+					<input v-model="fiction.maxLength" type="number" min="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>startsWith</code></span>
+					<input v-model="fiction.startsWith" type="text" maxlength="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-check" :class="{ 'is-off': !fictionalName }">
+					<input v-model="fiction.includeSurname" type="checkbox" :disabled="!fictionalName" />
+					<code>includeSurname</code>
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="fiction.unique" type="checkbox" />
 					<code>unique</code>
 				</label>
 			</div>

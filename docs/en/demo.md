@@ -1,6 +1,6 @@
 # Demo
 
-Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate` and `randPhone` actually take, and the system values tab puts a sample machine together from the system generators, one a line. The code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
+Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, the fictional generators, `randDate` and `randPhone` actually take, and the system values tab puts a sample machine together from the system generators, one a line. The code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
 
 <Demo />
 
@@ -32,6 +32,11 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Leave `type` on `all` and pick an `industry`. Only companies come back, because an industry is a company's.
 - Set `language` to `ko` and `minLength` to `12`. A Korean organization is usually shorter, so the long kinds are chosen, a company with its legal form or a 종합사회복지관, rather than a short name stretched.
 - Turn on the details, set `language` to `ko` and `startsWith` to `해`. The name starts with it even where `주식회사` is written in front.
+- On the fiction tab, tick `en`, `ko` and `ja` and turn on the details. Each name comes back in one of the three and is written in all of them beside it, `Artemis`, `아르테미스` and `アルテミス`, because a fictional name is one name however it is spelled.
+- Set `realism` to `invented` there. The names are put together out of syllables rather than drawn, and the Korean and Japanese spellings are joined along with the Latin one: `Ed` and `lyn` make `에들린`, with the doubled `ㄹ` Korean writes for an `l`.
+- Tick `ja` alone and type `あ` into `startsWith`. The names start with `ア`, because a made-up name is written in katakana and a hiragana prefix is read as one.
+- Pick `randFictionalCountry`, tick `ko` and set `includeKind` to `on`. A country's kind is translated, `왕국` and `제국`; set `kindStyle` to `borrowed` and the same countries become `킹덤` and `엠파이어` where Korean has a borrowed word in use, while `공국` stays as it is.
+- Pick `randFictionalDistrict` with `ko`. A district keeps its English word by default, `파크`, `베이`, `스퀘어`, the way `Central Park` does; `kindStyle` on `translated` writes `공원`, `만` and `광장` instead.
 - On the dates tab, set `minDate` and `maxDate` both to `2024-02`. Every date lands in February 2024 and its last day is the 29th, because a string bound names the whole month rather than its first millisecond.
 - Set `unit` to `month`, `count` to `20` and turn on `unique`. Twelve come back, however often you press Generate, since a year has no more.
 - Type `YYYY년 M월 D일 A h:mm` into `format`, then `[Day] D` and `Day D`. Text outside brackets is read for tokens, so the last one comes out as something like `5amy 5`: both `D` and `a` are tokens.
@@ -53,6 +58,6 @@ The page draws **without a seed**, so pressing Generate twice gives two differen
 ## Where to go next
 
 - [Getting started](./guide/getting-started) — installing it, for whichever of the three packages you use.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender), [`randOrganization`](./organization/rand-organization), [`randDate`](./date/rand-date) and [`randPhone`](./phone/rand-phone) — every option in the panel above, written out.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender), [`randOrganization`](./organization/rand-organization), [`randFictionalName`](./fictional/rand-fictional-name), [`randFictionalCountry`](./fictional/rand-fictional-country), [`randDate`](./date/rand-date) and [`randPhone`](./phone/rand-phone) — every option in the panel above, written out.
 - [`randOs`](./os/rand-os), [`randDevice`](./device/rand-device), [`randCpu`](./cpu/rand-cpu), [`randGpu`](./gpu/rand-gpu), [`randArchitecture`](./architecture/rand-architecture), [`randRam`](./ram/rand-ram), [`randDiskSize`](./disk/rand-disk-size) and the other system generators — what the system values tab keeps at its defaults.
 - [Supported languages](./guide/languages) — what each language can and cannot do.

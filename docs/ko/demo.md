@@ -1,6 +1,6 @@
 # 데모
 
-아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate`, `randPhone`이 실제로 받는 옵션이고, 시스템 값 탭은 시스템 값 생성 함수들로 예시 기기를 한 줄에 한 대씩 만듭니다. 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 **생성** 버튼을 누를 때마다 새로 뽑힙니다.
+아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, 가상 이름·장소 함수들, `randDate`, `randPhone`이 실제로 받는 옵션이고, 시스템 값 탭은 시스템 값 생성 함수들로 예시 기기를 한 줄에 한 대씩 만듭니다. 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 **생성** 버튼을 누를 때마다 새로 뽑힙니다.
 
 <Demo />
 
@@ -32,6 +32,11 @@
 - `type`을 `all`로 둔 채 `industry`를 골라 보세요. 업종은 회사에만 있으므로 회사만 나옵니다.
 - `language`를 `ko`, `minLength`를 `12`로 두어 보세요. 한국어 조직 이름은 대개 그보다 짧아서, 짧은 이름을 늘이지 않고 법인 형태가 붙은 회사나 종합사회복지관처럼 긴 종류를 고릅니다.
 - 상세 정보를 켜고 `language`를 `ko`, `startsWith`를 `해`로 두어 보세요. 앞에 `주식회사`가 붙어도 이름은 그 글자로 시작합니다.
+- 가상 세계 탭에서 `en`, `ko`, `ja`를 고르고 상세 정보를 켜 보세요. 이름은 셋 중 한 언어로 나오고, 옆에 세 언어 표기가 모두 붙습니다(`Artemis`, `아르테미스`, `アルテミス`). 가상의 이름은 어떻게 적든 한 이름이기 때문입니다.
+- 같은 탭에서 `realism`을 `invented`로 바꿔 보세요. 이름을 뽑지 않고 음절을 이어 만들며, 라틴 문자 표기와 함께 한국어와 일본어 표기도 이어 붙입니다. `Ed`와 `lyn`은 `에들린`이 되는데, 한국어가 `l`을 `ㄹㄹ`로 적기 때문입니다.
+- `ja`만 고르고 `startsWith`에 `あ`를 넣어 보세요. 이름이 `ア`로 시작합니다. 지어낸 이름은 가타카나로 적으므로 히라가나로 준 글자도 가타카나로 읽습니다.
+- `randFictionalCountry`를 고르고 `ko`를 고른 뒤 `includeKind`를 `on`으로 두어 보세요. 국가의 종류는 `왕국`, `제국`처럼 옮겨 적습니다. `kindStyle`을 `borrowed`로 바꾸면 한국어에 쓰이는 외래어가 있는 종류는 `킹덤`, `엠파이어`가 되고, `공국`은 그대로 남습니다.
+- `randFictionalDistrict`를 고르고 `ko`를 골라 보세요. 구역의 종류는 `Central Park`처럼 기본으로 영어 단어를 그대로 써서 `파크`, `베이`, `스퀘어`가 됩니다. `kindStyle`을 `translated`로 두면 `공원`, `만`, `광장`으로 적습니다.
 - 날짜 탭에서 `minDate`와 `maxDate`를 모두 `2024-02`로 두세요. 모든 날짜가 2024년 2월 안에 들고 마지막 날은 29일입니다. 문자열 경계는 그달의 첫 밀리초가 아니라 그달 전체를 가리키기 때문입니다.
 - `unit`을 `month`, `count`를 `20`으로 두고 `unique`를 켜 보세요. 몇 번을 눌러도 12개만 나옵니다. 1년에는 열두 달뿐이기 때문입니다.
 - `format`에 `YYYY년 M월 D일 A h:mm`을 넣고, 이어서 `[Day] D`와 `Day D`를 넣어 보세요. 대괄호 밖의 글자는 토큰으로 읽히므로, 마지막 형식은 `5amy 5`처럼 나옵니다. `D`와 `a`가 모두 토큰이기 때문입니다.
@@ -53,6 +58,6 @@
 ## 다음으로 볼 것 {#where-to-go-next}
 
 - [시작하기](./guide/getting-started) — 세 패키지 중 쓰는 것으로 설치하기.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender), [`randOrganization`](./organization/rand-organization), [`randDate`](./date/rand-date), [`randPhone`](./phone/rand-phone) — 위 패널에 있는 모든 옵션의 설명.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender), [`randOrganization`](./organization/rand-organization), [`randFictionalName`](./fictional/rand-fictional-name), [`randFictionalCountry`](./fictional/rand-fictional-country), [`randDate`](./date/rand-date), [`randPhone`](./phone/rand-phone) — 위 패널에 있는 모든 옵션의 설명.
 - [`randOs`](./os/rand-os), [`randDevice`](./device/rand-device), [`randCpu`](./cpu/rand-cpu), [`randGpu`](./gpu/rand-gpu), [`randArchitecture`](./architecture/rand-architecture), [`randRam`](./ram/rand-ram), [`randDiskSize`](./disk/rand-disk-size)와 그 밖의 시스템 값 생성 함수 — 시스템 값 탭이 기본값으로 두는 옵션의 설명.
 - [지원 언어](./guide/languages) — 언어마다 할 수 있는 것과 할 수 없는 것.

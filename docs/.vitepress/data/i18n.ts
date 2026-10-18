@@ -191,6 +191,11 @@ const strings = {
 	demoAges: { ko: '나이', en: 'Ages' },
 	demoGenders: { ko: '성별', en: 'Genders' },
 	demoOrganizations: { ko: '회사·기관', en: 'Organizations' },
+	demoFiction: { ko: '가상 세계', en: 'Fiction' },
+	demoFictionLanguages: {
+		ko: '고르지 않으면 모든 언어입니다. 여러 개를 고르면 결과마다 하나를 골라 쓰고, 상세 출력에는 고른 언어로 모두 적습니다.',
+		en: 'None picked is every language. Several draw one per result, and the detail writes each result in all of them.'
+	},
 	demoDates: { ko: '날짜', en: 'Dates' },
 	demoPhones: { ko: '전화번호', en: 'Phone numbers' },
 	demoSystem: { ko: '시스템 값', en: 'System values' },
