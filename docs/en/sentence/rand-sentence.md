@@ -1167,7 +1167,7 @@ Each word of `include` goes in the first sentence that can carry it, which puts 
 
 Every other generator here keeps person names out on purpose. A nickname is never built from one, and that rule is the whole point of keeping names and words apart. A sentence is the exception: <Lang js="includeName" py="include_name" dart="includeName" code /> writes a generated name where the sentence has room for a person.
 
-Left out, it is a coin flip per result rather than per sentence, because a paragraph either has a person in it or does not. Set it yourself and that answer stands.
+Left out, it is a coin flip per result rather than per sentence, because a paragraph either has a person in it or does not. A name is one short word where a noun phrase writes an article, a modifier and a noun, so a drawn name also gives way to the length range: the result has none when no named result could reach the range, and one that has a name and misses it is written again without one, the closer of the two kept. Set it yourself and that answer stands, whatever the range.
 
 ::: lang js
 
