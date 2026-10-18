@@ -1568,11 +1568,14 @@ void main() {
         reason: 'questions and exclamations are ${(marked * 100).toStringAsFixed(1)}%',
       );
 
-      // And what a sentence opens on is written once per result. Read in Korean
-      // alone, which writes neither an opening mark nor a capital, so what a
-      // sentence starts with is the word itself.
+      // And what a sentence opens on is written once per result, and so is one
+      // that starts with it: `그런데` and `그런데 그때` say one word twice. Read in
+      // Korean alone, which writes neither an opening mark nor a capital, so what
+      // a sentence starts with is the word itself — the longest one it starts with.
       final data = sentenceData[WordLanguage.ko]!;
-      final words = <String>[...connectivesOf(WordLanguage.ko), ...data.interjections];
+      final words = <String>[...connectivesOf(WordLanguage.ko), ...data.interjections]
+        ..sort((a, b) => b.length.compareTo(a.length));
+      bool repeats(String a, String b) => a == b || a.startsWith('$b ') || b.startsWith('$a ');
       var seen = 0;
 
       for (final detail in randSentenceDetails(
@@ -1589,7 +1592,11 @@ void main() {
             }(),
         ];
 
-        expect(openers.toSet(), hasLength(openers.length), reason: detail.sentence);
+        for (var i = 0; i < openers.length; i++) {
+          for (final other in openers.skip(i + 1)) {
+            expect(repeats(openers[i], other), isFalse, reason: detail.sentence);
+          }
+        }
 
         seen += openers.length;
       }

@@ -766,7 +766,10 @@ type Flow = {
 	mark: SentenceMark | null;
 	/** Whether it opened on a connective or an interjection. */
 	opened: boolean;
-	/** Every one the result has already used, so that none of them is written twice. */
+	/**
+	 * Every one the result has already used, so that none of them is written
+	 * twice, nor one that starts with another (`그런데` and `그런데 그때`).
+	 */
 	openers: Set<string>;
 	/** Whether it named the topic rather than standing a pronoun where it was. */
 	repeated: boolean;
@@ -4593,7 +4596,7 @@ function openerFor(
 ): string {
 	const spare = room - data.space.length - shortest;
 	const fitting = (pool: WordPool) =>
-		pool.filter((word) => word.length <= spare && !flow.openers.has(word));
+		pool.filter((word) => word.length <= spare && !reopens(word, flow.openers));
 	const damp = flow.opened ? OPENER_DAMP : 1;
 
 	if (mark === 'exclamation') {
@@ -4611,6 +4614,23 @@ function openerFor(
 	const usable = fitting(connectivesOf(data, follow, mark, kinds));
 
 	return usable.length && chance(CONNECTIVE_CHANCE * damp) ? pick(usable) : '';
+}
+
+/**
+ * Whether `word` would open a sentence on what the result already opened one on:
+ * the same connective, or one that starts with the other as a whole word.
+ * `그런데` and `그런데 그때` are two connectives and one word said twice, and so
+ * are `Bỗng` and `Bỗng nhiên`, `Dopo` and `Dopo un po'`. Two that only share a
+ * word in front, `그 순간` and `그 무렵`, are two openers.
+ */
+function reopens(word: string, used: ReadonlySet<string>): boolean {
+	for (const opener of used) {
+		if (word === opener || word.startsWith(`${opener} `) || opener.startsWith(`${word} `)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**

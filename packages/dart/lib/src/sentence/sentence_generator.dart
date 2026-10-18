@@ -887,7 +887,8 @@ class _Flow {
   /// Whether it opened on a connective or an interjection.
   bool opened = false;
 
-  /// Every one the result has already used, so that none is written twice.
+  /// Every one the result has already used, so that none is written twice, nor
+  /// one that starts with another (`그런데` and `그런데 그때`).
   final Set<String> openers = <String>{};
 
   /// Whether it named the topic rather than standing a pronoun where it was.
@@ -4704,6 +4705,15 @@ _ObjectReference? _objectReferenceFor(
   return _ObjectReference(noun, pick(pool), pronouns.clitic);
 }
 
+/// Whether [word] would open a sentence on what the result already opened one
+/// on: the same connective, or one that starts with the other as a whole word.
+/// `그런데` and `그런데 그때` are two connectives and one word said twice, and so
+/// are `Bỗng` and `Bỗng nhiên`, `Dopo` and `Dopo un po'`. Two that only share a
+/// word in front, `그 순간` and `그 무렵`, are two openers.
+bool _reopens(String word, Set<String> used) => used.any(
+  (opener) => word == opener || word.startsWith('$opener ') || opener.startsWith('$word '),
+);
+
 /// What a sentence opens on: an interjection when it is an exclamation, and a
 /// connective when it follows another.
 ///
@@ -4726,7 +4736,7 @@ String _openerFor(
   final spare = room - data.space.length - shortest;
 
   List<String> fitting(WordPool pool) => pool
-      .where((word) => word.length <= spare && !flow.openers.contains(word))
+      .where((word) => word.length <= spare && !_reopens(word, flow.openers))
       .toList(growable: false);
 
   final damp = flow.opened ? _openerDamp : 1.0;

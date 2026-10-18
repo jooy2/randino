@@ -1520,11 +1520,16 @@ describe('Sentence', () => {
 		assert.ok(share('statement') > 0.4, `statements are ${(share('statement') * 100).toFixed(1)}%`);
 		assert.ok(marked < 0.25, `questions and exclamations are ${(marked * 100).toFixed(1)}%`);
 
-		// And what a sentence opens on is written once per result. Read in Korean
-		// alone, which writes neither an opening mark nor a capital, so what a
-		// sentence starts with is the word itself.
+		// And what a sentence opens on is written once per result, and so is one
+		// that starts with it: `그런데` and `그런데 그때` say one word twice. Read in
+		// Korean alone, which writes neither an opening mark nor a capital, so what
+		// a sentence starts with is the word itself — the longest one it starts with.
 		const data = SENTENCE_DATA.ko;
-		const words = [...connectivesOf('ko'), ...data.interjections];
+		const words = [...connectivesOf('ko'), ...data.interjections].sort(
+			(a, b) => b.length - a.length
+		);
+		const repeats = (a: string, b: string) =>
+			a === b || a.startsWith(`${b} `) || b.startsWith(`${a} `);
 		let seen = 0;
 
 		for (const detail of randSentence({
@@ -1538,7 +1543,11 @@ describe('Sentence', () => {
 				.map((sentence) => words.find((word) => sentence.startsWith(word + data.space)))
 				.filter((word): word is string => Boolean(word));
 
-			assert.strictEqual(new Set(openers).size, openers.length, detail.sentence);
+			openers.forEach((opener, i) => {
+				for (const other of openers.slice(i + 1)) {
+					assert.ok(!repeats(opener, other), detail.sentence);
+				}
+			});
 
 			seen += openers.length;
 		}

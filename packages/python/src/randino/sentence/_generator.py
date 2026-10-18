@@ -1007,7 +1007,8 @@ class Flow:
     """Whether it opened on a connective or an interjection."""
 
     openers: set[str] = field(default_factory=set)
-    """Every one the result has already used, so that none is written twice."""
+    """Every one the result has already used, so that none is written twice, nor one
+    that starts with another (`그런데` and `그런데 그때`)."""
 
     repeated: bool = True
     """Whether it named the topic rather than standing a pronoun where it was.
@@ -4458,6 +4459,27 @@ def _object_reference_for(
     return ObjectReference(noun, pick(pool), pronouns.clitic)
 
 
+def _reopens(word: str, used: set[str]) -> bool:
+    """Whether `word` would open a sentence on what the result already opened one on.
+
+    That is the same connective, or one that starts with the other as a whole word.
+    `그런데` and `그런데 그때` are two connectives and one word said twice, and so are
+    `Bỗng` and `Bỗng nhiên`, `Dopo` and `Dopo un po'`. Two that only share a word in
+    front, `그 순간` and `그 무렵`, are two openers.
+
+    Args:
+        word: The connective or interjection a sentence might open on.
+        used: What the result's sentences have opened on so far.
+
+    Returns:
+        True when `word` repeats one of them.
+    """
+    return any(
+        word == opener or word.startswith(f"{opener} ") or opener.startswith(f"{word} ")
+        for opener in used
+    )
+
+
 def _opener_for(
     data: SentenceLanguageData,
     mark: SentenceMark,
@@ -4492,8 +4514,10 @@ def _opener_for(
     spare = room - len(data.space) - shortest
 
     def fitting(pool: WordPool) -> tuple[str, ...]:
-        # Never the same one twice in one result.
-        return tuple(word for word in pool if len(word) <= spare and word not in flow.openers)
+        # Never the same one twice in one result, nor one that starts with another.
+        return tuple(
+            word for word in pool if len(word) <= spare and not _reopens(word, flow.openers)
+        )
 
     damp = OPENER_DAMP if flow.opened else 1
 

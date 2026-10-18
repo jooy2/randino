@@ -1425,11 +1425,16 @@ def test_a_paragraph_is_mostly_statements_and_opens_each_line_its_own_way() -> N
     assert share("statement") > 0.4, f"statements are {share('statement') * 100:.1f}%"
     assert marked < 0.25, f"questions and exclamations are {marked * 100:.1f}%"
 
-    # And what a sentence opens on is written once per result. Read in Korean alone, which
+    # And what a sentence opens on is written once per result, and so is one that starts
+    # with it: `그런데` and `그런데 그때` say one word twice. Read in Korean alone, which
     # writes neither an opening mark nor a capital, so what a sentence starts with is the
-    # word itself.
+    # word itself — the longest one it starts with.
     data = SENTENCE_DATA["ko"]
-    words = (*connectives_of("ko"), *data.interjections)
+    words = sorted((*connectives_of("ko"), *data.interjections), key=len, reverse=True)
+
+    def repeats(a: str, b: str) -> bool:
+        return a == b or a.startswith(f"{b} ") or b.startswith(f"{a} ")
+
     seen = 0
 
     for detail in rand_sentence(language="ko", sentences=6, count=300, output="detail"):
@@ -1449,7 +1454,9 @@ def test_a_paragraph_is_mostly_statements_and_opens_each_line_its_own_way() -> N
             if found is not None
         ]
 
-        assert len(set(openers)) == len(openers), detail.sentence
+        for i, opener in enumerate(openers):
+            for other in openers[i + 1 :]:
+                assert not repeats(opener, other), detail.sentence
 
         seen += len(openers)
 
