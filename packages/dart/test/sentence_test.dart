@@ -4274,8 +4274,10 @@ void main() {
     test('a result of three sentences lands in the middle of its range', () {
       // Asked for the middle of what three sentences can be, give or take a
       // tenth, a story fell short most of the time: its steps write short
-      // sentences, and the top it aimed at could not be reached. Every language
-      // now lands at least one time in three, and most of them nearly always.
+      // sentences, and the top it aimed at could not be reached. German fell short
+      // half the time even after that, because a name drawn into it left a verb
+      // and an adverbial to make up the length. Every language now lands at least
+      // one time in two, and most of them nearly always.
       var landed = 0;
       var drawn = 0;
 
@@ -4299,7 +4301,7 @@ void main() {
                 .length;
 
         expect(
-          inside * 3,
+          inside * 2,
           greaterThanOrEqualTo(results.length),
           reason: '${language.name}: $inside',
         );
@@ -4307,7 +4309,22 @@ void main() {
         drawn += results.length;
       }
 
-      expect(landed, greaterThanOrEqualTo(drawn * 0.75));
+      expect(landed, greaterThanOrEqualTo(drawn * 0.9));
+    });
+
+    test('a name the caller asked for stays where the result misses its range', () {
+      // A drawn name that misses is written again without one; one asked for is
+      // written whatever the range, the way a story the caller named is told.
+      final unnamed = randSentenceDetails(
+        language: WordLanguage.de,
+        sentences: 3,
+        minLength: 140,
+        maxLength: 192,
+        includeName: true,
+        count: sample,
+      ).where((detail) => detail.names.isEmpty).map((detail) => detail.sentence);
+
+      expect(unnamed, isEmpty);
     });
 
     test('sentenceLengthRange reports what the language can produce', () {

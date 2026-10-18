@@ -5150,11 +5150,7 @@ bool _timeSpent(List<_Built> built, int count) {
       named >= (share < 1 ? 1 : share);
 }
 
-/// Every sentence of one result, in order.
-///
-/// The range is shared out before the first of them is drawn, and the topic is
-/// taken from that first sentence — so what follows is about the same thing
-/// rather than another draw that happened to land beside it.
+/// One result: whether it has a person in it, and then every sentence of it.
 _Result _generateResult(WordLanguage language, _Settings settings) {
   final data = sentenceData[language]!;
   final modifierBounds = _modifierSpan(language);
@@ -5178,6 +5174,47 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
       !_personless(data, settings) &&
       (settings.includeName ??
           (_nameFits(data, frames, modifierBounds, settings, language) && chance(50)));
+  final result = _writeResult(language, data, frames, modifierBounds, settings, named);
+
+  // `_nameFits` asks whether every sentence at its longest reaches the range, and
+  // a result never writes every sentence at its longest. German writes a name, a
+  // verb and an adverbial or two at most — no object, no place, and a time in one
+  // sentence of three — so asked for the middle of what three of its sentences
+  // can be, a named result fell short five times in six. A name nobody asked for
+  // that missed is written again without one, and the closer of the two is kept,
+  // the way a story that missed is set beside a paragraph.
+  if (!named || settings.includeName != null) return result;
+
+  final target = _boundsFor(
+    language,
+    data,
+    frames,
+    _roomFor(language, false),
+    modifierBounds,
+    settings,
+  );
+  final missed = _distanceFrom(_lengthOf(data, result.built), target);
+
+  if (missed == 0) return result;
+
+  final plain = _writeResult(language, data, frames, modifierBounds, settings, false);
+
+  return _distanceFrom(_lengthOf(data, plain.built), target) < missed ? plain : result;
+}
+
+/// Every sentence of one result, in order, with a name or without.
+///
+/// The range is shared out before the first of them is drawn, and the topic is
+/// taken from that first sentence — so what follows is about the same thing
+/// rather than another draw that happened to land beside it.
+_Result _writeResult(
+  WordLanguage language,
+  SentenceLanguageData data,
+  List<SentenceFrame> frames,
+  LengthRange modifierBounds,
+  _Settings settings,
+  bool named,
+) {
   final settled = settings.includeName == named ? settings : settings.naming(named);
   // And the budget is measured against what a named result actually writes: one
   // word where a noun phrase would have written an article, a modifier and a noun.
