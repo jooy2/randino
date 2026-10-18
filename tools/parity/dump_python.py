@@ -9,7 +9,8 @@ import json
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from randino._internal.parse import NameToken, outline
+from randino._internal.parse import NameToken, outline, words
+from randino._internal.table import rows
 from randino.age.data import AGE_BANDS, AGE_CURVE, AGE_GROUPS, AGE_MAX_DEFAULT
 from randino.appstore.data import APP_STORES
 from randino.architecture.data import ARCHITECTURE_DATA, ARCHITECTURE_NAMINGS, ARCHITECTURES
@@ -46,6 +47,20 @@ from randino.disk.data import (
     DISK_TYPE_LABELS,
     DISK_TYPE_WEIGHTS,
     DISK_TYPES,
+)
+from randino.fictional.data import (
+    FICTIONAL_AVOID,
+    FICTIONAL_AVOID_INSIDE,
+    FICTIONAL_COMPOUNDS,
+    FICTIONAL_GIVEN_NAMES,
+    FICTIONAL_KIND_CHANCE,
+    FICTIONAL_KINDS,
+    FICTIONAL_MIDDLE_CHANCE,
+    FICTIONAL_PLACE_ENDINGS,
+    FICTIONAL_PLACES,
+    FICTIONAL_SURNAMES,
+    FICTIONAL_SYLLABLE_CHANCE,
+    FICTIONAL_SYLLABLES,
 )
 from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS, MIME_TOP_LEVELS
 from randino.gender.data import (
@@ -546,6 +561,11 @@ def organization_of(data: OrganizationLanguageData) -> dict[str, object]:
     }
 
 
+def table(source: str) -> list[list[str]]:
+    """A table as the rows and cells `rows` splits it into, in lists."""
+    return [list(cells) for cells in rows(source)]
+
+
 print(
     json.dumps(
         {
@@ -587,6 +607,22 @@ print(
                     }
                     for code, names in DATE_NAMES.items()
                 },
+            },
+            # Every fictional table is one string in every package, so it is compared as the
+            # rows and cells each package's own parser splits it into.
+            "fictional": {
+                "givenNames": table(FICTIONAL_GIVEN_NAMES),
+                "surnames": table(FICTIONAL_SURNAMES),
+                "syllables": table(FICTIONAL_SYLLABLES),
+                "placeEndings": table(FICTIONAL_PLACE_ENDINGS),
+                "compounds": table(FICTIONAL_COMPOUNDS),
+                "places": table(FICTIONAL_PLACES),
+                "kinds": table(FICTIONAL_KINDS),
+                "avoid": list(words(FICTIONAL_AVOID)),
+                "avoidInside": list(words(FICTIONAL_AVOID_INSIDE)),
+                "kindChance": dict(FICTIONAL_KIND_CHANCE),
+                "middleChance": FICTIONAL_MIDDLE_CHANCE,
+                "syllableChance": dict(FICTIONAL_SYLLABLE_CHANCE),
             },
             "organization": {
                 "types": list(ORGANIZATION_TYPES),

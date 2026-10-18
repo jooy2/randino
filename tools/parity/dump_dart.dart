@@ -17,6 +17,7 @@ import 'package:randino/src/date/data/index.dart';
 import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/device/data/index.dart';
 import 'package:randino/src/disk/data/index.dart';
+import 'package:randino/src/fictional/data/index.dart';
 import 'package:randino/src/file/data/index.dart';
 import 'package:randino/src/gender/data/index.dart';
 import 'package:randino/src/gpu/data/index.dart';
@@ -611,6 +612,26 @@ void main() {
               'meridiem': entry.value.meridiem,
               'meridiemLower': entry.value.meridiemLower,
             },
+        },
+      },
+      // Every fictional table is one string in every package, so it is compared
+      // as the rows and cells each package's own parser splits it into.
+      'fictional': <String, Object?>{
+        'givenNames': rows(fictionalGivenNames),
+        'surnames': rows(fictionalSurnames),
+        'syllables': rows(fictionalSyllables),
+        'placeEndings': rows(fictionalPlaceEndings),
+        'compounds': rows(fictionalCompounds),
+        'places': rows(fictionalPlaces),
+        'kinds': rows(fictionalKinds),
+        'avoid': words(fictionalAvoid),
+        'avoidInside': words(fictionalAvoidInside),
+        'kindChance': <String, Object?>{
+          for (final entry in fictionalKindChance.entries) entry.key.name: entry.value,
+        },
+        'middleChance': fictionalMiddleChance,
+        'syllableChance': <String, Object?>{
+          for (final entry in fictionalSyllableChance.entries) entry.key.name: entry.value,
         },
       },
       'organization': <String, Object?>{

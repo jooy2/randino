@@ -32,7 +32,21 @@ import {
 	DATE_NAMES,
 	DATE_UNITS,
 } from "../../packages/javascript/lib/date/data/index.js";
-import { outline } from "../../packages/javascript/lib/_internal/parse.js";
+import {
+	FICTIONAL_AVOID,
+	FICTIONAL_AVOID_INSIDE,
+	FICTIONAL_COMPOUNDS,
+	FICTIONAL_GIVEN_NAMES,
+	FICTIONAL_KIND_CHANCE,
+	FICTIONAL_KINDS,
+	FICTIONAL_MIDDLE_CHANCE,
+	FICTIONAL_PLACE_ENDINGS,
+	FICTIONAL_PLACES,
+	FICTIONAL_SURNAMES,
+	FICTIONAL_SYLLABLE_CHANCE,
+	FICTIONAL_SYLLABLES,
+} from "../../packages/javascript/lib/fictional/data/index.js";
+import { outline, rows, words } from "../../packages/javascript/lib/_internal/parse.js";
 import {
 	AFFIX_CHARSET,
 	AFFIX_LENGTH_DEFAULT,
@@ -274,6 +288,22 @@ console.log(
 					},
 				]),
 			),
+		},
+		// Every fictional table is one string in every package, so it is compared as
+		// the rows and cells each package's own parser splits it into.
+		fictional: {
+			givenNames: rows(FICTIONAL_GIVEN_NAMES),
+			surnames: rows(FICTIONAL_SURNAMES),
+			syllables: rows(FICTIONAL_SYLLABLES),
+			placeEndings: rows(FICTIONAL_PLACE_ENDINGS),
+			compounds: rows(FICTIONAL_COMPOUNDS),
+			places: rows(FICTIONAL_PLACES),
+			kinds: rows(FICTIONAL_KINDS),
+			avoid: [...words(FICTIONAL_AVOID)],
+			avoidInside: [...words(FICTIONAL_AVOID_INSIDE)],
+			kindChance: { ...FICTIONAL_KIND_CHANCE },
+			middleChance: FICTIONAL_MIDDLE_CHANCE,
+			syllableChance: { ...FICTIONAL_SYLLABLE_CHANCE },
 		},
 		// A synthesis carries its `kind` tag, and a language without places or numbers
 		// writes them as null, the way every other optional field is written.
