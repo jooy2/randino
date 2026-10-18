@@ -57,6 +57,11 @@ if TYPE_CHECKING:
         DiskTypeOption,
         DiskUnit,
         DiskUnitOption,
+        FictionalKindStyle,
+        FictionalLanguageOption,
+        FictionalNameDetail,
+        FictionalPlaceDetail,
+        FictionalPlaceKind,
         FileCategory,
         FileCategoryOption,
         FileExtensionDetail,
@@ -152,6 +157,13 @@ if TYPE_CHECKING:
     )
     from randino.device import DEVICE_TYPES, DEVICE_VENDORS, rand_device
     from randino.disk import DISK_TYPES, DISK_UNITS, rand_disk_size, rand_disk_type
+    from randino.fictional import (
+        rand_fictional_city,
+        rand_fictional_country,
+        rand_fictional_district,
+        rand_fictional_name,
+        rand_fictional_region,
+    )
     from randino.file import FILE_CATEGORIES, MIME_TOP_LEVELS, rand_file_extension, rand_mime_type
     from randino.gender import rand_gender
     from randino.gpu import GPU_VENDORS, rand_gpu
@@ -288,6 +300,11 @@ __all__ = [
     "DiskTypeOption",
     "DiskUnit",
     "DiskUnitOption",
+    "FictionalKindStyle",
+    "FictionalLanguageOption",
+    "FictionalNameDetail",
+    "FictionalPlaceDetail",
+    "FictionalPlaceKind",
     "FileCategory",
     "FileCategoryOption",
     "FileExtensionDetail",
@@ -379,6 +396,11 @@ __all__ = [
     "rand_district",
     "rand_drink",
     "rand_emotion",
+    "rand_fictional_city",
+    "rand_fictional_country",
+    "rand_fictional_district",
+    "rand_fictional_name",
+    "rand_fictional_region",
     "rand_file_extension",
     "rand_finance",
     "rand_food",
@@ -471,6 +493,11 @@ _HOMES: dict[str, str] = {
     "DiskUnit": "randino._types",
     "DiskUnitOption": "randino._types",
     "FILE_CATEGORIES": "randino.file",
+    "FictionalKindStyle": "randino._types",
+    "FictionalLanguageOption": "randino._types",
+    "FictionalNameDetail": "randino._types",
+    "FictionalPlaceDetail": "randino._types",
+    "FictionalPlaceKind": "randino._types",
     "FileCategory": "randino._types",
     "FileCategoryOption": "randino._types",
     "FileExtensionDetail": "randino._types",
@@ -586,6 +613,11 @@ _HOMES: dict[str, str] = {
     "rand_district": "randino.location",
     "rand_drink": "randino.word",
     "rand_emotion": "randino.word",
+    "rand_fictional_city": "randino.fictional",
+    "rand_fictional_country": "randino.fictional",
+    "rand_fictional_district": "randino.fictional",
+    "rand_fictional_name": "randino.fictional",
+    "rand_fictional_region": "randino.fictional",
     "rand_file_extension": "randino.file",
     "rand_finance": "randino.word",
     "rand_food": "randino.word",

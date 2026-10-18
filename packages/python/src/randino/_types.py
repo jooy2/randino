@@ -656,6 +656,150 @@ class OrganizationDetail:
     """The language the organization is written in."""
 
 
+FictionalLanguageOption = WordLanguageOption | Sequence[WordLanguage]
+"""The languages a fictional name or place is written in: one, several, or `"all"` of them.
+
+A fictional name is one name however it is written — `Artemis`, `아르테미스`, `アルテミス` —
+so a sequence does two things at once. The value form writes each result in one language
+of the sequence, drawn per result the way `"all"` draws one; the detail form also writes
+every result in every language of the sequence, under `forms`, in the order given. A
+language named twice counts once, and a sequence that names none of the nine is every one
+of them.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class FictionalNameDetail:
+    """A generated fictional name, written in every language the call asked for."""
+
+    name: str
+    """What the value form returns: the name in `language`."""
+
+    gender: NameGender
+    """The gender the given name was drawn for."""
+
+    language: WordLanguage
+    """The language `name` is written in."""
+
+    forms: dict[WordLanguage, str]
+    """The same name in every language the call asked for, in the order it asked for them.
+
+    `{"en": "Artemis", "ko": "아르테미스"}`. The languages written in Latin letters write a
+    name the way English does.
+    """
+
+
+FictionalPlaceKind = Literal[
+    "kingdom",
+    "empire",
+    "republic",
+    "principality",
+    "archduchy",
+    "duchy",
+    "federation",
+    "confederation",
+    "dominion",
+    "theocracy",
+    "isles",
+    "province",
+    "march",
+    "county",
+    "barony",
+    "highlands",
+    "lowlands",
+    "valley",
+    "forest",
+    "plains",
+    "coast",
+    "peninsula",
+    "moors",
+    "wilds",
+    "isle",
+    "frontier",
+    "city",
+    "town",
+    "port",
+    "harbor",
+    "falls",
+    "crossing",
+    "bridge",
+    "springs",
+    "landing",
+    "village",
+    "park",
+    "bay",
+    "hills",
+    "heights",
+    "square",
+    "quarter",
+    "gardens",
+    "market",
+    "docks",
+    "terrace",
+    "green",
+    "grove",
+    "end",
+    "row",
+]
+"""What kind of place a fictional place is, written beside its name.
+
+Each level has its own:
+
+- a country: `kingdom`, `empire`, `republic`, `principality`, `archduchy`, `duchy`,
+  `federation`, `confederation`, `dominion`, `theocracy`, `isles`;
+- a region: `province`, `march`, `county`, `barony`, `highlands`, `lowlands`, `valley`,
+  `forest`, `plains`, `coast`, `peninsula`, `moors`, `wilds`, `isle`, `frontier`;
+- a city: `city`, `town`, `port`, `harbor`, `falls`, `crossing`, `bridge`, `springs`,
+  `landing`, `village`;
+- a district: `park`, `bay`, `hills`, `heights`, `square`, `quarter`, `gardens`,
+  `market`, `docks`, `terrace`, `green`, `grove`, `end`, `row`, `village`.
+"""
+
+FictionalKindStyle = Literal["borrowed", "translated"]
+"""How the kind of a place is written in a language other than English.
+
+- `borrowed`: the English word, written in the language's own script — `에들린 킹덤`,
+  `グルーガー・パーク`, `Гругер-парк` — and unchanged in the languages written in Latin
+  letters (`Gruger Park`).
+- `translated`: the language's own word for it — `에들린 왕국`, `グルーガー公園`,
+  `Parque Gruger`.
+
+Left out, a language writes a kind the way it writes a real foreign place: the kind of a
+country or a region is translated (`에들린 왕국`, `Reino de Edlin`, `Долина Сильверфен`,
+the way `Death Valley` is `Valle de la Muerte`), and the kind of a city or a district
+keeps its English word (`그루거 파크`, `Gruger Park`, the way `Central Park` and `Pearl
+Harbor` do). Chinese translates every kind whatever this says, because it never writes
+one by its sound, and a language with no borrowed word in use for a kind writes its own
+either way: Korean has no `프로빈스`.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class FictionalPlaceDetail:
+    """A generated fictional place, written in every language the call asked for."""
+
+    place: str
+    """What the value form returns: the place in `language`, its kind and all."""
+
+    name: str
+    """The place's own name in `language`, without its kind: `에들린` for `에들린 왕국`."""
+
+    kind: FictionalPlaceKind | None
+    """The kind of place written beside the name, or None for none."""
+
+    level: LocationLevel
+    """Which level of a map the place is: a country, a region, a city or a district."""
+
+    language: WordLanguage
+    """The language `place` is written in."""
+
+    forms: dict[WordLanguage, str]
+    """The same place in every language the call asked for, in the order it asked for them.
+
+    `{"en": "Kingdom of Edlin", "ko": "에들린 왕국"}`.
+    """
+
+
 DateUnit = Literal["year", "month", "day", "hour", "minute", "second", "millisecond"]
 """One part of a date, largest first.
 
