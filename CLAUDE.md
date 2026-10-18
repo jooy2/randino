@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders**, **organizations**, **dates** and **phone numbers**, per language, and the **system values** a sample machine is described by. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders**, **organizations**, **dates**, **phone numbers** and the **names and places of a fictional world**, per language, and the **system values** a sample machine is described by. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
@@ -16,6 +16,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Dates** are instants drawn evenly from a range and written out in UTC (`2024-03-15T14:07:32.481Z`, `2024년 3월 15일`), by a format of the caller's own. `unit` hands back one part of a date as a number instead — `minute` is `0` to `59` — read off a drawn date so it keeps to the range. Its `language` writes only the month and weekday names and the half of the day, and defaults to `'en'` rather than `'all'`: a format is written in one language. `minDate` / `maxDate`, `format`, `unit` and `utcOffset` are its own options.
 - **Phone numbers** are written the way their country writes them (`010-4821-####`, `(415) 726-####`, `8 (912) 345-##-##`, the last four digits hidden here the way every page hides them), for the country each word language is spoken in first. Each opens on a block the country's numbering plan really gives out and ends on random digits, so **a drawn number can by chance be somebody's** — the docs and the doc comments say so, and say never to call or text one. `randPhone` takes `country` in place of `language`, and `type`, `includeCountryCode`, `separator` and `fictional` are its own options.
 - **System values** describe a sample machine with real products, the one place the library does not invent: an operating system from `randOs` (`Windows 11 Pro 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`) a phone, tablet or laptop from `randDevice` (`Apple iPhone 15 Pro`, `Lenovo ThinkPad X1 Carbon Gen 11`), its processor and graphics from `randCpu` and `randGpu` (`Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`), the architecture it runs from `randArchitecture` (`x86_64`), the memory one is sold with and its kind from `randRam` (`16 GB`, `DDR5`), the kind and size of its storage from `randDiskType` and `randDiskSize` (`SSD`, `1 TB`), the size of its screen from `randResolution` (`1920x1080`), the version numbers of its software from `randVersion` (`2.14.3`, `2024.3.1`), the store its apps come from, from `randAppStore` (`Google Play Store`, `Steam`), the extensions of its files from `randFileExtension` (`.pdf`, `.png`), and the MIME types they are served as from `randMimeType` (`application/pdf`). Apart from a version number, which no catalog could list and which is drawn instead, nothing is made up — every value is a release that came out, written by the name it was released under — so none of them takes a `language`, and they share `platform` (`desktop` or `mobile`) and, where a value has a release year, `minYear` / `maxYear`. The names are the products' own and belong to their owners; the docs say so on every page that lists them.
+- **Fictional names and places** are what a story or a game names its characters and its map (`Alice`, `Arsis`, `Kingdom of Edlin`, `Gruger Park`), not what real people in one country are called: `randFictionalName`, and `randFictionalCountry` / `randFictionalRegion` / `randFictionalCity` / `randFictionalDistrict`. A name is spelled in Latin letters first and written by its sound in every other language (`Artemis`, `아르테미스`, `アルテミス`), so every entry of their datasets carries five spellings, one per script, and `language` may be a list whose every language the detail writes under `forms`. They are not `randName` at `realism: 'invented'`, which still reads like one real language, and they carry no name that belongs to one well-known work. See `packages/javascript/lib/fictional/CLAUDE.md`.
 - **Organizations** are companies, schools, offices and associations that do not exist (`(주)새솔테크`, `Westbrook High School`, `Гимназия № 135`), each written the way its language writes that kind. Nothing about them is real, and that is the requirement rather than a limitation: the stems are chosen to be nobody's brand, and **no organization is ever built from a person name** — a surname with a legal form behind it is exactly how famous companies are named.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared, along with `collectFrom`, which draws a catalog's results out of the list of them. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
@@ -92,6 +93,18 @@ lib/
     dateGenerator.ts        # internal: the range, the ISO 8601 reader, the format writer
     data/index.ts           # the default range, the floor and ceiling, the default format, the names
     data/constants.ts       # DATE_UNITS
+  fictional/
+    index.ts
+    randFictionalName.ts    # public: string[], or FictionalNameDetail[] on `output: 'detail'`
+    randFictionalCountry.ts …  # public: one per level — country, region, city, district
+    spelling.ts             # internal: the five scripts, the joins, the Korean ㄹ rule
+    pools.ts                # internal: the tables parsed on first use, `assemble`, the avoid lists
+    options.ts              # internal: the language list, the prefix per script, the length range
+    nameGenerator.ts        # internal: a given name and a surname, each drawn or invented
+    placeGenerator.ts       # internal: a name and a kind, the kind in each language's template
+    data/
+      index.ts              # the chances, written by hand in all three packages
+      names.ts syllables.ts compounds.ts places.ts kinds.ts avoid.ts   # tables, emitted to the ports
   file/
     index.ts
     randFileExtension.ts    # public: string[], or FileExtensionDetail[] on `output: 'detail'`
@@ -317,6 +330,8 @@ lib/
     date/                   # mirrors lib/date, plus `randDateUnit` and `randDateDetails`
     decorate/               # mirrors lib/decorate, plus the `…All` list forms
     device/                 # mirrors lib/device, plus `randDeviceDetails`
+    fictional/              # mirrors lib/fictional, plus a `…Details` twin per function
+      data/                 # the tables GENERATED by tools/emit; index.dart by hand
     disk/                   # mirrors lib/disk, plus `randDiskTypeDetails` and `randDiskSizeDetails`
     file/                   # mirrors lib/file, plus `randFileExtensionDetails` and `randMimeTypeDetails`
     gender/                 # mirrors lib/gender, plus `randGenderDetails`
@@ -429,6 +444,8 @@ src/randino/
   decorate/                 # mirrors lib/decorate; `@overload` carries the shape
   device/                   # mirrors lib/device
   disk/                     # mirrors lib/disk
+  fictional/                # mirrors lib/fictional
+    data/                   # the tables GENERATED by tools/emit; __init__.py by hand
   file/                     # mirrors lib/file
   gender/                   # mirrors lib/gender
   gpu/                      # mirrors lib/gpu
@@ -524,12 +541,14 @@ docs/
       markdown.ts           # `<Lang>` and the option tables flattened to text, for llms and <meta>
       wordOptions.ts        # the rows `WordOptions.vue` draws and `llms-full.txt` writes
       locationOptions.ts    # the same for `LocationOptions.vue`
+      fictionalOptions.ts   # the same for `FictionalPlaceOptions.vue`
     llms.ts                 # `llms.txt` and `llms-full.txt`, written at build time
     theme/                  # the language switch, the packages menu, the demo, the CSS
       components/
         Demo.vue            # `/demo`, which runs the library in the reader's browser
         WordOptions.vue     # the option table `randWord` and its thirty-seven share
         LocationOptions.vue # the option table `randLocation` and its four levels share
+        FictionalPlaceOptions.vue # the option table the four fictional place functions share
         Lang.vue …          # the `<Lang>` switch, the package marks and menus, the layout
   en/  ko/                  # the pages, mirrored
   scripts/
@@ -562,7 +581,7 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 The source is a folder per category, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the corner of the library it belongs to, so the groups are what a function **is**:
 
-- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing, **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`) or hand over something an option takes (`seededRandom`). Generators nests once more, into **General** — `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate` and `randPhone`, one per kind of value — **System**, the values a sample machine is described by, and two groups of one function with an argument decided: **Words**, the thirty-seven themed forms of `randWord`, and **Locations**, the four level forms of `randLocation`.
+- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing, **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`) or hand over something an option takes (`seededRandom`). Generators nests once more, into **General** — `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate` and `randPhone`, one per kind of value — **System**, the values a sample machine is described by, **Fiction**, the five functions for the names and places of a made-up world, and two groups of one function with an argument decided: **Words**, the thirty-seven themed forms of `randWord`, and **Locations**, the four level forms of `randLocation`.
 - **Behaviour** — the prose explaining how a generator's options behave, where there is enough of it to be its own page. `randName`, `randNickname` and `randSentence` have one each; `randWord` does not, because it draws one word and its API page says everything there is to say. Its own group rather than more entries under Guide, because it grows alongside Generators and Guide does not.
 
 `data/sidebar.ts` nests as deep as it is written: a `SidebarGroup`'s `items` are pages, or more groups, and `sidebarFor` recurses. **Three levels is the working limit** — API > Generators > Words is the deepest there is. The third level earns itself by splitting one group that had grown past reading, not by being a finer category: thirty-seven entries under Generators is a list nobody scans, and `randAnimal` is `randWord` with an argument decided, so `General` and `Words` is the split the functions themselves suggest. Anything that is merely *related* to a page still goes beside it, not under it.
@@ -571,9 +590,9 @@ The source is a folder per category, and the sidebar deliberately does not repea
 
 There is **no exception for a family of functions**. `randAnimal` … `randFurniture` are thirty-seven names for `randWord` with its `theme` decided, and they have thirty-seven pages: a reader looking for `randAnimal` should find `randAnimal`, not a section of somebody else's page. What that would cost — the same option table written out thirty times, in two locales, with three packages' types in every cell — is paid by `WordOptions.vue` instead, which draws the table once and takes a `theme` prop for the one page that accepts the option rather than answering it. **A page repeated across pages is a component, not a reason to merge the pages.**
 
-Those thirty-seven are the **Words** group nested inside Generators, beside **General** — in one list with it they would bury it. `LocationOptions.vue` does the same for `randLocation` and its four level pages, with a `level` prop. Words and Locations are the groups the navbar's API dropdown leaves out, and each says so itself with `sidebarOnly`: `navGroupsFor` gathers a group's pages through its subgroups, and skips the ones marked. The Markdown that is left on each page is what actually differs: what the theme is, and three code samples of it.
+Those thirty-seven are the **Words** group nested inside Generators, beside **General** — in one list with it they would bury it. `LocationOptions.vue` does the same for `randLocation` and its four level pages, with a `level` prop. `FictionalPlaceOptions.vue` draws the table the four fictional place pages share. Words and Locations are the groups the navbar's API dropdown leaves out, and each says so itself with `sidebarOnly`: `navGroupsFor` gathers a group's pages through its subgroups, and skips the ones marked. The Markdown that is left on each page is what actually differs: what the theme is, and three code samples of it.
 
-The navbar is the same lists — its API dropdown is Generators, System, Decorators and Utilities as four labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Generators there is **General**, because everything else in it is `sidebarOnly` or, like **System**, carries an `id` of its own and is a section of the dropdown in its own right; `pagesOf` leaves a subgroup with an `id` to that section. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
+The navbar is the same lists — its API dropdown is Generators, System, Decorators and Utilities as four labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Generators there is **General**, because everything else in it is `sidebarOnly` or, like **System** and **Fiction**, carries an `id` of its own and is a section of the dropdown in its own right; `pagesOf` leaves a subgroup with an `id` to that section. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
 
 ### The demo runs the real library
 
@@ -647,8 +666,9 @@ tools/
     dump_python.py
     README.md             # what canonical means, and what the check covers
   emit/
-    index.mjs             # writes the Dart and Python sentence datasets, then formats them
+    index.mjs             # writes the Dart and Python sentence and fictional datasets, then formats them
     sentence-data.ts      # the emitter: reads `SENTENCE_DATA`, writes each port's syntax
+    fictional-data.ts     # the same for the fictional tables, which are one string each
     README.md             # what it writes, what it leaves alone
   location/
     index.mjs             # writes all three packages' location datasets out of the publishers' files
@@ -665,7 +685,7 @@ The parity check runs from `.github/workflows/run-check-data.yml`, the one workf
 
 `node tools/emit/index.mjs` reads `SENTENCE_DATA` out of the JavaScript package and writes `packages/dart/lib/src/sentence/data/<code>.dart` and `packages/python/src/randino/sentence/data/<code>.py` for every language, then runs `dart format` and `ruff format` over them. **Edit a sentence dataset in `packages/javascript` and regenerate**, rather than editing the three copies; the emitted files say at the top that they are generated, and a comment worth keeping goes in the JavaScript source.
 
-It covers the sentence datasets alone. The word and name datasets, the `index` files, `THEME_CLASS`, the stories and the field rules are still written by hand in all three, and `tools/parity` is what checks them. A generated file that fails to compile is a bug in `sentence-data.ts`, not something to patch in the file.
+It also writes the fictional tables (`packages/dart/lib/src/fictional/data/*.dart`, `packages/python/src/randino/fictional/data/*.py`): each is one string in every package, copied as it is, so the generated file is the JavaScript table in the port's syntax. Their `index` files, with the chances, are written by hand. Beyond those two it writes nothing. The word and name datasets, the `index` files, `THEME_CLASS`, the stories and the field rules are still written by hand in all three, and `tools/parity` is what checks them. A generated file that fails to compile is a bug in `sentence-data.ts`, not something to patch in the file.
 
 ### `tools/location` — the locations come from the publisher, not from JavaScript
 
@@ -685,7 +705,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the device, processor and graphics catalogs with the makers `vendor` accepts, the operating system lines `family` accepts, the architectures with their weights per platform, names and aliases, the memory sizes per platform and their weights, the kinds of memory with their years and sizes, the disk types and their weights per platform, the disk sizes per kind and their weights, the screen resolutions and their weights per platform, the version formats and the ranges their parts are drawn from, the app stores and their weights per platform, the file extensions with their categories, weights and MIME types, the gender labels and weights, the non-binary identities with their labels and weights, the short-name rule of each location language, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the device, processor and graphics catalogs with the makers `vendor` accepts, the operating system lines `family` accepts, the architectures with their weights per platform, names and aliases, the memory sizes per platform and their weights, the kinds of memory with their years and sizes, the disk types and their weights per platform, the disk sizes per kind and their weights, the screen resolutions and their weights per platform, the version formats and the ranges their parts are drawn from, the app stores and their weights per platform, the file extensions with their categories, weights and MIME types, the gender labels and weights, the non-binary identities with their labels and weights, the short-name rule of each location language, the organization datasets and their odds, the fictional tables and their chances, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -723,6 +743,7 @@ What each generator does that is worth knowing before changing it, and how to ad
 | Phone numbers | `packages/javascript/lib/phone/CLAUDE.md` |
 | Genders | `packages/javascript/lib/gender/CLAUDE.md` |
 | Organizations | `packages/javascript/lib/organization/CLAUDE.md` |
+| Fictional names and places | `packages/javascript/lib/fictional/CLAUDE.md` |
 | System values, every one of them | `packages/javascript/lib/os/CLAUDE.md`, imported by the `CLAUDE.md` of each other system folder |
 
 Three rules are every generator's, and live in `_internal/generate`:
