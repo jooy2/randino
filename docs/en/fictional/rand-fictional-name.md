@@ -63,7 +63,7 @@ Every option is optional, and the defaults are what a call with nothing in it us
 
 Most of them are names people really carry, English, Welsh, Irish, Norse, Greek and Latin ones among them, and the rest are made up to sit beside them, the way a story's cast usually mixes both. None of them belongs to one well-known work: `Arwen`, `Yennefer` and `Arthas` are left out because the name is that work's, while `Guinevere`, `Artemis` and `Freya` are in, because Arthurian, Greek and Norse stories belong to everybody.
 
-There are about 180 men's names, about 190 women's names and about 120 family names.
+There are about 220 men's names, about 230 women's names and about 150 family names.
 
 ## One name in every language {#one-name-in-every-language}
 

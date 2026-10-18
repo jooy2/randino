@@ -70,15 +70,15 @@ The package declares `sideEffects: false` and marks every call it makes on impor
 | `randDate`, `randPhone`                                         | 3–4 KB     |
 | `randOrganization`                                              | 14 KB      |
 | `randCountry`                                                   | 18 KB      |
-| `randFictionalName`                                             | 23 KB      |
+| `randFictionalName`                                             | 27 KB      |
 | `randName`                                                      | 24 KB      |
-| `randFictionalCountry` and the other fictional places           | 37 KB      |
+| `randFictionalCountry` and the other fictional places           | 43 KB      |
 | `randModifier`                                                  | 122 KB     |
 | `randLocation`, `randCity`, `randDistrict`                      | 156 KB     |
 | `randWord`, `randAnimal` and the rest                           | 344 KB     |
 | `randNickname`                                                  | 346 KB     |
 | `randSentence`                                                  | 524 KB     |
-| Everything                                                      | 775 KB     |
+| Everything                                                      | 782 KB     |
 
 Measured by bundling the one import with esbuild, minified, and gzipping the result.
 

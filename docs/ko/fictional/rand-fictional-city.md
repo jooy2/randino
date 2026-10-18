@@ -42,7 +42,7 @@ rand_fictional_city(language="ko", count=3)  # ['애시윅', '포트 레이븐�
 
 ## 이름 {#names}
 
-도시 이름은 영어가 마을에 이름을 붙이는 방식으로 지었고(`Ashwick`, `Hollowbrook`, `Mapleford`), 데이터에 약 100개가 있습니다. `realism: 'invented'`는 `Raven`, `Silver`, `Briar` 같은 앞부분과 `ford`, `haven`, `wick` 같은 뒷부분을 이어 새로 만들고, 이렇게 만들 수 있는 이름은 2천 개쯤입니다. `mixed`는 도시마다 정합니다.
+도시 이름은 영어가 마을에 이름을 붙이는 방식으로 지었고(`Ashwick`, `Hollowbrook`, `Mapleford`), 데이터에 약 120개가 있습니다. `realism: 'invented'`는 `Raven`, `Silver`, `Briar` 같은 앞부분과 `ford`, `haven`, `wick` 같은 뒷부분을 이어 새로 만들고, 이렇게 만들 수 있는 이름은 2천 개쯤입니다. `mixed`는 도시마다 정합니다.
 
 영국 지명이 여러 곳에서 되풀이되듯, 이렇게 지은 이름이 어딘가의 작은 실제 마을과 같을 수는 있습니다. 하지만 유명한 곳이나 유명한 게임·영화·책이 지어낸 곳과는 같지 않습니다. 단어 두 개가 우연히 만드는 `Hollywood`, `Kingston`, `Riverwood`는 막아 둡니다.
 

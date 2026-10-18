@@ -42,7 +42,7 @@ rand_fictional_region(language="ko", count=3)  # ['실버펜 계곡', '알테리
 
 ## 이름 {#names}
 
-지역 이름은 국가처럼 라틴어풍의 웅장한 이름(`Altheria`, `Halveria`)이거나, 영어가 황야와 골짜기에 이름을 붙이는 방식으로 지은 영어 이름(`Brightvale`, `Ravenmoor`, `Wintermere`)이며, 데이터에 약 130개가 있습니다. `realism: 'invented'`는 음절을 잇거나(`Eli` + `heim`) 영어 단어 두 개를 이어(`Silver` + `heath`) 반반씩 새로 만들고, 이렇게 만들 수 있는 이름은 수만 개입니다. `mixed`는 지역마다 정합니다.
+지역 이름은 국가처럼 라틴어풍의 웅장한 이름(`Altheria`, `Halveria`)이거나, 영어가 황야와 골짜기에 이름을 붙이는 방식으로 지은 영어 이름(`Brightvale`, `Ravenmoor`, `Wintermere`)이며, 데이터에 약 180개가 있습니다. `realism: 'invented'`는 음절을 잇거나(`Eli` + `heim`) 영어 단어 두 개를 이어(`Silver` + `heath`) 반반씩 새로 만들고, 이렇게 만들 수 있는 이름은 수만 개입니다. `mixed`는 지역마다 정합니다.
 
 어느 이름도 아홉 언어 어디에서 실제 나라 이름이 되지 않고, 유명한 게임·영화·책이 지어낸 지명이 되지 않습니다. 단어 두 개가 우연히 만드는 `Westmarch`, `Riverwood`, `Winterfell`도 막아 둡니다.
 

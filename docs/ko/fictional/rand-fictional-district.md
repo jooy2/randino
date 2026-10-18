@@ -41,7 +41,7 @@ rand_fictional_district(language="ko", count=3)  # ['그루거 파크', '이블�
 
 ## 이름 {#names}
 
-구역은 실제 동네가 흔히 그렇듯 가문이나 사람의 이름(`Gruger`, `Evelyn`, `Hadley`)을 따거나, 마을처럼 지은 영어 이름을 씁니다. 구역만의 이름 약 50개에 [`randFictionalName`](./rand-fictional-name)이 쓰는 성 약 120개를 더해 씁니다. `realism: 'invented'`는 영어 단어 두 개를 잇거나(`Deep` + `grove`) 사람 이름처럼 음절을 이어(`Kalira`) 새로 만듭니다. `mixed`는 구역마다 정합니다.
+구역은 실제 동네가 흔히 그렇듯 가문이나 사람의 이름(`Gruger`, `Evelyn`, `Hadley`)을 따거나, 마을처럼 지은 영어 이름을 씁니다. 구역만의 이름 약 70개에 [`randFictionalName`](./rand-fictional-name)이 쓰는 성 약 150개를 더해 씁니다. `realism: 'invented'`는 영어 단어 두 개를 잇거나(`Deep` + `grove`) 사람 이름처럼 음절을 이어(`Kalira`) 새로 만듭니다. `mixed`는 구역마다 정합니다.
 
 ## 종류 {#kinds}
 

@@ -42,7 +42,7 @@ rand_fictional_region(language="ko", count=3)  # ['실버펜 계곡', '알테리
 
 ## Names {#names}
 
-A region's name is either a sweeping Latin-sounding one, `Altheria`, `Halveria`, like a country's, or an English one built the way English names its moors and dales, `Brightvale`, `Ravenmoor`, `Wintermere` — about 130 of them in the data. `realism: 'invented'` puts one together instead, out of syllables (`Eli` + `heim`) or out of two English halves (`Silver` + `heath`), half the time each, and there are tens of thousands of those. `mixed` decides per region.
+A region's name is either a sweeping Latin-sounding one, `Altheria`, `Halveria`, like a country's, or an English one built the way English names its moors and dales, `Brightvale`, `Ravenmoor`, `Wintermere` — about 180 of them in the data. `realism: 'invented'` puts one together instead, out of syllables (`Eli` + `heim`) or out of two English halves (`Silver` + `heath`), half the time each, and there are tens of thousands of those. `mixed` decides per region.
 
 None of them is a real country's name in any of the nine languages, and none is a place a well-known game, film or book made up: `Westmarch`, `Riverwood` and `Winterfell` are what two of the halves would spell, and they are kept out.
 

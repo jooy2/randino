@@ -41,7 +41,7 @@ rand_fictional_district(language="ko", count=3)  # ['그루거 파크', '이블�
 
 ## Names {#names}
 
-A district is named the way a real one usually is, after a family or a person, `Gruger`, `Evelyn`, `Hadley`, or with an English name built like a town's: about fifty of its own in the data and the hundred and twenty family names [`randFictionalName`](./rand-fictional-name) uses. `realism: 'invented'` puts one together instead, out of two English halves (`Deep` + `grove`) or out of syllables, like a person's name (`Kalira`). `mixed` decides per district.
+A district is named the way a real one usually is, after a family or a person, `Gruger`, `Evelyn`, `Hadley`, or with an English name built like a town's: about seventy of its own in the data and the hundred and fifty family names [`randFictionalName`](./rand-fictional-name) uses. `realism: 'invented'` puts one together instead, out of two English halves (`Deep` + `grove`) or out of syllables, like a person's name (`Kalira`). `mixed` decides per district.
 
 ## Kinds {#kinds}
 

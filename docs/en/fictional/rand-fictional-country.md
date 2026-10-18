@@ -42,7 +42,7 @@ rand_fictional_country(language="ko", count=3)  # ['에들린 왕국', '글래�
 
 ## Names {#names}
 
-A country's name is a sweeping Latin-sounding one, `Valoria`, `Sylvaria`, `Glacia`, out of about a hundred the data holds, among them the legendary lands that belong to everybody's stories: `Avalon`, `Lyonesse`, `Lemuria`. `realism: 'invented'` puts one together out of syllables instead, an opening, at most one middle syllable and an ending such as `-ria` or `-heim` (`Sil` + `va` + `ria`), and there are tens of thousands of those. `mixed` decides per country.
+A country's name is a sweeping Latin-sounding one, `Valoria`, `Sylvaria`, `Glacia`, out of about 130 the data holds, among them the legendary lands that belong to everybody's stories: `Avalon`, `Lyonesse`, `Lemuria`. `realism: 'invented'` puts one together out of syllables instead, an opening, at most one middle syllable and an ending such as `-ria` or `-heim` (`Sil` + `va` + `ria`), and there are tens of thousands of those. `mixed` decides per country.
 
 None of them is a real country's name in any of the nine languages, and none is a place a well-known game, film or book made up: `Hyrule`, `Narnia` and `Westeros` are out, and so is an invented name that only one language would read as a real country, such as `Senegar`, which Japanese writes `セネガル`.
 

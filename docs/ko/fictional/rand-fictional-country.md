@@ -42,7 +42,7 @@ rand_fictional_country(language="ko", count=3)  # ['에들린 왕국', '글래�
 
 ## 이름 {#names}
 
-국가 이름은 `Valoria`, `Sylvaria`, `Glacia`처럼 라틴어풍의 웅장한 이름이고, 데이터에 약 100개가 있습니다. 모두의 이야기에 속하는 전설 속 땅(`Avalon`, `Lyonesse`, `Lemuria`)도 들어 있습니다. `realism: 'invented'`는 음절을 이어 새로 만듭니다. 첫 음절, 많아야 하나인 가운데 음절, `-ria`나 `-heim` 같은 끝 음절을 잇는 방식(`Sil` + `va` + `ria`)이고, 이렇게 만들 수 있는 이름은 수만 개입니다. `mixed`는 국가마다 정합니다.
+국가 이름은 `Valoria`, `Sylvaria`, `Glacia`처럼 라틴어풍의 웅장한 이름이고, 데이터에 약 130개가 있습니다. 모두의 이야기에 속하는 전설 속 땅(`Avalon`, `Lyonesse`, `Lemuria`)도 들어 있습니다. `realism: 'invented'`는 음절을 이어 새로 만듭니다. 첫 음절, 많아야 하나인 가운데 음절, `-ria`나 `-heim` 같은 끝 음절을 잇는 방식(`Sil` + `va` + `ria`)이고, 이렇게 만들 수 있는 이름은 수만 개입니다. `mixed`는 국가마다 정합니다.
 
 어느 이름도 아홉 언어 어디에서 실제 나라 이름이 되지 않고, 유명한 게임·영화·책이 지어낸 지명이 되지 않습니다. `Hyrule`, `Narnia`, `Westeros`는 빠져 있고, 한 언어에서만 실제 나라로 읽히는 이름도 막아 둡니다. 예를 들어 `Senegar`는 일본어로 `セネガル`(세네갈)가 되므로 만들지 않습니다.
 

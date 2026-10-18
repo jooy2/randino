@@ -42,7 +42,7 @@ rand_fictional_city(language="ko", count=3)  # ['애시윅', '포트 레이븐�
 
 ## Names {#names}
 
-A city's name is built the way English names its towns, `Ashwick`, `Hollowbrook`, `Mapleford`, out of about a hundred the data holds. `realism: 'invented'` joins two English halves instead, a front such as `Raven`, `Silver` or `Briar` and a back such as `ford`, `haven` or `wick`, and there are some two thousand of those. `mixed` decides per city.
+A city's name is built the way English names its towns, `Ashwick`, `Hollowbrook`, `Mapleford`, out of about 120 the data holds. `realism: 'invented'` joins two English halves instead, a front such as `Raven`, `Silver` or `Briar` and a back such as `ford`, `haven` or `wick`, and there are some two thousand of those. `mixed` decides per city.
 
 A name built this way can match a small real town somewhere, the way English town names repeat. It never matches a famous one or a place a well-known game, film or book made up: `Hollywood`, `Kingston` and `Riverwood` are what two of the halves would spell, and they are kept out.
 
