@@ -15,7 +15,10 @@ export const LOCATION_LANGUAGES: readonly LocationLanguage[] = ['en', 'ko'];
 // How far down a location can go, largest first.
 export const LOCATION_LEVELS: readonly LocationLevel[] = ['country', 'region', 'city', 'district'];
 
-const LOCATION_LANGUAGE_OPTIONS: readonly LocationLanguageOption[] = [...LOCATION_LANGUAGES, 'all'];
+const LOCATION_LANGUAGE_OPTIONS = /*#__PURE__*/ ((): readonly LocationLanguageOption[] => [
+	...LOCATION_LANGUAGES,
+	'all'
+])();
 
 /** The caller's `language`, or `'all'` for one the location generators do not know. */
 export function resolveLocationLanguage(language: unknown): LocationLanguageOption {

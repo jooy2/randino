@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { OrganizationLanguageData } from './types.js';
 
-export const EN: OrganizationLanguageData = {
+export const EN = /*#__PURE__*/ ((): OrganizationLanguageData => ({
 	// Place-like names, the kind a town, a school and a firm all borrow. Any one
 	// of them can name a real small business somewhere, the way Riverside does;
 	// what is left out is every name a well-known company already carries
@@ -86,4 +86,4 @@ export const EN: OrganizationLanguageData = {
 		]
 	},
 	legalForms: ['{name}, Inc.', '{name} LLC', '{name} Corp.', '{name} Co.', '{name} Ltd.']
-};
+}))();

@@ -2,7 +2,7 @@ import { tokens } from '../../_internal/parse.js';
 import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
-export const JA: NameLanguageData = {
+export const JA = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.ja,
 	givenLenWeights: { 2: 70, 3: 30 },
 	last: tokens(`
@@ -74,4 +74,4 @@ export const JA: NameLanguageData = {
 		子:ko 奈:na 香:ka 音:ne 乃:no 衣:i 愛:a 咲:saki 美:mi 帆:ho 沙:sa 紀:ki 夏:natsu
 		矢:ya 秋:aki 尋:hiro 海:mi 穂:ho 織:ori 代:yo 緒:o 花:ka 希:ki
 	`)
-};
+}))();

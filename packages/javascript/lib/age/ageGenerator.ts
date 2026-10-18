@@ -89,7 +89,7 @@ function candidatesFor({ minAge, maxAge, groups, uniform }: Asked): Candidate[] 
 }
 
 // The ages each set of options allows, kept so a call does not read the curve again.
-const kept = new Map<string, readonly Outcome<number>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<number>[]>();
 
 export function generateAgeDetails(options: RandAgeOptions = {}): AgeDetail[] {
 	const asked = askedOf(options);

@@ -35,7 +35,7 @@ export const DISK_SCALE: CapacityScale<DiskUnit> = {
 	step: 1000,
 	base: 'GB',
 	reference: 'GB',
-	bytes: 1000 ** 3
+	bytes: 1e9
 };
 
 /**

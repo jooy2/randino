@@ -8,7 +8,7 @@ import type { FileExtensionDetail, RandFileExtensionOptions } from '../_types/gl
 import { FILE_CATEGORIES, FILE_EXTENSIONS } from './data/index.js';
 
 // The extensions each set of categories leaves, kept so a call does not filter the table again.
-const kept = new Map<string, readonly Outcome<(typeof FILE_EXTENSIONS)[number]>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<(typeof FILE_EXTENSIONS)[number]>[]>();
 
 export function generateFileExtensionDetails(
 	options: RandFileExtensionOptions = {}

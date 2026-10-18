@@ -197,11 +197,11 @@ const ONSET_EMPTY = 11;
 
 // Final consonants grouped by the sound they end on, which is what the
 // assimilation rules key off.
-const CODA_K = new Set([1, 2, 3, 9, 24]);
-const CODA_T = new Set([7, 19, 20, 22, 23, 25, 27]);
-const CODA_P = new Set([14, 17, 18, 26]);
-const CODA_L = new Set([8, 11, 12, 13, 15]);
-const CODA_NASAL = new Set([10, 16, 21]);
+const CODA_K = /*#__PURE__*/ new Set([1, 2, 3, 9, 24]);
+const CODA_T = /*#__PURE__*/ new Set([7, 19, 20, 22, 23, 25, 27]);
+const CODA_P = /*#__PURE__*/ new Set([14, 17, 18, 26]);
+const CODA_L = /*#__PURE__*/ new Set([8, 11, 12, 13, 15]);
+const CODA_NASAL = /*#__PURE__*/ new Set([10, 16, 21]);
 // Finals containing ㅎ, which aspirates the following consonant (좋고 -> joko).
 const CODA_H: Record<number, string> = { 6: 'n', 15: 'l', 27: '' };
 const ASPIRATED: Record<number, string> = { 0: 'k', 3: 't', 9: 'ss', 12: 'ch' };

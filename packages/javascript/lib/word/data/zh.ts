@@ -2,7 +2,7 @@ import { words } from '../../_internal/parse.js';
 import { ZH_MODIFIERS } from './modifiers/zh.js';
 import type { WordLanguageData } from './types.js';
 
-export const ZH: WordLanguageData = {
+export const ZH = /*#__PURE__*/ ((): WordLanguageData => ({
 	...ZH_MODIFIERS,
 	nouns: {
 		animal: words(`
@@ -467,4 +467,4 @@ export const ZH: WordLanguageData = {
 			大角星 豆汁 汤力水 马格利 岩茶 六堡茶 单丛 油茶 露点 珐琅
 		`)
 	}
-};
+}))();

@@ -4,7 +4,7 @@ import type { NameLanguageData } from './types.js';
 
 // Conventional romanization of the surnames below. Anything missing (including a
 // syllable passed through `startsWith`) falls back to Revised Romanization.
-export const KO_SURNAME_ROMAN: Record<string, string> = romanMap(`
+export const KO_SURNAME_ROMAN: Record<string, string> = /*#__PURE__*/ romanMap(`
 	김:Kim 이:Lee 박:Park 최:Choi 정:Jung 강:Kang 조:Cho 윤:Yoon 장:Jang 임:Lim
 	한:Han 오:Oh 서:Seo 신:Shin 권:Kwon 황:Hwang 안:Ahn 송:Song 류:Ryu 전:Jeon
 	홍:Hong 고:Ko 문:Moon 양:Yang 손:Son 배:Bae 백:Baek 허:Heo 유:Yoo 남:Nam 심:Shim
@@ -15,7 +15,7 @@ export const KO_SURNAME_ROMAN: Record<string, string> = romanMap(`
 	국:Kook
 `);
 
-export const KO: NameLanguageData = {
+export const KO = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.ko,
 	// Weighted to reality: two-syllable given names dominate, one- and
 	// three-syllable ones are the exception.
@@ -91,4 +91,4 @@ export const KO: NameLanguageData = {
 		연 윤 우 은 서 유 아 원 율 린 빈 진 하 영 지 희 나 슬 미 경 정 담 별 혜 효 림 라
 		현
 	`)
-};
+}))();

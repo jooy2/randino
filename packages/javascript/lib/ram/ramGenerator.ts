@@ -25,7 +25,7 @@ import type {
 import { RAM_SCALE, RAM_SIZES, RAM_TYPE_ENTRIES, RAM_UNITS } from './data/index.js';
 import type { RamTypeEntry } from './data/index.js';
 
-const RAM_UNIT_OPTIONS: readonly RamUnitOption[] = [...RAM_UNITS, 'auto'];
+const RAM_UNIT_OPTIONS = /*#__PURE__*/ ((): readonly RamUnitOption[] => [...RAM_UNITS, 'auto'])();
 
 /** A size one call may land on, with the kinds of memory it was sold as. */
 type Candidate = CapacityCandidate<RamUnit> & { types: readonly RamTypeEntry[] };
@@ -34,7 +34,7 @@ type Candidate = CapacityCandidate<RamUnit> & { types: readonly RamTypeEntry[] }
 type Drawn = { platform: SystemPlatform; candidate: Candidate; type: RamType };
 
 // The sizes each set of options leaves, kept so a call does not read the pools again.
-const kept = new Map<string, readonly Outcome<Drawn>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<Drawn>[]>();
 
 /** `capacity` with the kind of memory after it where the call asked for it. */
 export function writeRam(capacity: string, type: string, includeType: boolean): string {

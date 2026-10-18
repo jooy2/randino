@@ -77,7 +77,7 @@ const GAP = /\{(stem|industry|place|number)\}/g;
 const BARE = '{stem}';
 
 // A template is split once and kept: the same few dozen are read on every draw.
-const pieceCache = new Map<string, readonly Piece[]>();
+const pieceCache = /*#__PURE__*/ new Map<string, readonly Piece[]>();
 
 /** A template as its runs of text and its gaps, in order. */
 export function piecesOf(template: string): readonly Piece[] {
@@ -136,7 +136,7 @@ function matching(pool: OrganizationPool, prefix: string): OrganizationPool {
 }
 
 // Worked out once per pool: every one of them is a module constant.
-const spanCache = new Map<OrganizationPool, Span>();
+const spanCache = /*#__PURE__*/ new Map<OrganizationPool, Span>();
 
 /** The shortest and the longest entry of a pool, `[0, 0]` for an empty one. */
 function spanOfPool(pool: OrganizationPool): Span {
@@ -290,7 +290,7 @@ type Settings = {
 // Every word that says what a company does, across the industries and the words
 // that name none, per language — what an `{industry}` gap can be when none was
 // asked for.
-const descriptorCache = new WeakMap<OrganizationLanguageData, OrganizationPool>();
+const descriptorCache = /*#__PURE__*/ new WeakMap<OrganizationLanguageData, OrganizationPool>();
 
 function everyDescriptor(data: OrganizationLanguageData): OrganizationPool {
 	let pool = descriptorCache.get(data);
@@ -311,7 +311,7 @@ function descriptorsFor(data: OrganizationLanguageData, wanted: OrganizationIndu
 	return wanted === 'all' ? everyDescriptor(data) : data.industries[wanted];
 }
 
-const numberCache = new WeakMap<OrganizationLanguageData, OrganizationPool>();
+const numberCache = /*#__PURE__*/ new WeakMap<OrganizationLanguageData, OrganizationPool>();
 
 /** The numbers a `{number}` gap can be, as text. */
 function numbersOf(data: OrganizationLanguageData): OrganizationPool {
@@ -450,7 +450,7 @@ type Plan = {
 
 // The plans each language and set of settings made, kept so a call of one name
 // does not read every template of nine languages to draw it.
-const keptPlans = new Map<string, Plan>();
+const keptPlans = /*#__PURE__*/ new Map<string, Plan>();
 
 function planFor(language: WordLanguage, settings: Settings): Plan {
 	const data = ORGANIZATION_DATA[language];

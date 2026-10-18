@@ -169,7 +169,7 @@ function described(entries: string): {
 	};
 }
 
-export const JA: SentenceLanguageData = {
+export const JA = /*#__PURE__*/ ((): SentenceLanguageData => ({
 	space: '',
 	capitalize: false,
 	terminators: { statement: '。', question: '？', exclamation: '！', trailing: '…' },
@@ -1440,4 +1440,4 @@ export const JA: SentenceLanguageData = {
 			weight: 5
 		}
 	]
-};
+}))();

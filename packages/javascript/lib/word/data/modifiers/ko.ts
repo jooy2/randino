@@ -4,7 +4,7 @@ import type { WordModifierData } from '../types.js';
 // What `randModifier` needs of the language, apart from its nouns: the modifiers,
 // how they agree, and the shapes they sit in. `ko.ts` spreads it into the whole
 // dataset.
-export const KO_MODIFIERS: WordModifierData = {
+export const KO_MODIFIERS = /*#__PURE__*/ ((): WordModifierData => ({
 	joiner: '',
 	capitalize: false,
 	// Attributive forms, so they can sit straight in front of a noun: 멋진 + 사자.
@@ -74,4 +74,4 @@ export const KO_MODIFIERS: WordModifierData = {
 		minSyllables: 2,
 		maxSyllables: 3
 	}
-};
+}))();

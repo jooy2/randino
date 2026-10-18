@@ -3,7 +3,7 @@ import { RU_MODIFIERS } from './modifiers/ru.js';
 import { RU_NOUNS } from './nouns/ru.js';
 import type { WordLanguageData } from './types.js';
 
-export const RU: WordLanguageData = {
+export const RU = /*#__PURE__*/ ((): WordLanguageData => ({
 	...RU_MODIFIERS,
 	nouns: RU_NOUNS.pools,
 	nounGender: RU_NOUNS.gender,
@@ -230,4 +230,4 @@ export const RU: WordLanguageData = {
 			маниока ямс лебеда сныть орляк строчок ристретто сенча мацони ракия соджу
 		`)
 	}
-};
+}))();

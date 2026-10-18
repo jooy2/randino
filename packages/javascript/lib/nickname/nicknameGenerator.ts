@@ -178,7 +178,7 @@ function joinerOf(data: WordLanguageData, settings: Settings): string {
 }
 
 // Pool bounds never change, so they are worth computing once per language/theme.
-const boundsCache = new Map<string, Bounds>();
+const boundsCache = /*#__PURE__*/ new Map<string, Bounds>();
 
 function slotBounds(language: WordLanguage, data: WordLanguageData, theme: WordTheme): Bounds {
 	const key = `${language}:${theme}`;

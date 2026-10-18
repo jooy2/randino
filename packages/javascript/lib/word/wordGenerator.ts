@@ -72,7 +72,10 @@ export function modifiersOf(
 	return both;
 }
 
-const modifierCache = new WeakMap<Pick<WordLanguageData, 'adjectives' | 'actions'>, WordPool>();
+const modifierCache = /*#__PURE__*/ new WeakMap<
+	Pick<WordLanguageData, 'adjectives' | 'actions'>,
+	WordPool
+>();
 
 /**
  * Whether a modifier follows the noun rather than leading it, which the
@@ -164,7 +167,7 @@ export function poolBounds(pool: WordPool): readonly [number, number] {
 
 // A word draws a theme and measures its pool on every attempt, so the bounds are
 // kept with the pool.
-const boundsCache = new WeakMap<WordPool, readonly [number, number]>();
+const boundsCache = /*#__PURE__*/ new WeakMap<WordPool, readonly [number, number]>();
 
 /**
  * Shortest and longest entry of a pool, counting an empty entry as the zero it is.
@@ -259,7 +262,7 @@ export function genderOf(
 	return undefined;
 }
 
-const levelCache = new WeakMap<WordLanguageData, Map<string, WordPool>>();
+const levelCache = /*#__PURE__*/ new WeakMap<WordLanguageData, Map<string, WordPool>>();
 
 /**
  * The nouns of one theme as common as the caller asked: the whole pool at
@@ -311,7 +314,10 @@ export function levelledNouns(
  * is every pool of the language and some thousands of comparisons for a word
  * that is usually in none of them.
  */
-const tierCache = new WeakMap<WordLanguageData, Map<WordTheme, readonly WordPool[]>>();
+const tierCache = /*#__PURE__*/ new WeakMap<
+	WordLanguageData,
+	Map<WordTheme, readonly WordPool[]>
+>();
 
 /** A theme's pool split into its three levels: basic, common and rare. */
 function levelTiers(data: WordLanguageData, theme: WordTheme): readonly WordPool[] {
@@ -365,7 +371,7 @@ export function weightedNouns(
 	return pickWeighted(tiers, (tier) => each[tiers.indexOf(tier)] * tier.length);
 }
 
-const themeCache = new WeakMap<WordLanguageData, Map<string, WordTheme>>();
+const themeCache = /*#__PURE__*/ new WeakMap<WordLanguageData, Map<string, WordTheme>>();
 
 function themeIndexOf(data: WordLanguageData): Map<string, WordTheme> {
 	const cached = themeCache.get(data);
@@ -398,7 +404,7 @@ export function themeOf(data: WordLanguageData, word: string): WordTheme | null 
 // asked. A call asks every draw the same one, and a draw can walk a dozen themes:
 // filtering each pool again for each of them was most of what a `startsWith` cost.
 // One entry a pool, keyed on the pool itself, so this never grows.
-const prefixed = new WeakMap<WordPool, { prefix: string; words: WordPool }>();
+const prefixed = /*#__PURE__*/ new WeakMap<WordPool, { prefix: string; words: WordPool }>();
 
 function startingWith(pool: WordPool, prefix: string): WordPool {
 	const held = prefixed.get(pool);

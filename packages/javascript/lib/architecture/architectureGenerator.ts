@@ -36,7 +36,7 @@ export function aliasesOf(architecture: Architecture, written: string): string[]
 }
 
 // The architectures each set of options leaves, kept so a call does not work them out again.
-const kept = new Map<
+const kept = /*#__PURE__*/ new Map<
 	string,
 	readonly Outcome<{ platform: SystemPlatform; architecture: Architecture }>[]
 >();

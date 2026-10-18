@@ -3,7 +3,7 @@ import { DE_MODIFIERS } from './modifiers/de.js';
 import { DE_NOUNS } from './nouns/de.js';
 import type { WordLanguageData } from './types.js';
 
-export const DE: WordLanguageData = {
+export const DE = /*#__PURE__*/ ((): WordLanguageData => ({
 	...DE_MODIFIERS,
 	nouns: DE_NOUNS.pools,
 	nounGender: DE_NOUNS.gender,
@@ -260,4 +260,4 @@ export const DE: WordLanguageData = {
 			Pisco Aquavit Oolong Aquädukt
 		`)
 	}
-};
+}))();

@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { OrganizationLanguageData } from './types.js';
 
-export const IT: OrganizationLanguageData = {
+export const IT = /*#__PURE__*/ ((): OrganizationLanguageData => ({
 	// Place-like names, the kind a town, a school and a firm all borrow. Some are
 	// real villages somewhere, the way a place name usually is; what is left out
 	// is every name a well-known company or brand already carries (Valbruna,
@@ -74,4 +74,4 @@ export const IT: OrganizationLanguageData = {
 		]
 	},
 	legalForms: ['{name} S.r.l.', '{name} S.p.A.', '{name} S.n.c.', '{name} S.a.s.']
-};
+}))();

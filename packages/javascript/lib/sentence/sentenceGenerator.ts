@@ -206,8 +206,8 @@ function isImpersonal(frame: SentenceFrame): boolean {
 	return !frame.parts.some((part) => part.slot === 'subject' || part.slot === 'quantity');
 }
 
-const personalCache = new WeakMap<SentenceLanguageData, readonly SentenceFrame[]>();
-const reactionCache = new WeakMap<SentenceLanguageData, readonly SentenceFrame[]>();
+const personalCache = /*#__PURE__*/ new WeakMap<SentenceLanguageData, readonly SentenceFrame[]>();
+const reactionCache = /*#__PURE__*/ new WeakMap<SentenceLanguageData, readonly SentenceFrame[]>();
 
 /**
  * The shapes a sentence about something can take: every one but the reactions'.
@@ -244,8 +244,8 @@ function reactionFrames(data: SentenceLanguageData): readonly SentenceFrame[] {
  */
 const UNPLACED_THEMES: readonly WordTheme[] = ['time'];
 
-const placedCache = new WeakMap<readonly WordTheme[], readonly WordTheme[]>();
-const placingCache = new WeakMap<SentenceFrame, boolean>();
+const placedCache = /*#__PURE__*/ new WeakMap<readonly WordTheme[], readonly WordTheme[]>();
+const placingCache = /*#__PURE__*/ new WeakMap<SentenceFrame, boolean>();
 
 /** The subject themes a shape can take: `themes`, less the ones it would place somewhere they are not. */
 function placedThemes(frame: SentenceFrame, themes: readonly WordTheme[]): readonly WordTheme[] {
@@ -987,7 +987,7 @@ type Plan = {
 	modifier: Map<number, Requirement>;
 };
 
-const EMPTY_PLAN: Plan = { phrase: new Map(), modifier: new Map() };
+const EMPTY_PLAN: Plan = { phrase: /*#__PURE__*/ new Map(), modifier: /*#__PURE__*/ new Map() };
 
 /**
  * The pool's own spelling of `word`, or null when the pool does not hold it.
@@ -1186,19 +1186,19 @@ function requiredAt(frame: SentenceFrame, plan: Plan, slot: SentenceSlot): Requi
 /* --- Pools and bounds ------------------------------------------------------ */
 
 // Pools and their bounds never change, so they are worth holding on to.
-const nounCache = new Map<string, WordPool>();
+const nounCache = /*#__PURE__*/ new Map<string, WordPool>();
 
 /**
  * The subject pools a trait narrows, by group and theme. Every group a sentence
  * considers reads them for every theme it could take, and filtering two hundred
  * nouns each time is what made a paragraph slow once every language had them.
  */
-const subjectPoolCache = new WeakMap<VerbGroup | StateGroup, Map<string, WordPool>>();
-const objectPoolCache = new WeakMap<VerbGroup, Map<string, WordPool>>();
-const placePoolCache = new Map<string, WordPool>();
-const boundsCache = new Map<string, Record<string, readonly [number, number]>>();
-const spanCache = new Map<string, readonly [number, number]>();
-const agreedCache = new Map<string, readonly string[]>();
+const subjectPoolCache = /*#__PURE__*/ new WeakMap<VerbGroup | StateGroup, Map<string, WordPool>>();
+const objectPoolCache = /*#__PURE__*/ new WeakMap<VerbGroup, Map<string, WordPool>>();
+const placePoolCache = /*#__PURE__*/ new Map<string, WordPool>();
+const boundsCache = /*#__PURE__*/ new Map<string, Record<string, readonly [number, number]>>();
+const spanCache = /*#__PURE__*/ new Map<string, readonly [number, number]>();
+const agreedCache = /*#__PURE__*/ new Map<string, readonly string[]>();
 
 /**
  * The nouns of one theme a sentence may use. A language that inflects leaves out
@@ -1381,7 +1381,7 @@ function timePools(data: SentenceLanguageData): readonly WordPool[] {
 	].filter((pool) => pool.length > 0);
 }
 
-const articleCache = new WeakMap<SentenceLanguageData, readonly [number, number]>();
+const articleCache = /*#__PURE__*/ new WeakMap<SentenceLanguageData, readonly [number, number]>();
 
 /**
  * The longest and shortest article the language can open a phrase with. Held on
@@ -1487,7 +1487,7 @@ function partRange(
  * attempt, and again for every sentence; it and `partRange` together were a fifth
  * of the time a paragraph took.
  */
-const frameRangeCache = new WeakMap<
+const frameRangeCache = /*#__PURE__*/ new WeakMap<
 	SentenceFrame,
 	WeakMap<Record<string, readonly [number, number]>, readonly [number, number]>
 >();
@@ -1926,7 +1926,10 @@ const NO_TRAITS: readonly NounTrait[] = [];
  * group it considers, and rebuilding the entry list and filtering every pool each
  * time was six percent of what a paragraph took.
  */
-const traitCache = new WeakMap<SentenceLanguageData, Map<string, readonly NounTrait[]>>();
+const traitCache = /*#__PURE__*/ new WeakMap<
+	SentenceLanguageData,
+	Map<string, readonly NounTrait[]>
+>();
 
 function traitsIndexOf(data: SentenceLanguageData): Map<string, readonly NounTrait[]> {
 	const cached = traitCache.get(data);
@@ -4748,7 +4751,7 @@ function markWeight(mark: SentenceMark, flow: Flow): number {
  * named sentence cannot fill. Both the result's budget and the per-sentence
  * choice of shape read this rather than `slotBounds` directly.
  */
-const roomCache = new Map<string, Record<string, readonly [number, number]>>();
+const roomCache = /*#__PURE__*/ new Map<string, Record<string, readonly [number, number]>>();
 
 function roomFor(
 	language: WordLanguage,
@@ -6353,7 +6356,7 @@ const SHAPES: readonly SentenceShapeOption[] = ['all', 'simple', 'detailed', 'co
 const TENSES: readonly SentenceTense[] = ['present', 'past'];
 const QUOTES: readonly SentenceQuote[] = ['single', 'double'];
 const REALISMS: readonly RandRealism[] = ['real', 'mixed', 'invented'];
-const STORIES_BY_NAME: readonly SentenceStory[] = STORIES.map((story) => story.name);
+const STORIES_BY_NAME: readonly SentenceStory[] = /*#__PURE__*/ STORIES.map((story) => story.name);
 
 function resolveSettings(options: RandSentenceOptions): Settings {
 	return {

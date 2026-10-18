@@ -63,7 +63,7 @@ type Pool = {
 
 // Parsed once per dataset, on the first draw that needs it rather than at import:
 // importing the package should not cost a split of every division it ships.
-const entryCache = new WeakMap<LocationLanguageData, readonly OutlineEntry[]>();
+const entryCache = /*#__PURE__*/ new WeakMap<LocationLanguageData, readonly OutlineEntry[]>();
 
 function entriesOf(data: LocationLanguageData): readonly OutlineEntry[] {
 	let entries = entryCache.get(data);
@@ -186,7 +186,7 @@ function detailOf(pool: Pool, entry: OutlineEntry | null): LocationDetail {
 // whether it writes short names, each built the first time it is drawn from. A
 // location written out is keyed by the depth it stops at rather than by the
 // level, so two levels that write the same list share it.
-const poolCache = new WeakMap<LocationLanguageData, Map<string, Pool>>();
+const poolCache = /*#__PURE__*/ new WeakMap<LocationLanguageData, Map<string, Pool>>();
 
 function poolOf(
 	language: LocationLanguage,
@@ -322,7 +322,7 @@ export function drawLocation(
 type CountryPool = Texts & { language: WordLanguage; codes: readonly string[] };
 
 // Split out of the table the first time a language is drawn from, never at import.
-const countryCache = new Map<WordLanguage, CountryPool>();
+const countryCache = /*#__PURE__*/ new Map<WordLanguage, CountryPool>();
 
 function countryPoolOf(language: WordLanguage): CountryPool {
 	const cached = countryCache.get(language);

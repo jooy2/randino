@@ -2,7 +2,7 @@ import { words } from '../../_internal/parse.js';
 import { JA_MODIFIERS } from './modifiers/ja.js';
 import type { WordLanguageData } from './types.js';
 
-export const JA: WordLanguageData = {
+export const JA = /*#__PURE__*/ ((): WordLanguageData => ({
 	...JA_MODIFIERS,
 	nouns: {
 		animal: words(`
@@ -401,4 +401,4 @@ export const JA: WordLanguageData = {
 			安楽椅子 箪笥 鏡台 揺り椅子 スツール 飾り棚 傘立て 仏壇 神棚 屏風 衝立 暖簾 すだれ 行灯 燭台 姿見 壁掛け 掛け軸 蚊帳 文机 火鉢 衣桁 長持 カラーボックス
 		`)
 	}
-};
+}))();

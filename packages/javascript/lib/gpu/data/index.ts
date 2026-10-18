@@ -28,7 +28,7 @@ export interface GpuEntry {
  * came out in 2026, with the 2023 to 2025 parts added beside it, was checked
  * against its maker's own announcement or product page before it went in.
  */
-export const GPUS: readonly GpuEntry[] = rows(`
+export const GPUS: readonly GpuEntry[] = /*#__PURE__*/ rows(`
 	desktop | 2006 | NVIDIA | GeForce 8800 GTX
 	desktop | 2007 | NVIDIA | GeForce 8800 GT
 	desktop | 2008 | NVIDIA | GeForce 9800 GT

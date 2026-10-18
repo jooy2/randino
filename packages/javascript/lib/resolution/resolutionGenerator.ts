@@ -13,7 +13,7 @@ import type { RandResolutionOptions, ResolutionDetail } from '../_types/global.j
 import { RESOLUTIONS, RESOLUTION_SEPARATOR_DEFAULT } from './data/index.js';
 
 // The sizes each set of platforms leaves, kept so a call does not work them out again.
-const kept = new Map<string, readonly Outcome<(typeof RESOLUTIONS)[number]>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<(typeof RESOLUTIONS)[number]>[]>();
 
 export function generateResolutionDetails(options: RandResolutionOptions = {}): ResolutionDetail[] {
 	const separator =

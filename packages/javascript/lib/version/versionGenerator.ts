@@ -16,11 +16,11 @@ import {
 	VERSION_YEAR_MIN_DEFAULT
 } from './data/index.js';
 
-const PRERELEASES = Object.keys(VERSION_PRERELEASES);
+const PRERELEASES = /*#__PURE__*/ Object.keys(VERSION_PRERELEASES);
 
 // The sum of a range's weights, worked out the first time the range is drawn
 // from. The ranges are the parts in `VERSION_PARTS`, so there are seven of them.
-const totals = new WeakMap<readonly [number, number], number>();
+const totals = /*#__PURE__*/ new WeakMap<readonly [number, number], number>();
 
 function totalOf(range: readonly [number, number]): number {
 	let total = totals.get(range);

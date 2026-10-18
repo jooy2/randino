@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { OrganizationLanguageData } from './types.js';
 
-export const DE: OrganizationLanguageData = {
+export const DE = /*#__PURE__*/ ((): OrganizationLanguageData => ({
 	// Place-like names, the kind a town, a school and a firm all borrow. Some are
 	// real villages somewhere, the way a place name usually is; what is left out
 	// is every name a well-known company or brand already carries (Rosenthal,
@@ -86,4 +86,4 @@ export const DE: OrganizationLanguageData = {
 		'{name} KG',
 		'{name} UG (haftungsbeschränkt)'
 	]
-};
+}))();

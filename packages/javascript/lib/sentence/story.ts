@@ -510,7 +510,7 @@ function walkFrom(
  * step says, but whether the step can be settled at all is the language's
  * business, and that is the only half `tellable` reads.
  */
-const answerCache = new WeakMap<SentenceLanguageData, Map<string, unknown>>();
+const answerCache = /*#__PURE__*/ new WeakMap<SentenceLanguageData, Map<string, unknown>>();
 
 function remembered<T>(data: SentenceLanguageData, key: string, answer: () => T): T {
 	let byKey = answerCache.get(data);

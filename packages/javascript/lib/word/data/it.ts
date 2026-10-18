@@ -3,7 +3,7 @@ import { IT_MODIFIERS } from './modifiers/it.js';
 import { IT_NOUNS } from './nouns/it.js';
 import type { WordLanguageData } from './types.js';
 
-export const IT: WordLanguageData = {
+export const IT = /*#__PURE__*/ ((): WordLanguageData => ({
 	...IT_MODIFIERS,
 	nouns: IT_NOUNS.pools,
 	nounGender: IT_NOUNS.gender,
@@ -311,4 +311,4 @@ export const IT: WordLanguageData = {
 			applique portariviste
 		`)
 	}
-};
+}))();

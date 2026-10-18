@@ -18,7 +18,7 @@ import { CPUS, CPU_VENDORS } from './data/index.js';
 import type { CpuEntry } from './data/index.js';
 
 // The parts each set of options leaves, kept so a call does not filter the catalog again.
-const kept = new Map<string, readonly Outcome<CpuEntry>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<CpuEntry>[]>();
 
 /** `entry` with its maker in front, or alone. */
 export function writeCpu(entry: CpuEntry, includeVendor: boolean): string {

@@ -11,7 +11,7 @@ export const RAM_SCALE: CapacityScale<RamUnit> = {
 	step: 1024,
 	base: 'MB',
 	reference: 'GB',
-	bytes: 1024 * 1024
+	bytes: 1048576
 };
 
 /**
@@ -110,7 +110,7 @@ export interface RamTypeEntry {
  * are common in among the machines in use now, so DDR4 and DDR5 lead the
  * desktops and LPDDR4X and LPDDR5 the phones.
  */
-export const RAM_TYPE_ENTRIES: readonly RamTypeEntry[] = rows(`
+export const RAM_TYPE_ENTRIES: readonly RamTypeEntry[] = /*#__PURE__*/ rows(`
 	DDR     | desktop | 2000 | 2006 | 1  | 0.5@2002 1@2002 2@2002
 	DDR2    | desktop | 2004 | 2010 | 2  | 0.5@2005 1@2005 2@2005 3@2006 4@2005 8@2005
 	DDR3    | desktop | 2008 | 2017 | 8  | 1@2009 2 3@2009 4 6@2009 8@2009 12@2009 16@2009 24@2010 32@2009 48@2012 64@2012 128@2013 256@2013 512@2013

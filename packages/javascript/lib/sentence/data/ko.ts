@@ -196,7 +196,7 @@ function auxiliary(spelt: { words: WordPool; forms: PredicateForms; past: Predic
 	return { words: spelt.words, forms, past: spelt.past };
 }
 
-export const KO: SentenceLanguageData = {
+export const KO = /*#__PURE__*/ ((): SentenceLanguageData => ({
 	space: ' ',
 	capitalize: false,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
@@ -2041,4 +2041,4 @@ export const KO: SentenceLanguageData = {
 			weight: 5
 		}
 	]
-};
+}))();

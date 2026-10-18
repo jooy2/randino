@@ -4,7 +4,7 @@ import type { WordModifierData } from '../types.js';
 // What `randModifier` needs of the language, apart from its nouns: the modifiers,
 // how they agree, and the shapes they sit in. `zh.ts` spreads it into the whole
 // dataset.
-export const ZH_MODIFIERS: WordModifierData = {
+export const ZH_MODIFIERS = /*#__PURE__*/ ((): WordModifierData => ({
 	joiner: '',
 	capitalize: false,
 	// Two-character modifiers, which sit directly in front of a noun without 的:
@@ -63,4 +63,4 @@ export const ZH_MODIFIERS: WordModifierData = {
 		minSyllables: 2,
 		maxSyllables: 3
 	}
-};
+}))();

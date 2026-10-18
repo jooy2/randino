@@ -3,7 +3,7 @@ import { SPANISH_SYLLABLES } from './syllables.js';
 import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
-export const ES: NameLanguageData = {
+export const ES = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.es,
 	last: words(`
 		García Rodríguez González Fernández López Martínez Sánchez Pérez Gómez Martín
@@ -41,4 +41,4 @@ export const ES: NameLanguageData = {
 		Vicenta
 	`),
 	syn: SPANISH_SYLLABLES
-};
+}))();

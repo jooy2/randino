@@ -17,6 +17,7 @@
 - Korean sentences are spaced the way Korean is written: `입을 다셨다`, `이른 아침에`, `그런 다음`, `소리 없이`, where they ran the words together. `좀처럼`, which only goes with a negative, no longer opens a sentence that says yes. `sentenceLengthRange('ko')` reaches 56 characters, where it reached 53.
 - An English sentence that refers to its object with `it` writes a one-word verb where it can, rather than `hauls along it` and `sorts out it`.
 - `randSentence` checks whether the language can build a shape after drawing it rather than for every shape first, so one sentence takes no longer than it did with the new shapes added. A result of several sentences takes about a twentieth longer, for the reactions and setbacks its story plans. A seeded `randSentence` returns other sentences than it did.
+- A bundler that does not read `sideEffects: false` drops the pools a caller never reaches as well. It kept every module before, because each pool is built by a call at the top level of its module: `randSuffix` alone came to 524 KB gzipped with esbuild and 498 KB with Rollup when the field was not read. Every call that runs on import is marked `/*#__PURE__*/` now, and that import is 0.6 KB whether the field is read or not.
 
 ## 1.5.0 (2026-10-11)
 

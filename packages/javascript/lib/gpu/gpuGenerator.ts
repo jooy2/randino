@@ -18,7 +18,7 @@ import { GPUS, GPU_VENDORS } from './data/index.js';
 import type { GpuEntry } from './data/index.js';
 
 // The parts each set of options leaves, kept so a call does not filter the catalog again.
-const kept = new Map<string, readonly Outcome<GpuEntry>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<GpuEntry>[]>();
 
 /** `entry` with its maker in front, or alone. */
 export function writeGpu(entry: GpuEntry, includeVendor: boolean): string {

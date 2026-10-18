@@ -8,7 +8,10 @@ import type { MimeTypeDetail, RandMimeTypeOptions } from '../_types/global.js';
 import { MIME_TOP_LEVELS, mimeTypeEntries } from './data/index.js';
 
 // The types each set of top levels leaves, kept so a call does not work them out again.
-const kept = new Map<string, readonly Outcome<ReturnType<typeof mimeTypeEntries>[number]>[]>();
+const kept = /*#__PURE__*/ new Map<
+	string,
+	readonly Outcome<ReturnType<typeof mimeTypeEntries>[number]>[]
+>();
 
 export function generateMimeTypeDetails(options: RandMimeTypeOptions = {}): MimeTypeDetail[] {
 	const types = resolveMany(options.type, MIME_TOP_LEVELS, MIME_TOP_LEVELS);

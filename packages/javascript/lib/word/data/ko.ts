@@ -2,7 +2,7 @@ import { words } from '../../_internal/parse.js';
 import { KO_MODIFIERS } from './modifiers/ko.js';
 import type { WordLanguageData } from './types.js';
 
-export const KO: WordLanguageData = {
+export const KO = /*#__PURE__*/ ((): WordLanguageData => ({
 	...KO_MODIFIERS,
 	nouns: {
 		animal: words(`
@@ -426,4 +426,4 @@ export const KO: WordLanguageData = {
 			아티초크 곰취 엘니뇨 라니냐 진사 우거지 원추리 오크라 아세로라 아사이 높새바람 오색 오방색
 		`)
 	}
-};
+}))();

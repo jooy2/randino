@@ -4,7 +4,7 @@ import type { WordModifierData } from '../types.js';
 // What `randModifier` needs of the language, apart from its nouns: the modifiers,
 // how they agree, and the shapes they sit in. `vi.ts` spreads it into the whole
 // dataset.
-export const VI_MODIFIERS: WordModifierData = {
+export const VI_MODIFIERS = /*#__PURE__*/ ((): WordModifierData => ({
 	joiner: ' ',
 	capitalize: false,
 	adjectives: words(`
@@ -60,4 +60,4 @@ export const VI_MODIFIERS: WordModifierData = {
 		minSyllables: 1,
 		maxSyllables: 1
 	}
-};
+}))();

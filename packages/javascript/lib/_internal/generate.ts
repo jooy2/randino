@@ -455,7 +455,7 @@ type Prepared<E> = { pool: readonly Outcome<E>[]; totals: readonly number[] | nu
 
 // Kept with the list itself, so a list a catalog keeps is made ready once and one
 // put together for a single call goes when the call does.
-const preparedLists = new WeakMap<readonly Outcome<unknown>[], Prepared<unknown>>();
+const preparedLists = /*#__PURE__*/ new WeakMap<readonly Outcome<unknown>[], Prepared<unknown>>();
 
 function prepare<E>(outcomes: readonly Outcome<E>[]): Prepared<E> {
 	const cached = preparedLists.get(outcomes);

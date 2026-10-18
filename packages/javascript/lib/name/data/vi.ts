@@ -3,7 +3,7 @@ import { VIETNAMESE_SYLLABLES } from './syllables.js';
 import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
-export const VI: NameLanguageData = {
+export const VI = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.vi,
 	// Share of the population carrying each surname, in tenths of a percent. No
 	// language in the set is more lopsided: two Vietnamese names in five are a
@@ -50,4 +50,4 @@ export const VI: NameLanguageData = {
 		Yến
 	`),
 	syn: VIETNAMESE_SYLLABLES
-};
+}))();

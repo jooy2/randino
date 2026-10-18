@@ -87,7 +87,10 @@ export function resolveOrganizationTypes(type: unknown): readonly OrganizationTy
 	return resolveMany(type, ORGANIZATION_TYPES, ORGANIZATION_TYPES);
 }
 
-const INDUSTRY_OPTIONS: readonly OrganizationIndustryOption[] = [...ORGANIZATION_INDUSTRIES, 'all'];
+const INDUSTRY_OPTIONS = /*#__PURE__*/ ((): readonly OrganizationIndustryOption[] => [
+	...ORGANIZATION_INDUSTRIES,
+	'all'
+])();
 
 /** The caller's `industry`, or `'all'` for one this package does not know. */
 export function resolveIndustry(industry: unknown): OrganizationIndustryOption {

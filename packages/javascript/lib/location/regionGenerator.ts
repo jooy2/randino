@@ -28,7 +28,7 @@ import { shortName } from './shorten.js';
 // the regions as the country publishes them, which the detail reports.
 type RegionPool = Texts & { names: readonly string[] };
 
-const pools = new Map<string, RegionPool>();
+const pools = /*#__PURE__*/ new Map<string, RegionPool>();
 
 function poolOf(language: LocationLanguage, short: boolean): RegionPool {
 	const key = `${language}:${short}`;

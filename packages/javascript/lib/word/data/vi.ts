@@ -2,7 +2,7 @@ import { words } from '../../_internal/parse.js';
 import { VI_MODIFIERS } from './modifiers/vi.js';
 import type { WordLanguageData } from './types.js';
 
-export const VI: WordLanguageData = {
+export const VI = /*#__PURE__*/ ((): WordLanguageData => ({
 	...VI_MODIFIERS,
 	nouns: {
 		animal: words(`
@@ -756,4 +756,4 @@ export const VI: WordLanguageData = {
 			ráng_mỡ_gà rãnh_áp_thấp nước_mủ_trôm đỏ_gụ silic paladi đất_hiếm
 		`)
 	}
-};
+}))();

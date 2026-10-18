@@ -3,7 +3,7 @@ import { ES_MODIFIERS } from './modifiers/es.js';
 import { ES_NOUNS } from './nouns/es.js';
 import type { WordLanguageData } from './types.js';
 
-export const ES: WordLanguageData = {
+export const ES = /*#__PURE__*/ ((): WordLanguageData => ({
 	...ES_MODIFIERS,
 	nouns: ES_NOUNS.pools,
 	nounGender: ES_NOUNS.gender,
@@ -222,4 +222,4 @@ export const ES: WordLanguageData = {
 			Astrolábos Ahra Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto
 		`)
 	}
-};
+}))();

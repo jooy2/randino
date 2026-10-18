@@ -26,7 +26,7 @@ export interface AppStoreEntry {
  * weights are written by hand in the order the stores are common in, not
  * measured, and each platform's add up to a hundred.
  */
-export const APP_STORES: readonly AppStoreEntry[] = rows(`
+export const APP_STORES: readonly AppStoreEntry[] = /*#__PURE__*/ rows(`
 	mobile | 45 | Google | Google Play | Google Play Store
 	mobile | 35 | Apple | App Store | Apple App Store
 	mobile | 6 | Samsung | Galaxy Store | Samsung Galaxy Store

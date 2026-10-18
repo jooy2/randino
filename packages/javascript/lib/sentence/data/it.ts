@@ -9,7 +9,7 @@ function tensed(present: string, past: string): { words: WordPool; past: Predica
 	return { words: words(present), past: { words: words(past) } };
 }
 
-export const IT: SentenceLanguageData = {
+export const IT = /*#__PURE__*/ ((): SentenceLanguageData => ({
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
@@ -1288,4 +1288,4 @@ export const IT: SentenceLanguageData = {
 		{ parts: [{ slot: 'state', head: 'è', pastHead: 'era' }], weight: 8 },
 		{ parts: [{ slot: 'degree' }, { slot: 'state', head: 'è', pastHead: 'era' }], weight: 8 }
 	]
-};
+}))();

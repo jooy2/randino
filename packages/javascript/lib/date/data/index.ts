@@ -52,7 +52,7 @@ export interface DateNames {
  * Languages that keep to a 24-hour clock in writing still have `AM` and `PM`
  * for a format that asks for them.
  */
-export const DATE_NAMES: Record<WordLanguage, DateNames> = {
+export const DATE_NAMES = /*#__PURE__*/ ((): Record<WordLanguage, DateNames> => ({
 	en: {
 		months: words(
 			'January February March April May June July August September October November December'
@@ -139,4 +139,4 @@ export const DATE_NAMES: Record<WordLanguage, DateNames> = {
 		meridiem: words('AM PM'),
 		meridiemLower: words('am pm')
 	}
-};
+}))();

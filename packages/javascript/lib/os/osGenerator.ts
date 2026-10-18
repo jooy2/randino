@@ -127,7 +127,7 @@ function outcomesFor(asked: Asked): Outcome<Drawn>[] {
 
 // The results each set of options leaves, kept so a call does not read the
 // catalog and its builds again.
-const kept = new Map<string, readonly Outcome<Drawn>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<Drawn>[]>();
 
 export function generateOsDetails(options: RandOsOptions = {}): OsDetail[] {
 	const includeVersion = options.includeVersion !== false;

@@ -104,7 +104,10 @@ export const NAME_SPECS: Record<NameLanguage, NameSpec> = {
 // Every value `language` accepts, and what an unknown one falls back to. The
 // type rules one out and a JavaScript caller can still pass it; answering with
 // `NAME_SPECS['xx'].lengthSpec` names neither the option nor the value.
-const NAME_LANGUAGE_OPTIONS: readonly NameLanguageOption[] = [...NAME_LANGUAGES, 'all'];
+const NAME_LANGUAGE_OPTIONS = /*#__PURE__*/ ((): readonly NameLanguageOption[] => [
+	...NAME_LANGUAGES,
+	'all'
+])();
 
 /** The caller's `language`, or `'all'` for one this package does not know. */
 export function resolveNameLanguage(language: unknown): NameLanguageOption {

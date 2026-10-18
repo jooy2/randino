@@ -3,7 +3,7 @@ import { ITALIAN_SYLLABLES } from './syllables.js';
 import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
-export const IT: NameLanguageData = {
+export const IT = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.it,
 	last: words(`
 		Rossi Russo Ferrari Esposito Bianchi Romano Colombo Ricci Marino Greco Bruno
@@ -42,4 +42,4 @@ export const IT: NameLanguageData = {
 		Cristina Daniela Barbara Monica Teresa
 	`),
 	syn: ITALIAN_SYLLABLES
-};
+}))();

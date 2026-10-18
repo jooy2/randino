@@ -13,7 +13,7 @@ import type { AppStoreDetail, RandAppStoreOptions } from '../_types/global.js';
 import { APP_STORES } from './data/index.js';
 
 // The stores each set of platforms leaves, kept so a call does not work them out again.
-const kept = new Map<string, readonly Outcome<(typeof APP_STORES)[number]>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<(typeof APP_STORES)[number]>[]>();
 
 export function generateAppStoreDetails(options: RandAppStoreOptions = {}): AppStoreDetail[] {
 	const includeCompany = options.includeCompany !== false;

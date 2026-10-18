@@ -73,8 +73,8 @@ const TOKENS = [
 type Piece = { text: string } | { token: string };
 
 // The widest offset a clock is set to is fourteen hours; anything up to a day
-// short of it is still an offset, and a day or more is not one.
-const OFFSET_LIMIT = 24 * 60;
+// short of it is still an offset, and a day or more is not one. A day, in minutes.
+const OFFSET_LIMIT = 1440;
 
 // `Z`, `+09:00`, `+0900` or `+09`.
 const OFFSET = /^(?:[Zz]|([+-])(\d{2})(?::?(\d{2}))?)$/;

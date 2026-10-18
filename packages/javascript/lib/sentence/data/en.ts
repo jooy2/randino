@@ -19,7 +19,7 @@ function tensed(
 	};
 }
 
-export const EN: SentenceLanguageData = {
+export const EN = /*#__PURE__*/ ((): SentenceLanguageData => ({
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
@@ -1633,4 +1633,4 @@ export const EN: SentenceLanguageData = {
 			weight: 6
 		}
 	]
-};
+}))();

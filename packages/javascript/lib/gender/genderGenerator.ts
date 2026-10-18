@@ -26,7 +26,7 @@ import {
 type Drawn = { code: GenderCode; language: WordLanguage; identity: NonbinaryIdentity | null };
 
 // The labels each set of options allows, kept so a call does not work them out again.
-const kept = new Map<string, readonly Outcome<Drawn>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<Drawn>[]>();
 
 /** The codes a call may answer with: the two that are always on, and whichever of the others it asked for. */
 function codesFor(options: RandGenderOptions): readonly GenderCode[] {

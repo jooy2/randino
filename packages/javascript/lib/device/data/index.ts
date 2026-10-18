@@ -32,7 +32,7 @@ export interface DeviceEntry {
  * came out in 2026, with the 2024 and 2025 devices added beside it, was checked
  * against its maker's own announcement or product page before it went in.
  */
-export const DEVICES: readonly DeviceEntry[] = rows(`
+export const DEVICES: readonly DeviceEntry[] = /*#__PURE__*/ rows(`
 	phone | 2007 | Apple | iPhone
 	phone | 2008 | Apple | iPhone 3G
 	phone | 2009 | Apple | iPhone 3GS

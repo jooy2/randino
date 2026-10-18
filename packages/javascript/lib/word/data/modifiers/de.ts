@@ -4,7 +4,7 @@ import type { WordModifierData } from '../types.js';
 // What `randModifier` needs of the language, apart from its nouns: the modifiers,
 // how they agree, and the shapes they sit in. `de.ts` spreads it into the whole
 // dataset.
-export const DE_MODIFIERS: WordModifierData = {
+export const DE_MODIFIERS = /*#__PURE__*/ ((): WordModifierData => ({
 	joiner: ' ',
 	capitalize: false,
 	adjectives: words(`
@@ -108,4 +108,4 @@ export const DE_MODIFIERS: WordModifierData = {
 		minSyllables: 2,
 		maxSyllables: 2
 	}
-};
+}))();

@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { SentenceLanguageData } from './types.js';
 
-export const VI: SentenceLanguageData = {
+export const VI = /*#__PURE__*/ ((): SentenceLanguageData => ({
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
@@ -1206,4 +1206,4 @@ export const VI: SentenceLanguageData = {
 		{ parts: [{ slot: 'state', head: 'rất' }], weight: 8 },
 		{ parts: [{ slot: 'degree' }, { slot: 'state' }], weight: 8 }
 	]
-};
+}))();

@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { OrganizationLanguageData } from './types.js';
 
-export const RU: OrganizationLanguageData = {
+export const RU = /*#__PURE__*/ ((): OrganizationLanguageData => ({
 	// The single words a Russian firm, club or kindergarten is named after. What
 	// is left out is every name a well-known company or institution already
 	// carries, alone or with a word for its business behind it (Альфа, Вектор,
@@ -71,4 +71,4 @@ export const RU: OrganizationLanguageData = {
 		]
 	},
 	legalForms: ['ООО «{name}»', 'АО «{name}»', 'ПАО «{name}»']
-};
+}))();

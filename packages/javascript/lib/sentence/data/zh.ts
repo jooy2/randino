@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { SentenceLanguageData } from './types.js';
 
-export const ZH: SentenceLanguageData = {
+export const ZH = /*#__PURE__*/ ((): SentenceLanguageData => ({
 	space: '',
 	capitalize: false,
 	terminators: { statement: '。', question: '？', exclamation: '！', trailing: '…' },
@@ -1200,4 +1200,4 @@ export const ZH: SentenceLanguageData = {
 		{ parts: [{ slot: 'state', head: '很' }], weight: 8 },
 		{ parts: [{ slot: 'degree' }, { slot: 'state' }], weight: 8 }
 	]
-};
+}))();

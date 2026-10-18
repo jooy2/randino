@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { OrganizationLanguageData } from './types.js';
 
-export const JA: OrganizationLanguageData = {
+export const JA = /*#__PURE__*/ ((): OrganizationLanguageData => ({
 	// Words a school, a firm and a foundation all borrow. What is left out is every
 	// name a well-known company already carries, alone or with a word for its
 	// business behind it (朝日, 富士, 大和, 東邦, 明星, 瑞穂, 松風, 霧島).
@@ -85,4 +85,4 @@ export const JA: OrganizationLanguageData = {
 		]
 	},
 	legalForms: ['株式会社{name}', '{name}株式会社', '有限会社{name}', '合同会社{name}']
-};
+}))();

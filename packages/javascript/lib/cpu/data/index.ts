@@ -28,7 +28,7 @@ export interface CpuEntry {
  * to 2025 parts added beside it, was checked against its maker's own
  * announcement or product page before it went in.
  */
-export const CPUS: readonly CpuEntry[] = rows(`
+export const CPUS: readonly CpuEntry[] = /*#__PURE__*/ rows(`
 	desktop | 2000 | Intel | Pentium 4
 	desktop | 2003 | Intel | Pentium M
 	desktop | 2005 | Intel | Pentium D

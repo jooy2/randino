@@ -2,7 +2,7 @@ import { tokens, weights } from '../../_internal/parse.js';
 import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
-export const ZH: NameLanguageData = {
+export const ZH = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.zh,
 	givenLenWeights: { 1: 45, 2: 55 },
 	// Share of the population carrying each surname, in tenths of a percent. The
@@ -79,4 +79,4 @@ export const ZH: NameLanguageData = {
 		琳:lin 悦:yue 华:hua 芳:fang 敏:min 梦:meng 瑶:yao 珍:zhen 兰:lan 梅:mei 花:hua
 		香:xiang 彤:tong 萱:xuan 诺:nuo 嫣:yan 辰:chen 若:ruo 琪:qi 清:qing 芬:fen
 	`)
-};
+}))();

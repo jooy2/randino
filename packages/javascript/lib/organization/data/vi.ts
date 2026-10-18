@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { OrganizationLanguageData } from './types.js';
 
-export const VI: OrganizationLanguageData = {
+export const VI = /*#__PURE__*/ ((): OrganizationLanguageData => ({
 	// The two-syllable names a firm, a ward and a school all borrow, chosen for how
 	// they sound. What is left out is every name a well-known company already
 	// carries (Hòa Phát, Thành Công, Hoàng Long, Thiên Long, Minh Long, Mai Linh,
@@ -77,4 +77,4 @@ export const VI: OrganizationLanguageData = {
 		]
 	},
 	legalForms: ['Công ty TNHH {name}', 'Công ty Cổ phần {name}', 'Công ty TNHH MTV {name}']
-};
+}))();

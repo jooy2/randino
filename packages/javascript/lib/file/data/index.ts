@@ -35,7 +35,7 @@ export interface FileExtensionEntry {
  * `.rs`, which mime-db maps to an unrelated format or not at all — and
  * `application/octet-stream` when it is binary.
  */
-export const FILE_EXTENSIONS: readonly FileExtensionEntry[] = rows(`
+export const FILE_EXTENSIONS: readonly FileExtensionEntry[] = /*#__PURE__*/ rows(`
 	document | 5 | pdf | application/pdf
 	document | 5 | docx | application/vnd.openxmlformats-officedocument.wordprocessingml.document
 	document | 5 | txt | text/plain

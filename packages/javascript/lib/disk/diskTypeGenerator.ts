@@ -18,7 +18,10 @@ import type {
 import { DISK_TYPES, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS } from './data/index.js';
 
 // The kinds each set of platforms uses, kept so a call does not work them out again.
-const kept = new Map<string, readonly Outcome<{ platform: SystemPlatform; code: DiskType }>[]>();
+const kept = /*#__PURE__*/ new Map<
+	string,
+	readonly Outcome<{ platform: SystemPlatform; code: DiskType }>[]
+>();
 
 export function generateDiskTypeDetails(options: RandDiskTypeOptions = {}): DiskTypeDetail[] {
 	const platforms = resolvePlatforms(options.platform);

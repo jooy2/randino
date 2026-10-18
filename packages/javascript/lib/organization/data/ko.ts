@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { OrganizationLanguageData } from './types.js';
 
-export const KO: OrganizationLanguageData = {
+export const KO = /*#__PURE__*/ ((): OrganizationLanguageData => ({
 	// Mostly native Korean words, the kind a school, a firm and a foundation all
 	// borrow. Any one of them can name a small business or a school somewhere;
 	// what is left out is every name a well-known company already carries (한빛,
@@ -88,4 +88,4 @@ export const KO: OrganizationLanguageData = {
 		]
 	},
 	legalForms: ['주식회사 {name}', '{name} 주식회사', '(주){name}', '{name}(주)', '유한회사 {name}']
-};
+}))();

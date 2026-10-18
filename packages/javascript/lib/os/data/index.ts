@@ -78,7 +78,7 @@ function builds(cell: string): OsBuild[] {
  * 26H2, macOS Golden Gate 27, iOS and iPadOS 27, Android 17, Ubuntu 26.04 LTS
  * and Fedora 44.
  */
-export const OS_RELEASES: readonly OsRelease[] = rows(`
+export const OS_RELEASES: readonly OsRelease[] = /*#__PURE__*/ rows(`
 	windows | 1995 | 95 | Windows {v}{b} | Windows | | 1995: (4.00.950); 1996: OSR2 (4.00.950 B); 1997: OSR2.5 (4.00.950 C)
 	windows | 1998 | 98 | Windows {v}{b} | Windows | | 1998: (4.10.1998); 1999: Second Edition (4.10.2222)
 	windows | 2000 | 2000 | Windows {v}{e}{b} | Windows | Professional | 2000: (Build 2195), SP1 (Build 2195); 2001: SP2 (Build 2195); 2002: SP3 (Build 2195); 2003: SP4 (Build 2195)

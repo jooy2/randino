@@ -246,8 +246,11 @@ test/
   ram.test.ts
   resolution.test.ts
   sentence.test.ts
+  treeshake.test.ts         # no module in lib does anything on import
   version.test.ts
   word.test.ts
+scripts/
+  check-side-effects.mjs    # that rule, run over lib by the test and over dist by the build
 ```
 
 ### Conventions
@@ -261,6 +264,7 @@ test/
 - **Every draw goes through one source, and `random` is how a caller replaces it.** `_internal/utils` holds an ambient source and `withRandom` swaps it for the length of a call; `Math.random` is named in exactly one place. Ambient rather than threaded through every signature, because the alternative is carrying a parameter through some fifty call sites of `pick` — and the library is synchronous from the entry point down, so nothing can interleave. **A new draw calls `pick` / `randInt` / `chance` / `random`, never `Math.random`**, or a caller's source quietly stops being the source: `List.shuffle` and `random.shuffle` are how both ports leaked one. **`seededRandom` is the seeded source the JavaScript package hands a caller**, because `Math.random` takes no seed and Dart's `Random(42)` and Python's `random.Random(42).random` already are one; its numbers are pinned by `test/random.test.ts`, since every fixture built on a seed is made of them, so a change to the generator is a change to every one of those fixtures.
 - **Zero runtime dependencies.** This is a hard constraint, not a preference. It is why Hangul romanization is implemented in `lib/name/romanize.ts` instead of pulling in `es-hangul`.
 - **No module may do anything at import time.** `package.json` declares `sideEffects: false`, which is what lets a bundler drop the pools a caller never reaches — importing only `randSuffix` is about half a kilobyte gzipped, where the whole library is over 700 KB — the getting-started page's table has the measured numbers, and is the one place they are written down. The declaration is a promise about every file in `lib/`: constants and function declarations, and nothing that runs. A single top-level statement with an effect makes it a lie, and the failure is silent — the bundler drops code the caller needed.
+- **And nothing at import time may look like it does something.** A bundler, or a configuration of one, that does not read `sideEffects` decides from the code, and keeps every module whose top level might do something: a call, a `new`, a spread, a property read, an arithmetic operator inside an object — esbuild keeps `{ bytes: 1000 ** 3 }` and drops `{ bytes: 1e9 }`. One such statement in a dataset puts every pool into a bundle that imports `randSuffix` alone. So a call that builds a value at the top level is marked `/*#__PURE__*/`, and a literal that holds calls or spreads — every dataset — is wrapped whole in one marked arrow function called on the spot: `export const EN = /*#__PURE__*/ ((): WordLanguageData => ({ … }))();`. The type goes on the arrow, because a type on the constant no longer checks the literal's property names. **esbuild reads `@__NO_SIDE_EFFECTS__` on a function only within its own file**, so marking `words` once in `parse` does nothing for the datasets that import it; the mark is on each call. `scripts/check-side-effects.mjs` holds the rule: `test/treeshake.test.ts` runs it over `lib`, and `npm run build` runs it over `dist`, where it would notice `terser.config.json` losing `preserve_annotations` and every mark with it.
 - **A decorator does not reach the nouns.** Each word language's modifiers, agreement, frames and invented-word template live in `word/data/modifiers/<code>.ts`, which the language's file spreads into `WORD_DATA`; `randModifier` reads `MODIFIER_DATA` and, for the four languages whose modifiers agree with a noun, `NOUN_GENDERS` out of `word/data/nouns/<code>.ts`. One module per language was 253 KB gzipped for a decorator when it was split, against 91 KB after; the four tagged noun files grew with the pools since, and it is 122 KB now. The ports keep one file per language, since nothing there is bundled, and `tools/parity` compares the assembled `WORD_DATA` either way.
 - **A public constant does not share a module with a catalog.** A catalog is built by a call at the top of its module (`rows(...)`, `words(...)`), which a bundler cannot prove pure and so keeps whenever anything of that module is imported. `CPU_VENDORS` beside `CPUS` cost an importer 1.7 KB for a list of twelve names; a category's public constants go in its `data/constants.ts`, which `data/index.ts` re-exports for the generators.
 
@@ -285,13 +289,13 @@ Run from `packages/javascript`; there is no workspace root that forwards them.
 | Command          | What it does                                                        |
 | ---------------- | ------------------------------------------------------------------- |
 | `npm run test`   | `tsc` (emit to `dist`), then `node --test` over `test/**` via `tsx` |
-| `npm run build`  | `format` → `clean` → `tsc` → `minify`                               |
+| `npm run build`  | `format` → `clean` → `tsc` → `minify` → `check:side-effects`        |
 | `npm run lint`   | ESLint (`lint:fix` to fix)                                          |
 | `npm run format` | Prettier, in place                                                  |
 
 The tests are TypeScript but import from `../dist`, so they are run through `tsx` and **they need a build** — that is what `npm run test` does first. Node >= 22, which is the floor `package.json` declares and the lowest the workflow runs.
 
-Only `dist/` and the top-level `README.md` / `LICENSE` are published; `.npmignore` keeps `lib/`, `test/`, the config files and the remaining markdown out of the package.
+Only `dist/` and the top-level `README.md` / `LICENSE` are published; `.npmignore` keeps `lib/`, `scripts/`, `test/`, the config files and the remaining markdown out of the package.
 
 **`build` empties `dist/` first**, because `tsc` writes over what it emits and never deletes. A renamed folder leaves its old output behind — `lib/affix` became `lib/decorate` and `dist/affix` sat there afterwards — and since the whole of `dist/` is published, that is dead code shipped to npm.
 

@@ -60,7 +60,7 @@ function languageOf(value: string): WordLanguageOption {
 // one: the rest of a language's nouns are no business of a decorator's. Put
 // together once per language, so the caches that key on a language's data find
 // it again on the next call.
-const decoratorData = new Map<WordLanguage, ReturnType<typeof joinData>>();
+const decoratorData = /*#__PURE__*/ new Map<WordLanguage, ReturnType<typeof joinData>>();
 
 function joinData(language: WordLanguage) {
 	return { ...MODIFIER_DATA[language], nounGender: NOUN_GENDERS[language] };

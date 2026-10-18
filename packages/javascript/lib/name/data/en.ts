@@ -3,7 +3,7 @@ import { WESTERN_SYLLABLES } from './syllables.js';
 import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
-export const EN: NameLanguageData = {
+export const EN = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.en,
 	last: words(`
 		Smith Johnson Williams Brown Jones Miller Davis Wilson Anderson Taylor Thomas
@@ -79,4 +79,4 @@ export const EN: NameLanguageData = {
 		Josie Juno Katrina Lorna Mabel Madeline Maren
 	`),
 	syn: WESTERN_SYLLABLES
-};
+}))();

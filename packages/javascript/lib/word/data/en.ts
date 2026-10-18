@@ -2,7 +2,7 @@ import { words } from '../../_internal/parse.js';
 import { EN_MODIFIERS } from './modifiers/en.js';
 import type { WordLanguageData } from './types.js';
 
-export const EN: WordLanguageData = {
+export const EN = /*#__PURE__*/ ((): WordLanguageData => ({
 	...EN_MODIFIERS,
 	nouns: {
 		animal: words(`
@@ -729,4 +729,4 @@ export const EN: WordLanguageData = {
 			Kendama Diabolo Knell Tumult Credenza Hutch Coffer Pouf
 		`)
 	}
-};
+}))();

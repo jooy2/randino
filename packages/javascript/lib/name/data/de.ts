@@ -3,7 +3,7 @@ import { GERMAN_SYLLABLES } from './syllables.js';
 import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
-export const DE: NameLanguageData = {
+export const DE = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.de,
 	last: words(`
 		Müller Schmidt Schneider Fischer Weber Meyer Wagner Becker Schulz Hoffmann
@@ -39,4 +39,4 @@ export const DE: NameLanguageData = {
 		Sigrid Ulrike Yvonne Astrid Britta Carina Constanze Dorothea Elfriede Wiebke
 	`),
 	syn: GERMAN_SYLLABLES
-};
+}))();

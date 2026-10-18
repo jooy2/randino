@@ -24,7 +24,10 @@ import type {
 } from '../_types/global.js';
 import { DISK_SCALE, DISK_SIZES, DISK_TYPES, DISK_TYPE_WEIGHTS, DISK_UNITS } from './data/index.js';
 
-const DISK_UNIT_OPTIONS: readonly DiskUnitOption[] = [...DISK_UNITS, 'auto'];
+const DISK_UNIT_OPTIONS = /*#__PURE__*/ ((): readonly DiskUnitOption[] => [
+	...DISK_UNITS,
+	'auto'
+])();
 
 /** A kind of storage one call may land on, with the sizes of it the call may write. */
 type Kind = { type: DiskType; sizes: CapacityCandidate<DiskUnit>[] };
@@ -65,7 +68,7 @@ function candidatesFor(
 type Drawn = { platform: SystemPlatform; type: DiskType; candidate: CapacityCandidate<DiskUnit> };
 
 // The sizes each set of options leaves, kept so a call does not read the pools again.
-const kept = new Map<string, readonly Outcome<Drawn>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<Drawn>[]>();
 
 export function generateDiskSizeDetails(options: RandDiskSizeOptions = {}): DiskSizeDetail[] {
 	const includeUnit = options.includeUnit !== false;

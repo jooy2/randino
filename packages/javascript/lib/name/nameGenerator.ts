@@ -96,11 +96,11 @@ function startingWith(pool: NamePool, prefix: string): NamePool {
 
 // What a pool holds on one first character, kept per pool for the last character
 // asked: a call asks every draw the same one.
-const prefixed = new WeakMap<NamePool, { prefix: string; items: NamePool }>();
+const prefixed = /*#__PURE__*/ new WeakMap<NamePool, { prefix: string; items: NamePool }>();
 
 // Each pool by the length of its names, in pool order, so a draw reads the
 // lengths a range holds rather than filtering the pool for them twice.
-const byLength = new WeakMap<NamePool, ReadonlyMap<number, NamePool>>();
+const byLength = /*#__PURE__*/ new WeakMap<NamePool, ReadonlyMap<number, NamePool>>();
 
 function lengthsOf(pool: NamePool): ReadonlyMap<number, NamePool> {
 	let groups = byLength.get(pool);
@@ -289,7 +289,7 @@ function leadEntry(
 // The surnames short enough to leave a character for a given name, per pool and
 // maximum. The pools are module constants and a maximum is at most
 // `RAND_LENGTH_MAX`, so this never grows past a few dozen entries a pool.
-const roomyCache = new WeakMap<NamePool, Map<number, NamePool>>();
+const roomyCache = /*#__PURE__*/ new WeakMap<NamePool, Map<number, NamePool>>();
 
 /**
  * The surnames of `pool` that leave room for a given name under `maxLength`, or

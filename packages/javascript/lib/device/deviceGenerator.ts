@@ -18,7 +18,7 @@ import { DEVICES, DEVICE_TYPES, DEVICE_VENDORS } from './data/index.js';
 import type { DeviceEntry } from './data/index.js';
 
 // The models each set of options leaves, kept so a call does not filter the catalog again.
-const kept = new Map<string, readonly Outcome<DeviceEntry>[]>();
+const kept = /*#__PURE__*/ new Map<string, readonly Outcome<DeviceEntry>[]>();
 
 /**
  * `entry` with its maker in front, unless the model already opens on the maker's

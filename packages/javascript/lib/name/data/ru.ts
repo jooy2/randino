@@ -3,7 +3,7 @@ import { RUSSIAN_SYLLABLES } from './syllables.js';
 import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
-export const RU: NameLanguageData = {
+export const RU = /*#__PURE__*/ ((): NameLanguageData => ({
 	...NAME_SPECS.ru,
 	// Every surname here is the masculine form; `feminizeRu` derives the feminine
 	// one, so a new entry has to end in -ов / -ев / -ёв / -ин / -ын / -ский / -ой.
@@ -60,4 +60,4 @@ export const RU: NameLanguageData = {
 		Святославовна Семёновна Станиславовна Степановна Фёдоровна Юрьевна
 	`),
 	syn: RUSSIAN_SYLLABLES
-};
+}))();

@@ -1,7 +1,7 @@
 import { words } from '../../_internal/parse.js';
 import type { OrganizationLanguageData } from './types.js';
 
-export const ZH: OrganizationLanguageData = {
+export const ZH = /*#__PURE__*/ ((): OrganizationLanguageData => ({
 	// The two-character names a firm registers under, chosen for how they sound.
 	// What is left out is every name a well-known company already carries, alone
 	// or with a word for its business behind it (华信, 恒泰, 宏达, 锦程, 致远, 弘毅,
@@ -85,4 +85,4 @@ export const ZH: OrganizationLanguageData = {
 		]
 	},
 	legalForms: ['{name}有限公司', '{name}股份有限公司', '{name}有限责任公司']
-};
+}))();

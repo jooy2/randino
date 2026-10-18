@@ -26,7 +26,7 @@ export const RESOLUTION_SEPARATOR_DEFAULT = 'x';
  * of the common iPhones and Android phones lead, with tablets after them. Each
  * platform's weights add up to a hundred.
  */
-export const RESOLUTIONS: readonly ResolutionEntry[] = rows(`
+export const RESOLUTIONS: readonly ResolutionEntry[] = /*#__PURE__*/ rows(`
 	desktop | 1920x1080 | 26
 	desktop | 1366x768 | 10
 	desktop | 1536x864 | 10

@@ -2,7 +2,7 @@ import { taggedNouns } from '../../../_internal/parse.js';
 
 // Written once, with the gender each noun carries; `taggedNouns` splits the tags
 // back off into the lookup the modifiers agree against.
-export const RU_NOUNS = taggedNouns({
+export const RU_NOUNS = /*#__PURE__*/ taggedNouns({
 	animal: `
 		кот:m собака:f лев:m тигр:m леопард:m гепард:m лиса:f волк:m медведь:m панда:f выдра:f
 		кролик:m белка:f слон:m олень:m лошадь:f осёл:m корова:f бык:m коза:f овца:f свинья:f
@@ -669,4 +669,4 @@ export const RU_NOUNS = taggedNouns({
 
 // What a noun's gender is, for `randModifier` to agree with a value it finds here,
 // apart from the rest of the language's data.
-export const RU_GENDER = RU_NOUNS.gender;
+export const RU_GENDER = /*#__PURE__*/ (() => RU_NOUNS.gender)();

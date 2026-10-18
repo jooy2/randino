@@ -2,7 +2,7 @@ import { taggedNouns } from '../../../_internal/parse.js';
 
 // Written once, with the gender each noun carries; `taggedNouns` splits the tags
 // back off into the lookup the modifiers agree against.
-export const IT_NOUNS = taggedNouns({
+export const IT_NOUNS = /*#__PURE__*/ taggedNouns({
 	animal: `
 		gatto:m cane:m leone:m tigre:f leopardo:m ghepardo:m volpe:f lupo:m orso:m panda:m
 		lontra:f coniglio:m scoiattolo:m elefante:m cervo:m cavallo:m asino:m mucca:f toro:m
@@ -789,4 +789,4 @@ export const IT_NOUNS = taggedNouns({
 
 // What a noun's gender is, for `randModifier` to agree with a value it finds here,
 // apart from the rest of the language's data.
-export const IT_GENDER = IT_NOUNS.gender;
+export const IT_GENDER = /*#__PURE__*/ (() => IT_NOUNS.gender)();
