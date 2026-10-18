@@ -146,6 +146,41 @@ const strings = {
 		ko: '문자열, 또는 결과마다 LocationDetail 하나.',
 		en: 'Strings, or one LocationDetail per result.'
 	},
+	/* `FictionalPlaceOptions.vue` — the table the four fictional place functions
+	   share. The rows they have in common with `LocationOptions.vue` reuse its
+	   strings. */
+	optionFictionalLanguage: {
+		ko: '어느 언어로 쓸지. 하나, 여러 개, 또는 전부. 여러 개면 결과마다 하나를 골라 쓰고, 상세 출력의 forms에는 모두 씁니다.',
+		en: 'Language, or languages, to write the places in. Several draw one per result, and the detail writes every one under forms.'
+	},
+	optionIncludeKind: {
+		ko: '이름 옆에 장소의 종류를 붙입니다. 왕국, 베이, 파크 같은 말입니다. 생략하면 결과마다 정합니다.',
+		en: 'Write the kind of place beside its name: Kingdom, Bay, Park. Left out, it is decided per result.'
+	},
+	optionKindStyle: {
+		ko: '영어가 아닌 언어에서 종류를 영어 단어 그대로(borrowed) 쓸지, 그 언어의 말로(translated) 쓸지. 생략하면 단계에 따라 정합니다.',
+		en: 'Whether a language other than English writes the kind as the English word (borrowed) or in its own word (translated). Left out, it depends on the level.'
+	},
+	optionFictionalRealism: {
+		ko: '이름을 데이터에 있는 것(real)에서 뽑을지, 음절과 단어를 이어 새로 만들지(invented). mixed는 결과마다 정합니다.',
+		en: 'Whether the name is one the data holds (real) or one put together out of syllables and words (invented). mixed decides per result.'
+	},
+	optionFictionalMaxLength: {
+		ko: '최대 글자 수. 종류까지 포함한 전체 길이이며, 맞는 곳이 없으면 가장 가까운 길이로 답합니다.',
+		en: 'Maximum length in characters, kind and all. A range nothing fits is answered with the closest length there is.'
+	},
+	optionFictionalStartsWith: {
+		ko: '이름이 이 글자로 시작하는 결과만 남깁니다. 앞에 붙는 종류(Kingdom of 등)는 이름의 시작이 아닙니다.',
+		en: 'Keep only places whose name starts with this character. A kind written in front, such as Kingdom of, is not where the name starts.'
+	},
+	optionFictionalUnique: {
+		ko: '같은 장소를 두 번 돌려주지 않습니다. 언어만 다른 같은 장소도 하나로 셉니다.',
+		en: 'Never return the same place twice, in any language.'
+	},
+	optionFictionalOutput: {
+		ko: '문자열, 또는 결과마다 FictionalPlaceDetail 하나.',
+		en: 'Strings, or one FictionalPlaceDetail per result.'
+	},
 	/* The demo page. Its controls are labelled with the option names themselves,
 	   so these are only the parts that are not identifiers. */
 	demoNames: { ko: '사람 이름', en: 'Person names' },

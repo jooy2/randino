@@ -21,7 +21,8 @@
  *
  * **Generators** is the one that goes a level deeper, into **General** — one
  * function per kind of value — **System**, the values a sample machine is
- * described by, and two groups of the same function with one
+ * described by, **Fiction**, the names and places of a world that does not
+ * exist, and two groups of the same function with one
  * argument decided: **Words**, the thirty-seven themed forms of `randWord`, and
  * **Locations**, the four level forms of `randLocation`. Thirty-eight entries in
  * one list would bury the rest, so the forms sit beside them rather than among
@@ -29,8 +30,9 @@
  *
  * Words and Locations are the groups the navbar's API dropdown leaves out, which
  * they say themselves with `sidebarOnly`: the dropdown already points at the
- * function each of them is. System is in the dropdown as a section of its own,
- * which it says with an `id`, the way the three top groups of API do.
+ * function each of them is. System and Fiction are in the dropdown as sections
+ * of their own, which they say with an `id`, the way the three top groups of
+ * API do.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
  * where there is enough of it to be its own page — `randName`, `randNickname`
@@ -137,6 +139,38 @@ export const SIDEBAR: SidebarGroup[] = [
 								ko: 'randFileExtension'
 							},
 							{ path: 'file/rand-mime-type', en: 'randMimeType', ko: 'randMimeType' }
+						]
+					},
+					{
+						id: 'fiction',
+						en: 'Fiction',
+						ko: '가상 세계',
+						items: [
+							{
+								path: 'fictional/rand-fictional-name',
+								en: 'randFictionalName',
+								ko: 'randFictionalName'
+							},
+							{
+								path: 'fictional/rand-fictional-country',
+								en: 'randFictionalCountry',
+								ko: 'randFictionalCountry'
+							},
+							{
+								path: 'fictional/rand-fictional-region',
+								en: 'randFictionalRegion',
+								ko: 'randFictionalRegion'
+							},
+							{
+								path: 'fictional/rand-fictional-city',
+								en: 'randFictionalCity',
+								ko: 'randFictionalCity'
+							},
+							{
+								path: 'fictional/rand-fictional-district',
+								en: 'randFictionalDistrict',
+								ko: 'randFictionalDistrict'
+							}
 						]
 					},
 					{

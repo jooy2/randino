@@ -1,4 +1,5 @@
 import { t, type StringKey } from './i18n';
+import { FICTIONAL_PLACE_OPTIONS } from './fictionalOptions';
 import { locationOptionRows } from './locationOptions';
 import {
 	isPhrase,
@@ -68,6 +69,11 @@ export function wordOptionsTable(theme: boolean): string {
 /** `<LocationOptions />` → the option table it draws, the same way `<WordOptions />` is. */
 export function locationOptionsTable(level: boolean, country = false): string {
 	return optionsTable(locationOptionRows(level, country));
+}
+
+/** `<FictionalPlaceOptions />` → the option table it draws, the same way `<LocationOptions />` is. */
+export function fictionalPlaceOptionsTable(): string {
+	return optionsTable(FICTIONAL_PLACE_OPTIONS);
 }
 
 function optionsTable(

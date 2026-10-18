@@ -5,6 +5,7 @@ import Lang from './components/Lang.vue';
 import LangStart from './components/LangStart.vue';
 import WordOptions from './components/WordOptions.vue';
 import LocationOptions from './components/LocationOptions.vue';
+import FictionalPlaceOptions from './components/FictionalPlaceOptions.vue';
 import PackageLinks from './components/PackageLinks.vue';
 import { syncCodeLanguage } from '../data/language';
 import './styles/lang.css';
@@ -43,6 +44,9 @@ export default {
 
 		// One table, five pages: `randLocation` and each of its level functions.
 		app.component('LocationOptions', LocationOptions);
+
+		// One table, four pages: the fictional country, region, city and district.
+		app.component('FictionalPlaceOptions', FictionalPlaceOptions);
 
 		// Reads the stored choice into the reactive copy the components use, and
 		// writes it back onto `<html>`. No-op during SSR.

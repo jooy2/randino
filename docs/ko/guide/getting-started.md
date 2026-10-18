@@ -70,13 +70,15 @@ pip install randino
 | `randDate`, `randPhone`                                         | 3–4 KB     |
 | `randOrganization`                                              | 14 KB      |
 | `randCountry`                                                   | 18 KB      |
+| `randFictionalName`                                             | 23 KB      |
 | `randName`                                                      | 24 KB      |
+| `randFictionalCountry` 등 가상 장소 함수                        | 37 KB      |
 | `randModifier`                                                  | 122 KB     |
 | `randLocation`, `randCity`, `randDistrict`                      | 156 KB     |
 | `randWord`와 테마별 함수들                                      | 344 KB     |
 | `randNickname`                                                  | 346 KB     |
 | `randSentence`                                                  | 524 KB     |
-| 전체                                                            | 736 KB     |
+| 전체                                                            | 775 KB     |
 
 가져올 함수 하나만 esbuild로 번들하고 minify한 뒤 gzip으로 잰 값입니다.
 

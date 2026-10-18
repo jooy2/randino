@@ -84,7 +84,8 @@ const packageLinks = [
  *
  * **System** sits inside Generators in the sidebar and is a section of its own
  * here, so the functions that describe a sample machine are found together
- * rather than among the kinds of text.
+ * rather than among the kinds of text. **Fiction** does the same for the names
+ * and places of a made-up world, which would otherwise be read as real ones.
  *
  * The sidebar's **Words** group, nested inside Generators beside **General**,
  * is the one left out — and it says so itself, with `sidebarOnly` on the group
@@ -97,7 +98,11 @@ const navFor = (lang: string, labels: { demo: string; guide: string; packages: s
 	{ text: labels.demo, link: `${localeBase(lang, defaultLocale)}demo` },
 	{
 		text: 'API',
-		items: navGroupsFor(['generators', 'system', 'decorators', 'utilities'], lang, defaultLocale)
+		items: navGroupsFor(
+			['generators', 'system', 'fiction', 'decorators', 'utilities'],
+			lang,
+			defaultLocale
+		)
 	},
 	{
 		text: labels.packages,

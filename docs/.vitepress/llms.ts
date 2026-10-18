@@ -20,7 +20,12 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { inlineLang, locationOptionsTable, wordOptionsTable } from './data/markdown';
+import {
+	fictionalPlaceOptionsTable,
+	inlineLang,
+	locationOptionsTable,
+	wordOptionsTable
+} from './data/markdown';
 import { SIDEBAR, type SidebarGroup, type SidebarPage } from './data/sidebar';
 
 export interface LlmsOptions {
@@ -95,6 +100,7 @@ function flatten(markdown: string): string {
 				(_, level?: string, country?: string) =>
 					locationOptionsTable(Boolean(level), Boolean(country))
 			)
+			.replace(/^<FictionalPlaceOptions\s*\/>$/gm, () => fictionalPlaceOptionsTable())
 			// Whatever the removals left behind.
 			.replace(/\n{3,}/g, '\n\n')
 			.trim()
