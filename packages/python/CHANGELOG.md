@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- A German result of three sentences asked for the middle of its length range lands in it about five times in six, up from half. A name `include_name` drew on its own leaves a German sentence only a verb and an adverbial to make up the length, so a named result nearly always fell short; one that misses is now written again without the name, and the closer of the two is kept. Korean and Japanese land a little more often for the same reason. A name asked for with `include_name=True` is still written whatever the range.
+
 ## 1.6.0 (2026-10-18)
 
 - **`rand_fictional_name` writes names for the characters of a story or a game, and `rand_fictional_country`, `rand_fictional_region`, `rand_fictional_city` and `rand_fictional_district` the places on its map.** A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language: `Artemis` is `아르테미스`, `アルテミス`, `阿尔忒弥斯` and `Артемис`. `language` also takes a list, which returns each result in every language of it, keyed by code — `rand_fictional_name(language=["ko", "en"])` is `[{"ko": "아르테미스", "en": "Artemis"}]` — so a game can show one character to every player in the player's own language. A place may carry its kind — `Kingdom of Edlin`, `Gruger Park`, `Evelyn Bay` — written in each language's words, and `kind_style` chooses between the English word (`에들린 킹덤`) and the language's own (`에들린 왕국`). About 450 given names, 150 family names and 370 place names are in the data, and `realism="invented"` builds tens of thousands more out of syllables and English halves, none of which is a real country or a famous character or place.

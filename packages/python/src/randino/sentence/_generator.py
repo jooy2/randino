@@ -4841,14 +4841,7 @@ def _draw_one(telling: Telling, draw: Draw) -> tuple[Built, str]:
 
 
 def _generate_result(language: WordLanguage, settings: Settings) -> Result:
-    """Every sentence of one result, in order.
-
-    The range is shared out before the first of them is drawn, and the topic is taken
-    from that first sentence — so what follows is about the same thing rather than
-    another draw that happened to land beside it. More than one sentence is a story, when
-    the language can tell one about the subject asked for; it always can, so the plain
-    paragraph is what a result falls back to rather than what it usually is.
-    """
+    """One result: whether it has a person in it, and then every sentence of it."""
     data = SENTENCE_DATA[language]
     # Every shape any of the requested kinds could take, because the budget is shared
     # out before the first of them is even drawn — and a quoted line can be any kind at
@@ -4868,6 +4861,44 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
         if settings.include_name is not None
         else (_name_fits(data, frames, settings, language) and chance(50))
     )
+    result = _write_result(language, data, frames, settings, named)
+
+    # `_name_fits` asks whether every sentence at its longest reaches the range, and a
+    # result never writes every sentence at its longest. German writes a name, a verb
+    # and an adverbial or two at most — no object, no place, and a time in one sentence
+    # of three — so asked for the middle of what three of its sentences can be, a named
+    # result fell short five times in six. A name nobody asked for that missed is
+    # written again without one, and the closer of the two is kept, the way a story
+    # that missed is set beside a paragraph.
+    if not named or settings.include_name is not None:
+        return result
+
+    target = _bounds_for(language, data, frames, _room_for(language, False), settings)
+    missed = _distance_from(_length_of(data, result.built), target)
+
+    if missed == 0:
+        return result
+
+    plain = _write_result(language, data, frames, settings, False)
+
+    return plain if _distance_from(_length_of(data, plain.built), target) < missed else result
+
+
+def _write_result(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    frames: list[SentenceFrame],
+    settings: Settings,
+    named: bool,
+) -> Result:
+    """Every sentence of one result, in order, with a name or without.
+
+    The range is shared out before the first of them is drawn, and the topic is taken
+    from that first sentence — so what follows is about the same thing rather than
+    another draw that happened to land beside it. More than one sentence is a story, when
+    the language can tell one about the subject asked for; it always can, so the plain
+    paragraph is what a result falls back to rather than what it usually is.
+    """
     settled = settings if settings.include_name == named else replace(settings, include_name=named)
     # And the budget is measured against what a named result actually writes.
     room = _room_for(language, named)

@@ -3609,8 +3609,9 @@ def test_the_top_of_sentence_length_range_is_one_a_sentence_comes_close_to() -> 
 def test_a_result_of_three_sentences_lands_in_the_middle_of_its_range() -> None:
     # Asked for the middle of what three sentences can be, give or take a tenth, a story
     # fell short most of the time: its steps write short sentences, and the top it aimed
-    # at could not be reached. Every language now lands at least one time in three, and
-    # most of them nearly always.
+    # at could not be reached. German fell short half the time even after that, because a
+    # name drawn into it left a verb and an adverbial to make up the length. Every
+    # language now lands at least one time in two, and most of them nearly always.
     landed = 0
     drawn = 0
 
@@ -3629,11 +3630,28 @@ def test_a_result_of_three_sentences_lands_in_the_middle_of_its_range() -> None:
         )
         inside = sum(1 for each in results if middle - spread <= len(each) <= middle + spread)
 
-        assert inside * 3 >= len(results), f"{language}: {inside} of {len(results)}"
+        assert inside * 2 >= len(results), f"{language}: {inside} of {len(results)}"
         landed += inside
         drawn += len(results)
 
-    assert landed >= drawn * 0.75, f"{landed} of {drawn}"
+    assert landed >= drawn * 0.9, f"{landed} of {drawn}"
+
+
+def test_a_name_the_caller_asked_for_stays_where_the_result_misses_its_range() -> None:
+    # A drawn name that misses is written again without one; one asked for is written
+    # whatever the range, the way a story the caller named is told.
+    details = rand_sentence(
+        language="de",
+        sentences=3,
+        min_length=140,
+        max_length=192,
+        include_name=True,
+        count=SAMPLE,
+        output="detail",
+    )
+    unnamed = [detail.sentence for detail in details if not detail.names]
+
+    assert not unnamed, unnamed[0] if unnamed else ""
 
 
 def test_sentence_length_range_reports_what_the_language_can_produce() -> None:
