@@ -27,7 +27,7 @@ export const FICTIONAL_PLACE_OPTIONS: readonly FictionalPlaceOptionRow[] = [
 		name: 'language',
 		type: {
 			js: 'FictionalLanguageOption',
-			dart: 'Set<WordLanguage>?',
+			dart: 'WordLanguage?',
 			py: 'FictionalLanguageOption'
 		},
 		fallback: { js: "'all'", dart: 'null', py: '"all"' },

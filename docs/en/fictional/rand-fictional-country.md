@@ -1,6 +1,6 @@
 # randFictionalCountry
 
-Generates the names of countries that do not exist, for the map of a story or a game, and returns `count` of them as strings. A country may carry the kind of state it is beside its name — `Kingdom of Edlin`, `Glacia` on its own — and its name is spelled in Latin letters first and written by its sound in every other language. With [`output: 'detail'`](#the-detail-output) it writes each country in every language you asked for.
+Generates the names of countries that do not exist, for the map of a story or a game, and returns `count` of them as strings. A country may carry the kind of state it is beside its name — `Kingdom of Edlin`, `Glacia` on its own — and its name is spelled in Latin letters first and written by its sound in every other language. Given a [list of languages](#several-languages), it returns each country in every one of them, keyed by language, and [`output: 'detail'`](#the-detail-output) reports what each was built from.
 
 ::: lang js
 
@@ -18,9 +18,9 @@ randFictionalCountry({ language: 'ko', count: 3 }); // ['에들린 왕국', '글
 ```dart
 import 'package:randino/randino.dart';
 
-randFictionalCountry(language: {WordLanguage.en}, count: 3);
+randFictionalCountry(language: WordLanguage.en, count: 3);
 // [Kingdom of Edlin, Glacia, Castavia Empire]
-randFictionalCountry(language: {WordLanguage.ko}, count: 3); // [에들린 왕국, 글래시아, 카스타비아 제국]
+randFictionalCountry(language: WordLanguage.ko, count: 3); // [에들린 왕국, 글래시아, 카스타비아 제국]
 ```
 
 :::
@@ -86,7 +86,7 @@ randFictionalCountry({ language: 'ko', includeKind: true, kindStyle: 'borrowed',
 
 ```dart
 randFictionalCountry(
-  language: {WordLanguage.ko},
+  language: WordLanguage.ko,
   includeKind: true,
   kindStyle: FictionalKindStyle.borrowed,
   count: 2,
@@ -107,7 +107,38 @@ rand_fictional_country(language="ko", include_kind=True, kind_style="borrowed", 
 
 ## Several languages at once {#several-languages}
 
-`language` takes a list as well as one language. The value form draws one language of the list for each country; the detail form also writes every country in every language of the list, in the order you gave, under `forms`. `unique` compares the countries themselves, so `Kingdom of Edlin` and `에들린 왕국` are one. `startsWith` reads the country's own name, not a kind written in front of it: `Kingdom of Edlin` starts with `E`.
+A game or a book shows the same map to every player in the player's own language, so `language` also takes a list, and a list returns every country in every language of it, keyed by code in the order you gave:
+
+::: lang js
+
+```javascript
+randFictionalCountry({ language: ['ko', 'en'], includeKind: true });
+// [{ ko: '에들린 왕국', en: 'Kingdom of Edlin' }]
+```
+
+:::
+
+::: lang dart
+
+```dart
+randFictionalCountryForms({WordLanguage.ko, WordLanguage.en}, includeKind: true);
+// [{WordLanguage.ko: 에들린 왕국, WordLanguage.en: Kingdom of Edlin}]
+```
+
+Dart cannot change a return type by argument, so the list is a function of its own, `randFictionalCountryForms`, which takes the languages first and the same named parameters as `randFictionalCountry` after them. A set keeps the order it was written in, and that is the order of each map.
+
+:::
+
+::: lang py
+
+```python
+rand_fictional_country(language=["ko", "en"], include_kind=True)
+# [{'ko': '에들린 왕국', 'en': 'Kingdom of Edlin'}]
+```
+
+:::
+
+Each country is drawn in the first language of the list and written in the rest, so the first is the one `startsWith` and the length range read. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> is not a list: it draws one language per country, the way every generator does. `unique` compares the countries themselves, so `Kingdom of Edlin` and `에들린 왕국` are one. `startsWith` reads the country's own name, not a kind written in front of it: `Kingdom of Edlin` starts with `E`.
 
 ## Length {#length}
 
@@ -138,7 +169,7 @@ randFictionalCountryDetails(language: {WordLanguage.en, WordLanguage.ko}, includ
 //   {en: Ilvaris Isles, ko: 일바리스 제도})
 ```
 
-Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randFictionalCountry`.
+Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randFictionalCountry`, except that `language` is a set: one language, or several for `forms` the way a list gives them in the other two packages.
 
 :::
 
@@ -154,12 +185,12 @@ rand_fictional_country(language=["en", "ko"], include_kind=True, output="detail"
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `place` | <Lang js="string" dart="String" py="str" code /> | The country in `language`, kind and all, as the value form returns it. |
+| `place` | <Lang js="string" dart="String" py="str" code /> | The country in `language`, kind and all: what a call of one language returns. |
 | `name` | <Lang js="string" dart="String" py="str" code /> | The country's own name in `language`, without its kind. |
 | `kind` | <Lang js="FictionalPlaceKind &#124; null" dart="FictionalPlaceKind?" py="FictionalPlaceKind &#124; None" code /> | The kind written beside the name, or <Lang js="null" dart="null" py="None" code /> for none. |
 | `level` | `LocationLevel` | Always `country` here. |
-| `language` | `WordLanguage` | The language `place` is written in. |
-| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | The same country in every language the call asked for, in the order it asked for them. |
+| `language` | `WordLanguage` | The language `place` is written in: the one drawn, or the first of a list. |
+| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | The same country in every language the call asked for, in the order it asked for them: what a list returns. |
 
 A made-up name can still match a real place somewhere; see the [disclaimer](../guide/disclaimer#coincidence).
 

@@ -32,7 +32,7 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Leave `type` on `all` and pick an `industry`. Only companies come back, because an industry is a company's.
 - Set `language` to `ko` and `minLength` to `12`. A Korean organization is usually shorter, so the long kinds are chosen, a company with its legal form or a 종합사회복지관, rather than a short name stretched.
 - Turn on the details, set `language` to `ko` and `startsWith` to `해`. The name starts with it even where `주식회사` is written in front.
-- On the fiction tab, tick `en`, `ko` and `ja` and turn on the details. Each name comes back in one of the three and is written in all of them beside it, `Artemis`, `아르테미스` and `アルテミス`, because a fictional name is one name however it is spelled.
+- On the fiction tab, tick `ko`, `en` and `ja`. Each line is one name in all three, `아르테미스 · Artemis · アルテミス`, the way a game shows one character to every player in the player's own language, and the call returns it keyed by language.
 - Set `realism` to `invented` there. The names are put together out of syllables rather than drawn, and the Korean and Japanese spellings are joined along with the Latin one: `Ed` and `lyn` make `에들린`, with the doubled `ㄹ` Korean writes for an `l`.
 - Tick `ja` alone and type `あ` into `startsWith`. The names start with `ア`, because a made-up name is written in katakana and a hiragana prefix is read as one.
 - Pick `randFictionalCountry`, tick `ko` and set `includeKind` to `on`. A country's kind is translated, `왕국` and `제국`; set `kindStyle` to `borrowed` and the same countries become `킹덤` and `엠파이어` where Korean has a borrowed word in use, while `공국` stays as it is.

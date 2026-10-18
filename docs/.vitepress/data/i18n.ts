@@ -150,8 +150,8 @@ const strings = {
 	   share. The rows they have in common with `LocationOptions.vue` reuse its
 	   strings. */
 	optionFictionalLanguage: {
-		ko: '어느 언어로 쓸지. 하나, 여러 개, 또는 전부. 여러 개면 결과마다 하나를 골라 쓰고, 상세 출력의 forms에는 모두 씁니다.',
-		en: 'Language, or languages, to write the places in. Several draw one per result, and the detail writes every one under forms.'
+		ko: '어느 언어로 쓸지. all은 결과마다 하나를 고르고, 목록을 주면 결과마다 목록의 모든 언어로 적은 값을 언어 코드별로 돌려줍니다. Dart에서는 목록 대신 …Forms 함수를 씁니다.',
+		en: 'Language of the places, all to draw one per result, or a list to return each place in every language of it, keyed by code. Dart takes the list in the …Forms function instead.'
 	},
 	optionIncludeKind: {
 		ko: '이름 옆에 장소의 종류를 붙입니다. 왕국, 베이, 파크 같은 말입니다. 생략하면 결과마다 정합니다.',
@@ -193,8 +193,8 @@ const strings = {
 	demoOrganizations: { ko: '회사·기관', en: 'Organizations' },
 	demoFiction: { ko: '가상 세계', en: 'Fiction' },
 	demoFictionLanguages: {
-		ko: '고르지 않으면 모든 언어입니다. 여러 개를 고르면 결과마다 하나를 골라 쓰고, 상세 출력에는 고른 언어로 모두 적습니다.',
-		en: 'None picked is every language. Several draw one per result, and the detail writes each result in all of them.'
+		ko: '고르지 않으면 결과마다 언어 하나를 고릅니다. 여러 개를 고르면 결과마다 고른 언어로 모두 적어 돌려줍니다.',
+		en: 'None picked draws a language per result. Several return each result in every one of them.'
 	},
 	demoDates: { ko: '날짜', en: 'Dates' },
 	demoPhones: { ko: '전화번호', en: 'Phone numbers' },

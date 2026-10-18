@@ -1,6 +1,6 @@
 # randFictionalName
 
-Generates names for the characters of a story or a game and returns `count` of them as strings: the names a novel, a game or a tabletop campaign gives its cast, rather than the names of real people in one country. A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language, so `Artemis` is `아르테미스` in Korean and `アルテミス` in Japanese. With [`output: 'detail'`](#the-detail-output) it writes each name in every language you asked for.
+Generates names for the characters of a story or a game and returns `count` of them as strings: the names a novel, a game or a tabletop campaign gives its cast, rather than the names of real people in one country. A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language, so `Artemis` is `아르테미스` in Korean and `アルテミス` in Japanese. Given a [list of languages](#several-languages), it returns every name in each of them, keyed by language, for a game that shows one character to every player in the player's own language.
 
 ::: lang js
 
@@ -19,10 +19,10 @@ randFictionalName({ language: 'ja', includeSurname: true }); // ['アスター�
 ```dart
 import 'package:randino/randino.dart';
 
-randFictionalName(language: {WordLanguage.en}, count: 3); // [Alice, Arsis, Emily]
-randFictionalName(language: {WordLanguage.ko}, gender: NameGender.female, count: 3);
+randFictionalName(language: WordLanguage.en, count: 3); // [Alice, Arsis, Emily]
+randFictionalName(language: WordLanguage.ko, gender: NameGender.female, count: 3);
 // [앨리스, 트리아, 베리]
-randFictionalName(language: {WordLanguage.ja}, includeSurname: true); // [アスター・シンクレア]
+randFictionalName(language: WordLanguage.ja, includeSurname: true); // [アスター・シンクレア]
 ```
 
 :::
@@ -45,7 +45,7 @@ Every option is optional, and the defaults are what a call with nothing in it us
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `language` | <Lang js="FictionalLanguageOption" dart="Set&lt;WordLanguage&gt;?" py="FictionalLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language, or [languages](#several-languages), to write the names in. Several draw one per name. |
+| `language` | <Lang js="FictionalLanguageOption" dart="WordLanguage?" py="FictionalLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language of the names, <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> to draw one per name, or a [list](#several-languages) to write every name in each language of it. |
 | `gender` | <Lang js="NameGenderOption" dart="NameGender?" py="NameGenderOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Whose name: a man's, a woman's, or either, decided per name. |
 | <Lang js="includeSurname" dart="includeSurname" py="include_surname" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Follow the given name with a family name. A character in a story is usually known by one name, so it is off. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many names to return. Clamped to `0` … `10000`. |
@@ -83,40 +83,43 @@ English, Vietnamese, Spanish, Italian and German keep a made-up name the way it 
 
 ## Several languages at once {#several-languages}
 
-`language` takes a list as well as one language. The value form draws one language of the list for each name, the way <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> draws one of all nine. The detail form also writes every name in every language of the list, in the order you gave, under `forms`:
+A game or a book shows one character to every player in the player's own language, so `language` also takes a list, and a list returns every name in every language of it, keyed by code in the order you gave:
 
 ::: lang js
 
 ```javascript
-randFictionalName({ language: ['en', 'ko', 'ja'], output: 'detail' });
-// [{ name: 'Artemis', gender: 'female', language: 'en',
-//    forms: { en: 'Artemis', ko: '아르테미스', ja: 'アルテミス' } }]
+randFictionalName({ language: ['ko', 'en', 'ja'], count: 2 });
+// [{ ko: '아르테미스', en: 'Artemis', ja: 'アルテミス' },
+//  { ko: '앨리스', en: 'Alice', ja: 'アリス' }]
 ```
+
+The return type follows the list: `form.ko` is a `string`, and a language you did not ask for is not there to read.
 
 :::
 
 ::: lang dart
 
 ```dart
-randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.ko, WordLanguage.ja}).first.forms;
-// {WordLanguage.en: Artemis, WordLanguage.ko: 아르테미스, WordLanguage.ja: アルテミス}
+randFictionalNameForms({WordLanguage.ko, WordLanguage.en, WordLanguage.ja}, count: 2);
+// [{WordLanguage.ko: 아르테미스, WordLanguage.en: Artemis, WordLanguage.ja: アルテミス},
+//  {WordLanguage.ko: 앨리스, WordLanguage.en: Alice, WordLanguage.ja: アリス}]
 ```
 
-A set keeps the order it was written in, and that is the order of `forms`.
+Dart cannot change a return type by argument, so the list is a function of its own, `randFictionalNameForms`, which takes the languages first and the same named parameters as `randFictionalName` after them. A set keeps the order it was written in, and that is the order of each map.
 
 :::
 
 ::: lang py
 
 ```python
-rand_fictional_name(language=["en", "ko", "ja"], output="detail")
-# [FictionalNameDetail(name='Artemis', gender='female', language='en',
-#                      forms={'en': 'Artemis', 'ko': '아르테미스', 'ja': 'アルテミス'})]
+rand_fictional_name(language=["ko", "en", "ja"], count=2)
+# [{'ko': '아르테미스', 'en': 'Artemis', 'ja': 'アルテミス'},
+#  {'ko': '앨리스', 'en': 'Alice', 'ja': 'アリス'}]
 ```
 
 :::
 
-`unique` compares the names themselves, not the strings: `Artemis` and `아르테미스` are one name, and only one of them comes back.
+Each name is drawn in the first language of the list and written in the rest, so the first is the one `startsWith` and the length range read: a Korean list asked for `maxLength: 4` keeps the Korean name to four characters, whatever its English spelling comes out at. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> is not a list: it draws one language per name, the way every generator does. `unique` compares the names themselves, so `Artemis` and `아르테미스` are one name.
 
 ## Invented names {#invented-names}
 
@@ -137,7 +140,7 @@ randFictionalName({ language: 'ko', realism: 'invented', count: 3 }); // ['말�
 ::: lang dart
 
 ```dart
-randFictionalName(language: {WordLanguage.en}, realism: RandRealism.invented, count: 5);
+randFictionalName(language: WordLanguage.en, realism: RandRealism.invented, count: 5);
 // [Ganora, Ordan, Ralyn, Melmus, Serseran]
 ```
 
@@ -177,7 +180,7 @@ randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.zh}, includeSu
 // FictionalNameDetail(Elara Blackwood, female, en, {en: Elara Blackwood, zh: 埃拉拉·布莱克伍德})
 ```
 
-Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randFictionalName`.
+Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randFictionalName`, except that `language` is a set: one language, or several for `forms` the way a list gives them in the other two packages.
 
 :::
 
@@ -193,10 +196,10 @@ rand_fictional_name(language=["en", "zh"], include_surname=True, output="detail"
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `name` | <Lang js="string" dart="String" py="str" code /> | The name in `language`, as the value form returns it. |
+| `name` | <Lang js="string" dart="String" py="str" code /> | The name in `language`: what a call of one language returns. |
 | `gender` | `NameGender` | Whose name it is. |
-| `language` | `WordLanguage` | The language `name` is written in. |
-| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | The same name in every language the call asked for, in the order it asked for them. |
+| `language` | `WordLanguage` | The language `name` is written in: the one drawn, or the first of a list. |
+| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | The same name in every language the call asked for, in the order it asked for them: what a list returns. |
 
 A name can match a real person's or a character's somewhere; see the [disclaimer](../guide/disclaimer#coincidence).
 

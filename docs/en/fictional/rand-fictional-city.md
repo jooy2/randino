@@ -1,6 +1,6 @@
 # randFictionalCity
 
-Generates the names of cities and towns that do not exist, for the map of a story or a game, and returns `count` of them as strings. A city may carry the kind of place it is beside its name — `Port Ravenford`, `Ashwick` on its own — and its name is spelled in Latin letters first and written by its sound in every other language. With [`output: 'detail'`](#the-detail-output) it writes each city in every language you asked for.
+Generates the names of cities and towns that do not exist, for the map of a story or a game, and returns `count` of them as strings. A city may carry the kind of place it is beside its name — `Port Ravenford`, `Ashwick` on its own — and its name is spelled in Latin letters first and written by its sound in every other language. Given a [list of languages](#several-languages), it returns each city in every one of them, keyed by language, and [`output: 'detail'`](#the-detail-output) reports what each was built from.
 
 ::: lang js
 
@@ -18,9 +18,9 @@ randFictionalCity({ language: 'ko', count: 3 }); // ['애시윅', '포트 레이
 ```dart
 import 'package:randino/randino.dart';
 
-randFictionalCity(language: {WordLanguage.en}, count: 3);
+randFictionalCity(language: WordLanguage.en, count: 3);
 // [Ashwick, Port Ravenford, Hollowbrook Falls]
-randFictionalCity(language: {WordLanguage.ko}, count: 3); // [애시윅, 포트 레이븐퍼드, 할로브룩 폴스]
+randFictionalCity(language: WordLanguage.ko, count: 3); // [애시윅, 포트 레이븐퍼드, 할로브룩 폴스]
 ```
 
 :::
@@ -76,7 +76,38 @@ A kind with no word of a language's own is written the same both ways, and Chine
 
 ## Several languages at once {#several-languages}
 
-`language` takes a list as well as one language. The value form draws one language of the list for each city; the detail form also writes every city in every language of the list, in the order you gave, under `forms`. `unique` compares the cities themselves, so `Port Ravenford` and `포트 레이븐퍼드` are one. `startsWith` reads the city's own name, not a kind written in front of it: `Port Ravenford` starts with `R`.
+A game or a book shows the same map to every player in the player's own language, so `language` also takes a list, and a list returns every city in every language of it, keyed by code in the order you gave:
+
+::: lang js
+
+```javascript
+randFictionalCity({ language: ['ko', 'en', 'ru'], includeKind: true });
+// [{ ko: '애시윅 스프링스', en: 'Ashwick Springs', ru: 'Эшуик-Спрингс' }]
+```
+
+:::
+
+::: lang dart
+
+```dart
+randFictionalCityForms({WordLanguage.ko, WordLanguage.en, WordLanguage.ru}, includeKind: true);
+// [{WordLanguage.ko: 애시윅 스프링스, WordLanguage.en: Ashwick Springs, WordLanguage.ru: Эшуик-Спрингс}]
+```
+
+Dart cannot change a return type by argument, so the list is a function of its own, `randFictionalCityForms`, which takes the languages first and the same named parameters as `randFictionalCity` after them. A set keeps the order it was written in, and that is the order of each map.
+
+:::
+
+::: lang py
+
+```python
+rand_fictional_city(language=["ko", "en", "ru"], include_kind=True)
+# [{'ko': '애시윅 스프링스', 'en': 'Ashwick Springs', 'ru': 'Эшуик-Спрингс'}]
+```
+
+:::
+
+Each city is drawn in the first language of the list and written in the rest, so the first is the one `startsWith` and the length range read. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> is not a list: it draws one language per city, the way every generator does. `unique` compares the cities themselves, so `Port Ravenford` and `포트 레이븐퍼드` are one. `startsWith` reads the city's own name, not a kind written in front of it: `Port Ravenford` starts with `R`.
 
 ## Length {#length}
 
@@ -107,7 +138,7 @@ randFictionalCityDetails(language: {WordLanguage.en, WordLanguage.ko}, includeKi
 //   {en: Penhallow Village, ko: 펜할로 빌리지})
 ```
 
-Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randFictionalCity`.
+Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randFictionalCity`, except that `language` is a set: one language, or several for `forms` the way a list gives them in the other two packages.
 
 :::
 
@@ -123,12 +154,12 @@ rand_fictional_city(language=["en", "ko"], include_kind=True, output="detail")
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `place` | <Lang js="string" dart="String" py="str" code /> | The city in `language`, kind and all, as the value form returns it. |
+| `place` | <Lang js="string" dart="String" py="str" code /> | The city in `language`, kind and all: what a call of one language returns. |
 | `name` | <Lang js="string" dart="String" py="str" code /> | The city's own name in `language`, without its kind. |
 | `kind` | <Lang js="FictionalPlaceKind &#124; null" dart="FictionalPlaceKind?" py="FictionalPlaceKind &#124; None" code /> | The kind written beside the name, or <Lang js="null" dart="null" py="None" code /> for none. |
 | `level` | `LocationLevel` | Always `city` here. |
-| `language` | `WordLanguage` | The language `place` is written in. |
-| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | The same city in every language the call asked for, in the order it asked for them. |
+| `language` | `WordLanguage` | The language `place` is written in: the one drawn, or the first of a list. |
+| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | The same city in every language the call asked for, in the order it asked for them: what a list returns. |
 
 A made-up name can still match a real place somewhere; see the [disclaimer](../guide/disclaimer#coincidence).
 

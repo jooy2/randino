@@ -269,8 +269,8 @@ const organization = reactive({
 
 /**
  * The fiction tab. `languages` is a list, because the generators take one: none
- * picked is every language, one is that language, and several draw one per
- * result while the detail writes all of them.
+ * picked draws a language per result, one is that language, and several return
+ * each result in every one of them.
  */
 const fiction = reactive({
 	fn: 'randFictionalName',
@@ -1019,7 +1019,11 @@ function generate() {
 				...Object.entries(detail.forms)
 			]);
 		} else {
-			items = draw(config);
+			// Several languages return each result in all of them, keyed by code, so a
+			// line shows every spelling of one name side by side.
+			items = draw(config).map((each) =>
+				typeof each === 'string' ? each : Object.values(each).join(' · ')
+			);
 		}
 	} else if (tab.value === 'location') {
 		const draw = LOCATION_FUNCTIONS[place.fn];

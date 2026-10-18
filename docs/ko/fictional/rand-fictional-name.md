@@ -1,6 +1,6 @@
 # randFictionalName
 
-소설이나 게임의 등장인물 이름을 만들어 `count`개만큼 문자열로 돌려줍니다. 한 나라 실제 사람들의 이름이 아니라, 소설·게임·TRPG가 등장인물에게 붙이는 이름입니다. 이름은 영미권 이름을 비롯해 라틴 문자로 먼저 정해지고, 다른 언어에서는 소리대로 적습니다. 그래서 `Artemis`는 한국어로 `아르테미스`, 일본어로 `アルテミス`입니다. [`output: 'detail'`](#the-detail-output)을 주면 요청한 모든 언어로 같은 이름을 적어 줍니다.
+소설이나 게임의 등장인물 이름을 만들어 `count`개만큼 문자열로 돌려줍니다. 한 나라 실제 사람들의 이름이 아니라, 소설·게임·TRPG가 등장인물에게 붙이는 이름입니다. 이름은 영미권 이름을 비롯해 라틴 문자로 먼저 정해지고, 다른 언어에서는 소리대로 적습니다. 그래서 `Artemis`는 한국어로 `아르테미스`, 일본어로 `アルテミス`입니다. [언어 목록](#several-languages)을 주면 이름마다 그 모든 언어로 적은 결과를 언어 코드별로 돌려줍니다. 한 인물을 플레이어마다 자기 언어로 보여 주는 게임에 쓰라는 기능입니다.
 
 ::: lang js
 
@@ -19,10 +19,10 @@ randFictionalName({ language: 'ja', includeSurname: true }); // ['アスター�
 ```dart
 import 'package:randino/randino.dart';
 
-randFictionalName(language: {WordLanguage.en}, count: 3); // [Alice, Arsis, Emily]
-randFictionalName(language: {WordLanguage.ko}, gender: NameGender.female, count: 3);
+randFictionalName(language: WordLanguage.en, count: 3); // [Alice, Arsis, Emily]
+randFictionalName(language: WordLanguage.ko, gender: NameGender.female, count: 3);
 // [앨리스, 트리아, 베리]
-randFictionalName(language: {WordLanguage.ja}, includeSurname: true); // [アスター・シンクレア]
+randFictionalName(language: WordLanguage.ja, includeSurname: true); // [アスター・シンクレア]
 ```
 
 :::
@@ -45,7 +45,7 @@ rand_fictional_name(language="ja", include_surname=True)  # ['アスター・シ
 
 | 옵션 | 타입 | 기본값 | 설명 |
 | --- | --- | --- | --- |
-| `language` | <Lang js="FictionalLanguageOption" dart="Set&lt;WordLanguage&gt;?" py="FictionalLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 이름을 쓸 언어. [여러 개](#several-languages)를 주면 이름마다 하나를 골라 씁니다. |
+| `language` | <Lang js="FictionalLanguageOption" dart="WordLanguage?" py="FictionalLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 이름을 쓸 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />은 이름마다 하나를 고르고, [목록](#several-languages)을 주면 이름마다 목록의 모든 언어로 적습니다. |
 | `gender` | <Lang js="NameGenderOption" dart="NameGender?" py="NameGenderOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 남자 이름, 여자 이름, 또는 이름마다 둘 중 하나. |
 | <Lang js="includeSurname" dart="includeSurname" py="include_surname" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 이름 뒤에 성을 붙입니다. 이야기 속 인물은 대개 이름 하나로 불리므로 기본은 꺼져 있습니다. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 이름 개수. `0` … `10000`으로 제한됩니다. |
@@ -83,40 +83,43 @@ rand_fictional_name(language="ja", include_surname=True)  # ['アスター・シ
 
 ## 여러 언어로 한 번에 {#several-languages}
 
-`language`에는 언어 하나 대신 목록을 줄 수 있습니다. 값 출력은 이름마다 목록에서 언어 하나를 고릅니다. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이 아홉 언어 중 하나를 고르는 것과 같습니다. 상세 출력은 여기에 더해 이름마다 목록의 모든 언어로 적은 표기를, 준 순서대로 `forms`에 담습니다.
+게임이나 책은 같은 인물을 플레이어마다 그 사람의 언어로 보여 줍니다. 그래서 `language`에는 목록도 줄 수 있고, 목록을 주면 이름마다 목록의 모든 언어로 적은 결과를 준 순서대로 언어 코드에 담아 돌려줍니다.
 
 ::: lang js
 
 ```javascript
-randFictionalName({ language: ['en', 'ko', 'ja'], output: 'detail' });
-// [{ name: 'Artemis', gender: 'female', language: 'en',
-//    forms: { en: 'Artemis', ko: '아르테미스', ja: 'アルテミス' } }]
+randFictionalName({ language: ['ko', 'en', 'ja'], count: 2 });
+// [{ ko: '아르테미스', en: 'Artemis', ja: 'アルテミス' },
+//  { ko: '앨리스', en: 'Alice', ja: 'アリス' }]
 ```
+
+반환 타입도 목록을 따릅니다. `form.ko`는 `string`이고, 요청하지 않은 언어는 읽을 수 없습니다.
 
 :::
 
 ::: lang dart
 
 ```dart
-randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.ko, WordLanguage.ja}).first.forms;
-// {WordLanguage.en: Artemis, WordLanguage.ko: 아르테미스, WordLanguage.ja: アルテミス}
+randFictionalNameForms({WordLanguage.ko, WordLanguage.en, WordLanguage.ja}, count: 2);
+// [{WordLanguage.ko: 아르테미스, WordLanguage.en: Artemis, WordLanguage.ja: アルテミス},
+//  {WordLanguage.ko: 앨리스, WordLanguage.en: Alice, WordLanguage.ja: アリス}]
 ```
 
-집합은 적은 순서를 유지하고, 그 순서가 `forms`의 순서입니다.
+Dart는 인자에 따라 반환 타입을 바꿀 수 없어서 목록은 별도 함수 `randFictionalNameForms`로 받습니다. 언어를 첫 인자로 받고, 나머지는 `randFictionalName`과 같은 이름 있는 매개변수입니다. 집합은 적은 순서를 유지하고, 그 순서가 각 맵의 순서입니다.
 
 :::
 
 ::: lang py
 
 ```python
-rand_fictional_name(language=["en", "ko", "ja"], output="detail")
-# [FictionalNameDetail(name='Artemis', gender='female', language='en',
-#                      forms={'en': 'Artemis', 'ko': '아르테미스', 'ja': 'アルテミス'})]
+rand_fictional_name(language=["ko", "en", "ja"], count=2)
+# [{'ko': '아르테미스', 'en': 'Artemis', 'ja': 'アルテミス'},
+#  {'ko': '앨리스', 'en': 'Alice', 'ja': 'アリス'}]
 ```
 
 :::
 
-`unique`는 문자열이 아니라 이름 자체를 비교합니다. `Artemis`와 `아르테미스`는 같은 이름이라 하나만 돌아옵니다.
+이름은 목록의 첫 언어로 뽑고 나머지 언어로 옮겨 적습니다. 그래서 `startsWith`와 길이 범위는 첫 언어를 기준으로 봅니다. 한국어로 시작하는 목록에 `maxLength: 4`를 주면 영어 표기가 몇 글자가 되든 한국어 이름을 네 글자 이하로 맞춥니다. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />은 목록이 아니라서, 다른 생성 함수처럼 이름마다 언어 하나를 고릅니다. `unique`는 이름 자체를 비교하므로 `Artemis`와 `아르테미스`는 하나로 셉니다.
 
 ## 지어낸 이름 {#invented-names}
 
@@ -137,7 +140,7 @@ randFictionalName({ language: 'ko', realism: 'invented', count: 3 }); // ['말�
 ::: lang dart
 
 ```dart
-randFictionalName(language: {WordLanguage.en}, realism: RandRealism.invented, count: 5);
+randFictionalName(language: WordLanguage.en, realism: RandRealism.invented, count: 5);
 // [Ganora, Ordan, Ralyn, Melmus, Serseran]
 ```
 
@@ -177,7 +180,7 @@ randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.zh}, includeSu
 // FictionalNameDetail(Elara Blackwood, female, en, {en: Elara Blackwood, zh: 埃拉拉·布莱克伍德})
 ```
 
-Dart에는 오버로드도 유니언 타입도 없어서 상세 출력은 별도 함수입니다. `randFictionalName`과 같은 매개변수를 받습니다.
+Dart에는 오버로드도 유니언 타입도 없어서 상세 출력은 별도 함수입니다. `randFictionalName`과 같은 매개변수를 받되, `language`는 집합입니다. 언어 하나를 주거나, 다른 두 패키지의 목록처럼 `forms`를 여러 언어로 받으려면 여러 개를 줍니다.
 
 :::
 
@@ -193,10 +196,10 @@ rand_fictional_name(language=["en", "zh"], include_surname=True, output="detail"
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
-| `name` | <Lang js="string" dart="String" py="str" code /> | `language`로 적은 이름. 값 출력이 돌려주는 문자열입니다. |
+| `name` | <Lang js="string" dart="String" py="str" code /> | `language`로 적은 이름. 언어 하나를 준 호출이 돌려주는 문자열입니다. |
 | `gender` | `NameGender` | 남자 이름인지 여자 이름인지. |
-| `language` | `WordLanguage` | `name`을 적은 언어. |
-| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | 요청한 모든 언어로 적은 같은 이름. 요청한 순서대로 담깁니다. |
+| `language` | `WordLanguage` | `name`을 적은 언어. 고른 언어이거나 목록의 첫 언어입니다. |
+| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | 요청한 모든 언어로 적은 같은 이름. 요청한 순서대로 담기며, 목록을 준 호출이 돌려주는 값입니다. |
 
 이름이 실제 사람이나 어떤 작품의 인물과 우연히 같을 수 있습니다. [면책 조항](../guide/disclaimer#coincidence)을 보세요.
 

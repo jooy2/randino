@@ -1,6 +1,6 @@
 # randFictionalDistrict
 
-Generates the names of districts that do not exist — the parts of a city a story moves between — and returns `count` of them as strings. A district usually carries the kind of place it is beside its name — `Gruger Park`, `Evelyn Bay` — and its name is spelled in Latin letters first and written by its sound in every other language. With [`output: 'detail'`](#the-detail-output) it writes each district in every language you asked for.
+Generates the names of districts that do not exist — the parts of a city a story moves between — and returns `count` of them as strings. A district usually carries the kind of place it is beside its name — `Gruger Park`, `Evelyn Bay` — and its name is spelled in Latin letters first and written by its sound in every other language. Given a [list of languages](#several-languages), it returns each district in every one of them, keyed by language, and [`output: 'detail'`](#the-detail-output) reports what each was built from.
 
 ::: lang js
 
@@ -18,8 +18,8 @@ randFictionalDistrict({ language: 'ko', count: 3 }); // ['그루거 파크', '�
 ```dart
 import 'package:randino/randino.dart';
 
-randFictionalDistrict(language: {WordLanguage.en}, count: 3); // [Gruger Park, Evelyn Bay, Hadley]
-randFictionalDistrict(language: {WordLanguage.ko}, count: 3); // [그루거 파크, 이블린 베이, 해들리]
+randFictionalDistrict(language: WordLanguage.en, count: 3); // [Gruger Park, Evelyn Bay, Hadley]
+randFictionalDistrict(language: WordLanguage.ko, count: 3); // [그루거 파크, 이블린 베이, 해들리]
 ```
 
 :::
@@ -78,7 +78,38 @@ A kind with no word of a language's own is written the same both ways, and Chine
 
 ## Several languages at once {#several-languages}
 
-`language` takes a list as well as one language. The value form draws one language of the list for each district; the detail form also writes every district in every language of the list, in the order you gave, under `forms`. `unique` compares the districts themselves, so `Gruger Park` and `그루거 파크` are one. `startsWith` reads the district's own name, not a kind written in front of it: `Evelyn Bay` starts with `E`.
+A game or a book shows the same map to every player in the player's own language, so `language` also takes a list, and a list returns every district in every language of it, keyed by code in the order you gave:
+
+::: lang js
+
+```javascript
+randFictionalDistrict({ language: ['ko', 'en', 'zh'], includeKind: true });
+// [{ ko: '이블린 베이', en: 'Evelyn Bay', zh: '伊芙琳湾' }]
+```
+
+:::
+
+::: lang dart
+
+```dart
+randFictionalDistrictForms({WordLanguage.ko, WordLanguage.en, WordLanguage.zh}, includeKind: true);
+// [{WordLanguage.ko: 이블린 베이, WordLanguage.en: Evelyn Bay, WordLanguage.zh: 伊芙琳湾}]
+```
+
+Dart cannot change a return type by argument, so the list is a function of its own, `randFictionalDistrictForms`, which takes the languages first and the same named parameters as `randFictionalDistrict` after them. A set keeps the order it was written in, and that is the order of each map.
+
+:::
+
+::: lang py
+
+```python
+rand_fictional_district(language=["ko", "en", "zh"], include_kind=True)
+# [{'ko': '이블린 베이', 'en': 'Evelyn Bay', 'zh': '伊芙琳湾'}]
+```
+
+:::
+
+Each district is drawn in the first language of the list and written in the rest, so the first is the one `startsWith` and the length range read. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> is not a list: it draws one language per district, the way every generator does. `unique` compares the districts themselves, so `Gruger Park` and `그루거 파크` are one. `startsWith` reads the district's own name, not a kind written in front of it: `Evelyn Bay` starts with `E`.
 
 ## Length {#length}
 
@@ -109,7 +140,7 @@ randFictionalDistrictDetails(language: {WordLanguage.en, WordLanguage.ko}, inclu
 //   {en: Ashworth Row, ko: 애시워스 로})
 ```
 
-Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randFictionalDistrict`.
+Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randFictionalDistrict`, except that `language` is a set: one language, or several for `forms` the way a list gives them in the other two packages.
 
 :::
 
@@ -125,12 +156,12 @@ rand_fictional_district(language=["en", "ko"], include_kind=True, output="detail
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `place` | <Lang js="string" dart="String" py="str" code /> | The district in `language`, kind and all, as the value form returns it. |
+| `place` | <Lang js="string" dart="String" py="str" code /> | The district in `language`, kind and all: what a call of one language returns. |
 | `name` | <Lang js="string" dart="String" py="str" code /> | The district's own name in `language`, without its kind. |
 | `kind` | <Lang js="FictionalPlaceKind &#124; null" dart="FictionalPlaceKind?" py="FictionalPlaceKind &#124; None" code /> | The kind written beside the name, or <Lang js="null" dart="null" py="None" code /> for none. |
 | `level` | `LocationLevel` | Always `district` here. |
-| `language` | `WordLanguage` | The language `place` is written in. |
-| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | The same district in every language the call asked for, in the order it asked for them. |
+| `language` | `WordLanguage` | The language `place` is written in: the one drawn, or the first of a list. |
+| `forms` | <Lang js="Partial&lt;Record&lt;WordLanguage, string&gt;&gt;" dart="Map&lt;WordLanguage, String&gt;" py="dict[WordLanguage, str]" code /> | The same district in every language the call asked for, in the order it asked for them: what a list returns. |
 
 A made-up name can still match a real place somewhere; see the [disclaimer](../guide/disclaimer#coincidence).
 
