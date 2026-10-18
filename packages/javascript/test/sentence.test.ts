@@ -3883,8 +3883,10 @@ describe('Sentence', () => {
 	it('a result of three sentences lands in the middle of its range', () => {
 		// Asked for the middle of what three sentences can be, give or take a tenth,
 		// a story fell short most of the time: its steps write short sentences, and
-		// the top it aimed at could not be reached. Every language now lands at least
-		// one time in three, and most of them nearly always.
+		// the top it aimed at could not be reached. German fell short half the time
+		// even after that, because a name drawn into it left a verb and an adverbial
+		// to make up the length. Every language now lands at least one time in two,
+		// and most of them nearly always.
 		let landed = 0;
 		let drawn = 0;
 
@@ -3905,12 +3907,31 @@ describe('Sentence', () => {
 				(each) => each.length >= middle - spread && each.length <= middle + spread
 			).length;
 
-			assert.ok(inside * 3 >= results.length, `${language}: ${inside} of ${results.length}`);
+			assert.ok(inside * 2 >= results.length, `${language}: ${inside} of ${results.length}`);
 			landed += inside;
 			drawn += results.length;
 		}
 
-		assert.ok(landed >= drawn * 0.75, `${landed} of ${drawn}`);
+		assert.ok(landed >= drawn * 0.9, `${landed} of ${drawn}`);
+	});
+
+	it('a name the caller asked for stays where the result misses its range', () => {
+		// A drawn name that misses is written again without one; one asked for is
+		// written whatever the range, the way a story the caller named is told.
+		const details = randSentence({
+			language: 'de',
+			sentences: 3,
+			minLength: 140,
+			maxLength: 192,
+			includeName: true,
+			count: SAMPLE,
+			output: 'detail'
+		});
+
+		assert.ok(
+			details.every((detail) => detail.names.length),
+			`${details.find((detail) => !detail.names.length)?.sentence}`
+		);
 	});
 
 	it('`tense` decides when it happened, and a result keeps one tense', () => {
