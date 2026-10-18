@@ -426,6 +426,32 @@ export function naturalRange(
 	return [min, max];
 }
 
+/**
+ * The shortest and longest shape of a language by how many gaps it has between
+ * its words, across all of its themes, with nothing in a gap but the frame's own
+ * particle. A joiner adds its length once per gap, so `naturalRange` for any
+ * separator follows from these. They are what `NICKNAME_SPANS` holds, which
+ * `tools/lengths` writes from here and `test/nickname.test.ts` checks against.
+ */
+export function frameSpans(language: WordLanguage): [number, number][] {
+	const data = WORD_DATA[language];
+	const spans: [number, number][] = [];
+
+	for (const theme of WORD_THEMES) {
+		const bounds = slotBounds(language, data, theme);
+
+		for (const frame of data.frames) {
+			const gaps = frame.slots.length - 1;
+			const [low, high] = frameRange(frame, bounds, 0);
+			const span = spans[gaps];
+
+			spans[gaps] = span ? [Math.min(span[0], low), Math.max(span[1], high)] : [low, high];
+		}
+	}
+
+	return spans;
+}
+
 type Built = {
 	words: string[];
 	slots: WordSlot[];

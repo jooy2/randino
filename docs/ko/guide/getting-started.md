@@ -60,22 +60,23 @@ pip install randino
 
 이 패키지는 `sideEffects: false`를 선언하므로, 번들러가 아무도 쓰지 않는 단어 풀을 덜어냅니다. 그리고 이 라이브러리는 거의 전부가 단어 풀입니다. 함수 하나를 가져올 때의 용량은 다음과 같습니다(minify + gzip 기준).
 
-| 가져오는 함수                                              | gzip       |
-| ---------------------------------------------------------- | ---------- |
-| `randSuffix`, `randPrefix`, `nameLengthRange` 등 이름 헬퍼 | 0.5 KB     |
-| `randAge`, `randGender`, `randArchitecture`, `randRam`     | 1.5–3 KB   |
-| `randRegion`                                               | 2 KB       |
-| `randOs`, `randDevice`, `randCpu` 등 다른 시스템 값 함수   | 1.5–5.5 KB |
-| `randDate`, `randPhone`                                    | 3–4 KB     |
-| `randOrganization`                                         | 14 KB      |
-| `randCountry`                                              | 18 KB      |
-| `randName`                                                 | 24 KB      |
-| `randModifier`                                             | 122 KB     |
-| `randLocation`, `randCity`, `randDistrict`                 | 156 KB     |
-| `randWord`와 테마별 함수들                                 | 344 KB     |
-| `randNickname`                                             | 346 KB     |
-| `randSentence`                                             | 524 KB     |
-| 전체                                                       | 736 KB     |
+| 가져오는 함수                                                   | gzip       |
+| --------------------------------------------------------------- | ---------- |
+| `randSuffix`, `randPrefix`, `nameLengthRange` 등 이름 헬퍼      | 0.5 KB     |
+| `wordLengthRange`, `nicknameLengthRange`, `sentenceLengthRange` | 0.5–1.5 KB |
+| `randAge`, `randGender`, `randArchitecture`, `randRam`          | 1.5–3 KB   |
+| `randRegion`                                                    | 2 KB       |
+| `randOs`, `randDevice`, `randCpu` 등 다른 시스템 값 함수        | 1.5–5.5 KB |
+| `randDate`, `randPhone`                                         | 3–4 KB     |
+| `randOrganization`                                              | 14 KB      |
+| `randCountry`                                                   | 18 KB      |
+| `randName`                                                      | 24 KB      |
+| `randModifier`                                                  | 122 KB     |
+| `randLocation`, `randCity`, `randDistrict`                      | 156 KB     |
+| `randWord`와 테마별 함수들                                      | 344 KB     |
+| `randNickname`                                                  | 346 KB     |
+| `randSentence`                                                  | 524 KB     |
+| 전체                                                            | 736 KB     |
 
 가져올 함수 하나만 esbuild로 번들하고 minify한 뒤 gzip으로 잰 값입니다.
 

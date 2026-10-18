@@ -33,7 +33,8 @@ import type {
 	VerbField,
 	VerbGroup
 } from '../dist/sentence/data/types.js';
-import { shapeOf } from '../dist/sentence/sentenceGenerator.js';
+import { SENTENCE_LENGTHS } from '../dist/sentence/data/lengths.js';
+import { naturalRange, shapeOf } from '../dist/sentence/sentenceGenerator.js';
 import { heroClassesFor, itemThemesFor, propThemesFor, tellable } from '../dist/sentence/story.js';
 
 const SAMPLE = 60;
@@ -3832,6 +3833,24 @@ describe('Sentence', () => {
 
 		assert.strictEqual(allMin, Math.min(...WORD_LANGUAGES.map((l) => sentenceLengthRange(l)[0])));
 		assert.strictEqual(allMax, Math.max(...WORD_LANGUAGES.map((l) => sentenceLengthRange(l)[1])));
+	});
+
+	it('sentenceLengthRange reads a table that matches the pools', () => {
+		// The helper reads `SENTENCE_LENGTHS` so that it bundles without the pools,
+		// and the generator still measures the pools and the shapes. One that moves
+		// a range has to move the table with it, or the helper reports a fallback
+		// the generator no longer uses.
+		const regenerate = 'run `node tools/lengths/index.mjs` from the repository root';
+
+		for (const language of WORD_LANGUAGES) {
+			assert.deepStrictEqual(
+				SENTENCE_LENGTHS[language],
+				naturalRange(language),
+				`${language}: ${regenerate}`
+			);
+		}
+
+		assert.deepStrictEqual(Object.keys(SENTENCE_LENGTHS), [...WORD_LANGUAGES], regenerate);
 	});
 
 	it('the top of sentenceLengthRange is one a sentence comes close to', () => {

@@ -2,7 +2,8 @@ import { clamp } from '../_internal/utils.js';
 import { RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
 import type { WordLanguageOption } from '../_types/global.js';
 import { WORD_LANGUAGES, resolveWordLanguage } from '../word/data/index.js';
-import { naturalRange, resolveSeparator } from './nicknameGenerator.js';
+import { NICKNAME_SPANS } from '../word/data/lengths.js';
+import { resolveSeparator } from './nicknameGenerator.js';
 
 /**
  * Every nickname length the language can produce, in characters, which is what
@@ -23,14 +24,21 @@ export function nicknameLengthRange(
 ): [number, number] {
 	const wanted = resolveWordLanguage(language);
 	const languages = wanted === 'all' ? WORD_LANGUAGES : [wanted];
+	const separator = resolveSeparator(wordSeparator);
 	let min = Infinity;
 	let max = 0;
 
+	// Read from a table rather than from the pools, so that the two numbers do not
+	// bring every pool into a bundle with them. The table is measured with nothing
+	// between the words, and whatever joins them is added once per gap.
 	for (const code of languages) {
-		const [low, high] = naturalRange(code, resolveSeparator(wordSeparator));
+		const { joiner, spans } = NICKNAME_SPANS[code];
+		const gap = (separator ?? joiner).length;
 
-		min = Math.min(min, low);
-		max = Math.max(max, high);
+		spans.forEach(([low, high], gaps) => {
+			min = Math.min(min, low + gaps * gap);
+			max = Math.max(max, high + gaps * gap);
+		});
 	}
 
 	return [

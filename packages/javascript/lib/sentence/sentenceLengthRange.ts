@@ -2,7 +2,7 @@ import { clamp } from '../_internal/utils.js';
 import { RAND_LENGTH_MIN, RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
 import type { WordLanguageOption } from '../_types/global.js';
 import { WORD_LANGUAGES, resolveWordLanguage } from '../word/data/index.js';
-import { naturalRange } from './sentenceGenerator.js';
+import { SENTENCE_LENGTHS } from './data/lengths.js';
 
 /**
  * Every sentence length the language can produce, in characters, which is what
@@ -12,8 +12,8 @@ import { naturalRange } from './sentenceGenerator.js';
  * purpose — the shape of each sentence is picked inside it.
  *
  * @example
- * sentenceLengthRange('ko'); // [5, 55]
- * sentenceLengthRange('en'); // [11, 118]
+ * sentenceLengthRange('ko'); // [5, 56]
+ * sentenceLengthRange('en'); // [11, 117]
  */
 export function sentenceLengthRange(language: WordLanguageOption = 'all'): [number, number] {
 	const wanted = resolveWordLanguage(language);
@@ -21,8 +21,10 @@ export function sentenceLengthRange(language: WordLanguageOption = 'all'): [numb
 	let min = Infinity;
 	let max = 0;
 
+	// Read from a table rather than from the pools, so that the two numbers do not
+	// bring every pool and every shape into a bundle with them.
 	for (const code of languages) {
-		const [low, high] = naturalRange(code);
+		const [low, high] = SENTENCE_LENGTHS[code];
 
 		min = Math.min(min, low);
 		max = Math.max(max, high);

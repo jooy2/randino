@@ -2,6 +2,8 @@ import assert from 'assert';
 import { describe, it } from 'node:test';
 import {
 	RAND_COUNT_MAX,
+	RAND_LENGTH_MAX,
+	RAND_LENGTH_MIN,
 	WORD_LANGUAGES,
 	WORD_THEMES,
 	nicknameLengthRange,
@@ -18,9 +20,11 @@ import type {
 // The datasets are internal, but a nickname is only as good as the words it is
 // built from — these checks are what keep person names out of them.
 import { LOOSE_THEMES, WORD_DATA } from '../dist/word/data/index.js';
+import { NICKNAME_SPANS } from '../dist/word/data/lengths.js';
 import { agree } from '../dist/word/wordGenerator.js';
 import type { WordGender } from '../dist/word/data/types.js';
 import { NAME_DATA } from '../dist/name/data/index.js';
+import { frameSpans, naturalRange } from '../dist/nickname/nicknameGenerator.js';
 
 const SAMPLE = 60;
 
@@ -406,6 +410,41 @@ describe('Nickname', () => {
 				}
 			}
 		}
+	});
+
+	it('nicknameLengthRange reads a table that matches the pools', () => {
+		// The helper reads `NICKNAME_SPANS` so that it bundles without the pools, and
+		// the generator still measures the pools and the frames. A pool or a frame
+		// that moves a range has to move the table with it, or the helper reports a
+		// fallback the generator no longer uses.
+		const regenerate = 'run `node tools/lengths/index.mjs` from the repository root';
+
+		for (const language of WORD_LANGUAGES) {
+			assert.deepStrictEqual(
+				NICKNAME_SPANS[language],
+				{ joiner: WORD_DATA[language].joiner, spans: frameSpans(language) },
+				`${language}: ${regenerate}`
+			);
+
+			// The table is measured with nothing between the words, so this is what
+			// checks the joiner is added the way the generator adds it. The helper
+			// clamps to the length bounds, which the Spanish, Italian and Vietnamese
+			// shapes run past.
+			for (const wordSeparator of [undefined, '', ' ', '-', '::', '-+-']) {
+				const [low, high] = naturalRange(language, wordSeparator);
+
+				assert.deepStrictEqual(
+					nicknameLengthRange(language, wordSeparator),
+					[
+						Math.min(Math.max(low, RAND_LENGTH_MIN), RAND_LENGTH_MAX),
+						Math.min(Math.max(high, RAND_LENGTH_MIN), RAND_LENGTH_MAX)
+					],
+					`${language} '${wordSeparator}'`
+				);
+			}
+		}
+
+		assert.deepStrictEqual(Object.keys(NICKNAME_SPANS), [...WORD_LANGUAGES], regenerate);
 	});
 
 	it('wordSeparator goes between the words', () => {

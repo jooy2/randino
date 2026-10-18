@@ -55,7 +55,13 @@ import type {
 // The datasets are internal, but a word generator is only as good as the pools
 // behind it — these checks are what tie the output back to them.
 import { WORD_DATA } from '../dist/word/data/index.js';
-import { genderOf, poolCapitalizes, synthBounds } from '../dist/word/wordGenerator.js';
+import { WORD_LENGTHS } from '../dist/word/data/lengths.js';
+import {
+	genderOf,
+	naturalRange,
+	poolCapitalizes,
+	synthBounds
+} from '../dist/word/wordGenerator.js';
 
 const SAMPLE = 60;
 
@@ -271,6 +277,28 @@ describe('Word', () => {
 				assert.ok(low >= min && high <= max, `${language}/${theme}: ${low}-${high}`);
 			}
 		}
+	});
+
+	it('wordLengthRange reads a table that matches the pools', () => {
+		// The helper reads `WORD_LENGTHS` so that it bundles without the pools, and
+		// the generator still measures the pools. A pool that moves a range has to
+		// move the table with it, or the helper reports a fallback the generator
+		// no longer uses.
+		const regenerate = 'run `node tools/lengths/index.mjs` from the repository root';
+
+		for (const language of WORD_LANGUAGES) {
+			for (const theme of WORD_THEMES) {
+				assert.deepStrictEqual(
+					WORD_LENGTHS[language][theme],
+					naturalRange(language, theme),
+					`${language}/${theme}: ${regenerate}`
+				);
+			}
+
+			assert.deepStrictEqual(wordLengthRange(language), naturalRange(language, 'all'), language);
+		}
+
+		assert.deepStrictEqual(Object.keys(WORD_LENGTHS), [...WORD_LANGUAGES], regenerate);
 	});
 
 	it('startsWith leads every word with the requested character', () => {

@@ -60,22 +60,23 @@ pip install randino
 
 The package declares `sideEffects: false`, so a bundler drops the pools nothing reaches — and the pools are nearly all of it. What one import costs, minified and gzipped:
 
-| Import                                                        | gzipped    |
-| ------------------------------------------------------------- | ---------- |
-| `randSuffix`, `randPrefix`, the `nameLengthRange` helpers     | 0.5 KB     |
-| `randAge`, `randGender`, `randArchitecture`, `randRam`        | 1.5–3 KB   |
-| `randRegion`                                                  | 2 KB       |
-| `randOs`, `randDevice`, `randCpu` and the other system values | 1.5–5.5 KB |
-| `randDate`, `randPhone`                                       | 3–4 KB     |
-| `randOrganization`                                            | 14 KB      |
-| `randCountry`                                                 | 18 KB      |
-| `randName`                                                    | 24 KB      |
-| `randModifier`                                                | 122 KB     |
-| `randLocation`, `randCity`, `randDistrict`                    | 156 KB     |
-| `randWord`, `randAnimal` and the rest                         | 344 KB     |
-| `randNickname`                                                | 346 KB     |
-| `randSentence`                                                | 524 KB     |
-| Everything                                                    | 736 KB     |
+| Import                                                          | gzipped    |
+| --------------------------------------------------------------- | ---------- |
+| `randSuffix`, `randPrefix`, the `nameLengthRange` helpers       | 0.5 KB     |
+| `wordLengthRange`, `nicknameLengthRange`, `sentenceLengthRange` | 0.5–1.5 KB |
+| `randAge`, `randGender`, `randArchitecture`, `randRam`          | 1.5–3 KB   |
+| `randRegion`                                                    | 2 KB       |
+| `randOs`, `randDevice`, `randCpu` and the other system values   | 1.5–5.5 KB |
+| `randDate`, `randPhone`                                         | 3–4 KB     |
+| `randOrganization`                                              | 14 KB      |
+| `randCountry`                                                   | 18 KB      |
+| `randName`                                                      | 24 KB      |
+| `randModifier`                                                  | 122 KB     |
+| `randLocation`, `randCity`, `randDistrict`                      | 156 KB     |
+| `randWord`, `randAnimal` and the rest                           | 344 KB     |
+| `randNickname`                                                  | 346 KB     |
+| `randSentence`                                                  | 524 KB     |
+| Everything                                                      | 736 KB     |
 
 Measured by bundling the one import with esbuild, minified, and gzipping the result.
 
