@@ -334,41 +334,56 @@ describe('Fictional names', () => {
 		}
 	});
 
-	it('`forms` holds every language asked for, in the order asked, and `name` is one of them', () => {
-		const asked: WordLanguage[] = ['ru', 'ko', 'en', 'ja'];
-		const seen = new Set<WordLanguage>();
+	it('a list returns every name in every language of it, keyed in the order asked', () => {
+		const asked = ['ru', 'ko', 'en', 'ja'] as const;
+		const forms = randFictionalName({ language: asked, includeSurname: true, count: SAMPLE });
 
+		assert.strictEqual(forms.length, SAMPLE);
+
+		for (const form of forms) {
+			assert.deepStrictEqual(Object.keys(form), asked);
+
+			for (const language of asked) {
+				assert.match(form[language], SCRIPT[language], `${language} ${form[language]}`);
+			}
+		}
+
+		// The detail is the same, drawn in the first language of the list.
 		for (const detail of randFictionalName({ language: asked, count: SAMPLE, output: 'detail' })) {
 			assert.deepStrictEqual(Object.keys(detail.forms), asked);
-			assert.ok(asked.includes(detail.language));
+			assert.strictEqual(detail.language, 'ru');
+			assert.strictEqual(detail.name, detail.forms.ru);
+		}
+
+		// One language, and `'all'`, are strings, and `'all'` draws a language per name.
+		const seen = new Set<WordLanguage>();
+
+		for (const detail of randFictionalName({ count: SAMPLE, output: 'detail' })) {
+			assert.deepStrictEqual(Object.keys(detail.forms), [...WORD_LANGUAGES]);
 			assert.strictEqual(detail.name, detail.forms[detail.language]);
 			seen.add(detail.language);
 		}
 
-		// The value form draws a language per name from the list.
 		assert.ok(seen.size > 1);
-
-		const one = randFictionalName({ language: 'ko', output: 'detail' })[0];
-
-		assert.deepStrictEqual(Object.keys(one.forms), ['ko']);
-		assert.deepStrictEqual(Object.keys(randFictionalName({ output: 'detail' })[0].forms), [
-			...WORD_LANGUAGES
-		]);
+		assert.ok(randFictionalName({ count: 5 }).every((name) => typeof name === 'string'));
+		assert.deepStrictEqual(
+			Object.keys(randFictionalName({ language: 'ko', output: 'detail' })[0].forms),
+			['ko']
+		);
 	});
 
 	it('reads an unknown or empty language list as every language, and a repeated one once', () => {
-		assert.deepStrictEqual(
-			Object.keys(randFictionalName({ language: [], output: 'detail' })[0].forms),
-			[...WORD_LANGUAGES]
-		);
+		assert.deepStrictEqual(Object.keys(randFictionalName({ language: [] })[0]), [
+			...WORD_LANGUAGES
+		]);
 		assert.deepStrictEqual(
 			Object.keys(randFictionalName({ language: 'xx' as never, output: 'detail' })[0].forms),
 			[...WORD_LANGUAGES]
 		);
-		assert.deepStrictEqual(
-			Object.keys(randFictionalName({ language: ['ko', 'ko', 'en'], output: 'detail' })[0].forms),
-			['ko', 'en']
-		);
+		assert.deepStrictEqual(Object.keys(randFictionalName({ language: ['ko', 'ko', 'en'] })[0]), [
+			'ko',
+			'en'
+		]);
 	});
 
 	it('`realism: real` draws given names and surnames from the pools, of the right gender', () => {
@@ -434,15 +449,24 @@ describe('Fictional names', () => {
 
 		// A character no language writes is answered with nothing.
 		assert.deepStrictEqual(randFictionalName({ startsWith: '!', count: 3 }), []);
-		// And a language that does not write it is left out of a list.
-		for (const detail of randFictionalName({
-			language: ['ko', 'en'],
-			startsWith: 'B',
-			count: SAMPLE,
-			output: 'detail'
-		})) {
-			assert.strictEqual(detail.language, 'en');
+		// A language that does not write it is left out of `'all'`.
+		for (const detail of randFictionalName({ startsWith: 'B', count: SAMPLE, output: 'detail' })) {
+			assert.ok(['en', 'vi', 'es', 'it', 'de'].includes(detail.language), detail.language);
 		}
+
+		// A list is read in its first language, and the rest only write the name.
+		for (const form of randFictionalName({
+			language: ['ko', 'en'],
+			startsWith: '아',
+			count: SAMPLE
+		})) {
+			assert.ok(form.ko.startsWith('아'), form.ko);
+		}
+
+		assert.deepStrictEqual(
+			randFictionalName({ language: ['ko', 'en'], startsWith: 'B', count: 3 }),
+			[]
+		);
 	});
 
 	it('keeps to a length range the pools can meet', () => {
@@ -464,6 +488,11 @@ describe('Fictional names', () => {
 		// Only the CJK languages write a name of two characters.
 		for (const detail of randFictionalName({ maxLength: 2, count: SAMPLE, output: 'detail' })) {
 			assert.ok(detail.name.length <= 2, detail.name);
+		}
+
+		// A list is measured in its first language, whatever the rest come out at.
+		for (const form of randFictionalName({ language: ['ko', 'en'], maxLength: 2, count: SAMPLE })) {
+			assert.ok(form.ko.length <= 2, form.ko);
 		}
 	});
 
@@ -528,6 +557,39 @@ describe('Fictional places', () => {
 			assert.strictEqual(PLACES[level]({ count: 9 }).length, 9);
 			assert.strictEqual(PLACES[level]({ count: -1 }).length, 0);
 		}
+	});
+
+	it('a list returns every place in every language of it, keyed in the order asked', () => {
+		const asked = ['zh', 'ko', 'es', 'en'] as const;
+
+		for (const level of LEVELS) {
+			const forms = PLACES[level]({
+				language: asked,
+				includeKind: true,
+				count: SAMPLE
+			}) as unknown as Record<(typeof asked)[number], string>[];
+
+			assert.strictEqual(forms.length, SAMPLE);
+
+			for (const form of forms) {
+				assert.deepStrictEqual(Object.keys(form), asked);
+
+				for (const language of asked) {
+					assert.match(form[language], SCRIPT[language], `${level} ${language} ${form[language]}`);
+				}
+			}
+
+			for (const detail of placeDetails(level, { language: asked, count: SAMPLE })) {
+				assert.strictEqual(detail.language, 'zh');
+				assert.strictEqual(detail.place, detail.forms.zh);
+			}
+		}
+
+		// The function's own types follow the list: `form.ko` is a string.
+		const [form] = randFictionalDistrict({ language: ['ko', 'en'] });
+
+		assert.strictEqual(typeof form.ko, 'string');
+		assert.strictEqual(typeof form.en, 'string');
 	});
 
 	it('writes each language in its own script', () => {

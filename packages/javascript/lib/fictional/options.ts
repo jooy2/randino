@@ -34,9 +34,9 @@ export function prefixIn(prefix: string, script: number): string {
 
 /** What every fictional generator works out from the options before it draws. */
 export type FictionalBase = {
-	/** The languages a result may be written in. Empty when none can answer. */
+	/** The languages a result may be drawn in. Empty when none can answer. */
 	languages: readonly WordLanguage[];
-	/** The languages every result is written in for the detail's `forms`. */
+	/** The languages every result is written in, for the detail's `forms` and a list's maps. */
 	forms: readonly WordLanguage[];
 	prefix: string;
 	/** The length range a result has to land in, or `null` for none. */
@@ -44,10 +44,17 @@ export type FictionalBase = {
 };
 
 /**
- * The languages, the prefix and the length range of a call. A language that
- * does not write the requested character is left out, and so is one whose own
- * range cannot meet the one asked for while another's can — `rangeOf` is that
- * language's range for this call.
+ * The languages, the prefix and the length range of a call.
+ *
+ * One language, or `'all'`, is the language each result is drawn in, and a
+ * language that does not write the requested character is left out, and so is
+ * one whose own range cannot meet the one asked for while another's can —
+ * `rangeOf` is that language's range for this call.
+ *
+ * A list asks for every result in every language of it, so each result is drawn
+ * in the first and written in the rest: the first is the one `startsWith` and the
+ * length range read, the way a game's own language is the one its fields are
+ * sized for.
  */
 export function resolveBase(
 	options: RandCommonOptions & { language?: unknown },
@@ -57,10 +64,11 @@ export function resolveBase(
 	const prefix = resolvePrefix(options.startsWith);
 	const minLength = resolveLength(options.minLength);
 	const maxLength = resolveLength(options.maxLength);
-	const writing = languagesWriting('all', forms, prefix);
+	const listed = Array.isArray(options.language);
+	const writing = languagesWriting('all', listed ? forms.slice(0, 1) : forms, prefix);
 
 	return {
-		languages: languagesFitting(writing, minLength, maxLength, rangeOf),
+		languages: listed ? writing : languagesFitting(writing, minLength, maxLength, rangeOf),
 		forms,
 		prefix,
 		bounds:
