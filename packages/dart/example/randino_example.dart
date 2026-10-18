@@ -14,6 +14,7 @@ void main() {
   _locations();
   _people();
   _organizations();
+  _fiction();
   _dates();
   _phones();
   _system();
@@ -157,6 +158,19 @@ void _organizations() {
     ),
   );
   // [Greenbriar Logistics Corp.]
+}
+
+/// Names and places for a story or a game, written by their sound in every language.
+void _fiction() {
+  print('-- fiction ----------------------------------------------------');
+
+  print(randFictionalName(language: {WordLanguage.en}, count: 3)); // [Alice, Arsis, Emily]
+  print(randFictionalCountry(language: {WordLanguage.ko}, count: 3)); // [에들린 왕국, 글래시아, 카스타비아 제국]
+  print(randFictionalDistrict(language: {WordLanguage.ko}, includeKind: true)); // [그루거 파크]
+  print(
+    randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.ko, WordLanguage.ja}).first,
+  );
+  // FictionalNameDetail(Artemis, female, en, {en: Artemis, ko: 아르테미스, ja: アルテミス})
 }
 
 /// Dates drawn evenly from a range, written out in UTC or one part at a time.

@@ -1,8 +1,8 @@
 name: randino
 description: >-
-  Generates random names, nicknames, words, sentences, locations, ages,
-  genders, organizations, dates, phone numbers and real system specs. Nine
-  languages, pure Dart.
+  Generates random names, nicknames, words, sentences, real and fictional
+  places, ages, genders, organizations, dates, phone numbers and system specs.
+  Nine languages, pure Dart.
 version: 1.5.0
 repository: https://github.com/jooy2/randino
 homepage: https://randino.cdget.com

@@ -54,6 +54,10 @@ void main() {
           'DiskType',
           'DiskTypeDetail',
           'DiskUnit',
+          'FictionalKindStyle',
+          'FictionalNameDetail',
+          'FictionalPlaceDetail',
+          'FictionalPlaceKind',
           'FileCategory',
           'FileExtensionDetail',
           'GenderCode',
@@ -169,6 +173,16 @@ void main() {
           'randDistrictDetails',
           'randDrink',
           'randEmotion',
+          'randFictionalCity',
+          'randFictionalCityDetails',
+          'randFictionalCountry',
+          'randFictionalCountryDetails',
+          'randFictionalDistrict',
+          'randFictionalDistrictDetails',
+          'randFictionalName',
+          'randFictionalNameDetails',
+          'randFictionalRegion',
+          'randFictionalRegionDetails',
           'randFileExtension',
           'randFileExtensionDetails',
           'randFinance',
@@ -333,6 +347,19 @@ void main() {
       ]);
       expect(organizationIndustries, hasLength(10));
 
+      // A fictional name or place is one name in every language at once, so its
+      // detail writes it in each language the call asked for.
+      expect(randFictionalName(), hasLength(1));
+      expect(randFictionalNameDetails()[0].forms.keys, wordLanguages);
+      expect(randFictionalCountry(), hasLength(1));
+      expect(randFictionalCountryDetails()[0].level, LocationLevel.country);
+      expect(randFictionalRegion(), hasLength(1));
+      expect(randFictionalRegionDetails()[0].level, LocationLevel.region);
+      expect(randFictionalCity(), hasLength(1));
+      expect(randFictionalCityDetails()[0].level, LocationLevel.city);
+      expect(randFictionalDistrict(), hasLength(1));
+      expect(randFictionalDistrictDetails()[0].level, LocationLevel.district);
+
       // A phone number is written by its country, one country per word
       // language.
       expect(randPhone(), hasLength(1));
@@ -488,6 +515,15 @@ void main() {
       twice(() => randMimeType(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
+      twice(
+        () => randFictionalName(
+          count: 5,
+          includeSurname: true,
+          realism: RandRealism.mixed,
+          random: Random(42),
+        ).join('|'),
+      );
+      twice(() => randFictionalCity(count: 5, maxLength: 12, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());
       twice(() => randModifierAll(const ['사자', '여우'], random: Random(42)).join());
 
@@ -575,6 +611,36 @@ void main() {
             ({required int count, Random? random}) => randDrink(count: count, random: random),
         'randEmotion':
             ({required int count, Random? random}) => randEmotion(count: count, random: random),
+        'randFictionalCity':
+            ({required int count, Random? random}) =>
+                randFictionalCity(count: count, random: random),
+        'randFictionalCityDetails':
+            ({required int count, Random? random}) =>
+                randFictionalCityDetails(count: count, random: random),
+        'randFictionalCountry':
+            ({required int count, Random? random}) =>
+                randFictionalCountry(count: count, random: random),
+        'randFictionalCountryDetails':
+            ({required int count, Random? random}) =>
+                randFictionalCountryDetails(count: count, random: random),
+        'randFictionalDistrict':
+            ({required int count, Random? random}) =>
+                randFictionalDistrict(count: count, random: random),
+        'randFictionalDistrictDetails':
+            ({required int count, Random? random}) =>
+                randFictionalDistrictDetails(count: count, random: random),
+        'randFictionalName':
+            ({required int count, Random? random}) =>
+                randFictionalName(count: count, random: random),
+        'randFictionalNameDetails':
+            ({required int count, Random? random}) =>
+                randFictionalNameDetails(count: count, random: random),
+        'randFictionalRegion':
+            ({required int count, Random? random}) =>
+                randFictionalRegion(count: count, random: random),
+        'randFictionalRegionDetails':
+            ({required int count, Random? random}) =>
+                randFictionalRegionDetails(count: count, random: random),
         'randFileExtension':
             ({required int count, Random? random}) =>
                 randFileExtension(count: count, random: random),

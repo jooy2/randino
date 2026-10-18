@@ -13,7 +13,7 @@ The full documentation, with **Dart** picked in the sidebar. This README is the 
 **randino** generates random sample data in nine languages: person names, nicknames, words, sentences, real places, ages, genders, organizations, dates and phone numbers, and the operating system, hardware and files of a sample machine.
 
 - **Written the way each language writes it.** Names, nicknames and sentences follow the language's own script, word order and grammar: 김민준, Emma Clover, 여우가 사과를 먹는다.
-- **Real only where it should be.** Places and system values are real, such as 서울특별시 종로구 and Apple iPhone 15 Pro. Organizations are invented, and nicknames are never built from person names.
+- **Real only where it should be.** Places and system values are real, such as 서울특별시 종로구 and Apple iPhone 15 Pro. Organizations are invented, and nicknames are never built from person names. Fictional names and places are made for a story's cast and map, and none is a real country or a famous character.
 - **Named parameters**, every one optional. A null enum means "every one of them", so `randName()` on its own works.
 - **Seeded or secure.** Every generator and decorator takes a `random`: `Random(42)` for a fixture that must repeat, `Random.secure()` for a token nobody may predict.
 - **Pure Dart, no dependencies.** It imports only `dart:math`, so it runs on the VM, on the web and in Flutter.
@@ -290,6 +290,35 @@ randOrganizationDetails(language: WordLanguage.ko, type: {OrganizationType.compa
 | `unique`                  | `bool`                   | `false`             |
 
 A null `type` draws a kind per result, companies most often. An `industry` is written into a company's name as a word for its business, and naming one with `type` left null asks for companies. `RandRealism.invented` builds the stem from the language's own sounds, for a name nobody has.
+
+## Fictional names and places
+
+Names for the characters of a story or a game, and the countries, regions, cities and districts of its map. A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language: `Artemis` is `아르테미스` and `アルテミス`. Several languages draw one per result, and the `…Details` functions write each result in all of them.
+
+```dart
+randFictionalName(language: {WordLanguage.en}, count: 3); // [Alice, Arsis, Emily]
+randFictionalName(language: {WordLanguage.ko}, includeSurname: true); // [엘라라 블랙우드]
+randFictionalCountry(language: {WordLanguage.ko}, count: 3); // [에들린 왕국, 글래시아, 카스타비아 제국]
+randFictionalDistrict(language: {WordLanguage.ko}, count: 2); // [그루거 파크, 이블린 베이]
+
+randFictionalNameDetails(language: {WordLanguage.en, WordLanguage.ko, WordLanguage.ja}).first.forms;
+// {WordLanguage.en: Artemis, WordLanguage.ko: 아르테미스, WordLanguage.ja: アルテミス}
+```
+
+`randFictionalRegion` and `randFictionalCity` fill in the levels between. Every place function takes the same parameters:
+
+| Parameter                 | Type                  | Default              |
+| ------------------------- | --------------------- | -------------------- |
+| `language`                | `Set<WordLanguage>?`  | `null` — every one   |
+| `includeKind`             | `bool?`               | `null` — drawn       |
+| `kindStyle`               | `FictionalKindStyle?` | `null` — by level    |
+| `count`                   | `int`                 | `1`                  |
+| `realism`                 | `RandRealism`         | `RandRealism.real`   |
+| `minLength` / `maxLength` | `int?`                | `null`               |
+| `startsWith`              | `String?`             | `null`               |
+| `unique`                  | `bool`                | `false`              |
+
+`randFictionalName` takes `gender` and `includeSurname` (default `false`) in place of the two kind parameters. A set keeps the order it was written in, and that is the order of a detail's `forms`. The kind is written in each language's words: a country's or a region's is translated (`에들린 왕국`) and a city's or a district's keeps the English word (`그루거 파크`); `FictionalKindStyle.borrowed` or `.translated` writes every kind one way (`에들린 킹덤`). `RandRealism.invented` builds names out of syllables and English halves, tens of thousands of them, none of which is a real country or a famous character or place.
 
 ## Dates
 

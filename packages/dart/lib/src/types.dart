@@ -990,6 +990,255 @@ class OrganizationDetail {
       '${industry?.name}, ${language.name})';
 }
 
+/// A generated fictional name, written in every language the call asked for.
+class FictionalNameDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const FictionalNameDetail({
+    required this.name,
+    required this.gender,
+    required this.language,
+    required this.forms,
+  });
+
+  /// What `randFictionalName` returns: the name in [language].
+  final String name;
+
+  /// The gender the given name was drawn for.
+  final NameGender gender;
+
+  /// The language [name] is written in.
+  final WordLanguage language;
+
+  /// The same name in every language the call asked for, in the order it asked
+  /// for them: `{en: Artemis, ko: 아르테미스}`. The languages written in Latin
+  /// letters write a name the way English does.
+  final Map<WordLanguage, String> forms;
+
+  @override
+  String toString() =>
+      'FictionalNameDetail($name, ${gender.name}, ${language.name}, '
+      '{${forms.entries.map((entry) => '${entry.key.name}: ${entry.value}').join(', ')}})';
+}
+
+/// What kind of place a fictional place is, written beside its name.
+///
+/// Each level has its own: a country is one of [kingdom] to [isles], a region
+/// one of [province] to [frontier], a city one of [city] to [village], and a
+/// district [village] or one of [park] to [row]. The examples are the English
+/// templates; every language writes the kind in its own.
+enum FictionalPlaceKind {
+  /// A country: `Kingdom of Edlin`.
+  kingdom,
+
+  /// A country: `Edlin Empire`.
+  empire,
+
+  /// A country: `Republic of Edlin`.
+  republic,
+
+  /// A country: `Principality of Edlin`.
+  principality,
+
+  /// A country: `Archduchy of Edlin`.
+  archduchy,
+
+  /// A country: `Duchy of Edlin`.
+  duchy,
+
+  /// A country: `Edlin Federation`.
+  federation,
+
+  /// A country: `Edlin Confederation`.
+  confederation,
+
+  /// A country: `Dominion of Edlin`.
+  dominion,
+
+  /// A country: `Theocracy of Edlin`.
+  theocracy,
+
+  /// A country: `Edlin Isles`.
+  isles,
+
+  /// A region: `Altheria Province`.
+  province,
+
+  /// A region: `Altheria March`.
+  march,
+
+  /// A region: `County of Altheria`.
+  county,
+
+  /// A region: `Barony of Altheria`.
+  barony,
+
+  /// A region: `Mistvale Highlands`.
+  highlands,
+
+  /// A region: `Mistvale Lowlands`.
+  lowlands,
+
+  /// A region: `Silverfen Valley`.
+  valley,
+
+  /// A region: `Silverfen Forest`.
+  forest,
+
+  /// A region: `Silverfen Plains`.
+  plains,
+
+  /// A region: `Silverfen Coast`.
+  coast,
+
+  /// A region: `Silverfen Peninsula`.
+  peninsula,
+
+  /// A region: `Silverfen Moors`.
+  moors,
+
+  /// A region: `Silverfen Wilds`.
+  wilds,
+
+  /// A region: `Isle of Lumeria`.
+  isle,
+
+  /// A region: `Lumeria Frontier`.
+  frontier,
+
+  /// A city: `Ashwick City`.
+  city,
+
+  /// A city: `Ashwick Town`.
+  town,
+
+  /// A city: `Port Ravenford`.
+  port,
+
+  /// A city: `Ravenford Harbor`.
+  harbor,
+
+  /// A city: `Hollowbrook Falls`.
+  falls,
+
+  /// A city: `Ravenford Crossing`.
+  crossing,
+
+  /// A city: `Ravenford Bridge`.
+  bridge,
+
+  /// A city: `Ashwick Springs`.
+  springs,
+
+  /// A city: `Ravenford Landing`.
+  landing,
+
+  /// A city or a district: `Ashwick Village`.
+  village,
+
+  /// A district: `Gruger Park`.
+  park,
+
+  /// A district: `Evelyn Bay`.
+  bay,
+
+  /// A district: `Hadley Hills`.
+  hills,
+
+  /// A district: `Hadley Heights`.
+  heights,
+
+  /// A district: `Hadley Square`.
+  square,
+
+  /// A district: `Hadley Quarter`.
+  quarter,
+
+  /// A district: `Hadley Gardens`.
+  gardens,
+
+  /// A district: `Hadley Market`.
+  market,
+
+  /// A district: `Hadley Docks`.
+  docks,
+
+  /// A district: `Hadley Terrace`.
+  terrace,
+
+  /// A district: `Hadley Green`.
+  green,
+
+  /// A district: `Hadley Grove`.
+  grove,
+
+  /// A district: `Hadley End`.
+  end,
+
+  /// A district: `Hadley Row`.
+  row,
+}
+
+/// How the kind of a place is written in a language other than English.
+///
+/// Left null, a language writes a kind the way it writes a real foreign place:
+/// the kind of a country or a region is translated (`에들린 왕국`, `Reino de
+/// Edlin`, `Долина Сильверфен`, the way `Death Valley` is `Valle de la Muerte`),
+/// and the kind of a city or a district keeps its English word (`그루거 파크`,
+/// `Gruger Park`, the way `Central Park` and `Pearl Harbor` do). Chinese
+/// translates every kind whatever this says, because it never writes one by its
+/// sound, and a language with no borrowed word in use for a kind writes its own
+/// either way: Korean has no `프로빈스`.
+enum FictionalKindStyle {
+  /// The English word, written in the language's own script — `에들린 킹덤`,
+  /// `グルーガー・パーク`, `Гругер-парк` — and unchanged in the languages written
+  /// in Latin letters (`Gruger Park`).
+  borrowed,
+
+  /// The language's own word for it: `에들린 왕국`, `グルーガー公園`, `Parque Gruger`.
+  translated,
+}
+
+/// A generated fictional place, written in every language the call asked for.
+class FictionalPlaceDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const FictionalPlaceDetail({
+    required this.place,
+    required this.name,
+    required this.kind,
+    required this.level,
+    required this.language,
+    required this.forms,
+  });
+
+  /// What the value form returns: the place in [language], its kind and all.
+  final String place;
+
+  /// The place's own name in [language], without its kind: `에들린` for
+  /// `에들린 왕국`.
+  final String name;
+
+  /// The kind of place written beside the name, or `null` for none.
+  final FictionalPlaceKind? kind;
+
+  /// Which level of a map the place is: a country, a region, a city or a
+  /// district.
+  final LocationLevel level;
+
+  /// The language [place] is written in.
+  final WordLanguage language;
+
+  /// The same place in every language the call asked for, in the order it
+  /// asked for them: `{en: Kingdom of Edlin, ko: 에들린 왕국}`.
+  final Map<WordLanguage, String> forms;
+
+  @override
+  String toString() =>
+      'FictionalPlaceDetail($place, $name, ${kind?.name}, ${level.name}, ${language.name}, '
+      '{${forms.entries.map((entry) => '${entry.key.name}: ${entry.value}').join(', ')}})';
+}
+
 /// One part of a date, largest first.
 ///
 /// `randDateUnit` hands back the part it is given, as a number: `minute` is `0`

@@ -1,5 +1,6 @@
 /// randino generates random person names, nicknames, words, sentences,
-/// locations, ages, genders and organizations in the language you ask for.
+/// locations, ages, genders, organizations and the names and places of a
+/// fictional world in the language you ask for.
 ///
 /// The generators are kept apart on purpose. **Person names** read like names
 /// people actually carry (김민준, Emma Clover) and come with their English
@@ -9,8 +10,10 @@
 /// **sentences** are whole statements written in the language's own grammar, and
 /// **locations** are real places, from the country down to a Korean 읍·면·동 or a
 /// US city. **Ages** are whole numbers drawn along a curve shaped like a
-/// population, **genders** are the labels a form in the language writes, and
-/// **organizations** are companies, schools and offices that do not exist.
+/// population, **genders** are the labels a form in the language writes,
+/// **organizations** are companies, schools and offices that do not exist, and
+/// **fictional names and places** are what a story or a game calls its cast and
+/// its map (Alice, Kingdom of Edlin), written by their sound in every language.
 ///
 /// ```dart
 /// import 'package:randino/randino.dart';
@@ -67,6 +70,16 @@ export 'src/disk/rand_disk_size.dart' show randDiskSize;
 export 'src/disk/rand_disk_size_details.dart' show randDiskSizeDetails;
 export 'src/disk/rand_disk_type.dart' show randDiskType;
 export 'src/disk/rand_disk_type_details.dart' show randDiskTypeDetails;
+export 'src/fictional/rand_fictional_city.dart' show randFictionalCity;
+export 'src/fictional/rand_fictional_city_details.dart' show randFictionalCityDetails;
+export 'src/fictional/rand_fictional_country.dart' show randFictionalCountry;
+export 'src/fictional/rand_fictional_country_details.dart' show randFictionalCountryDetails;
+export 'src/fictional/rand_fictional_district.dart' show randFictionalDistrict;
+export 'src/fictional/rand_fictional_district_details.dart' show randFictionalDistrictDetails;
+export 'src/fictional/rand_fictional_name.dart' show randFictionalName;
+export 'src/fictional/rand_fictional_name_details.dart' show randFictionalNameDetails;
+export 'src/fictional/rand_fictional_region.dart' show randFictionalRegion;
+export 'src/fictional/rand_fictional_region_details.dart' show randFictionalRegionDetails;
 export 'src/file/data/index.dart' show fileCategories, mimeTopLevels;
 export 'src/file/rand_file_extension.dart' show randFileExtension;
 export 'src/file/rand_file_extension_details.dart' show randFileExtensionDetails;
@@ -133,6 +146,10 @@ export 'src/types.dart'
         DiskTypeDetail,
         DiskUnit,
         FileCategory,
+        FictionalKindStyle,
+        FictionalNameDetail,
+        FictionalPlaceDetail,
+        FictionalPlaceKind,
         FileExtensionDetail,
         GenderCode,
         GenderDetail,
