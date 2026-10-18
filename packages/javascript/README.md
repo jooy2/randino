@@ -13,7 +13,7 @@ The full documentation, with **JavaScript** picked in the sidebar. This README i
 **randino** generates random sample data in nine languages: person names, nicknames, words, sentences, real places, ages, genders, organizations, dates and phone numbers, and the operating system, hardware and files of a sample machine.
 
 - **Written the way each language writes it.** Names, nicknames and sentences follow the language's own script, word order and grammar: 김민준, Emma Clover, 여우가 사과를 먹는다.
-- **Real only where it should be.** Places and system values are real, such as 서울특별시 종로구 and Apple iPhone 15 Pro. Organizations are invented, and nicknames are never built from person names.
+- **Real only where it should be.** Places and system values are real, such as 서울특별시 종로구 and Apple iPhone 15 Pro. Organizations are invented, and nicknames are never built from person names. Fictional names and places are made for a story's cast and map, and none is a real country or a famous character.
 - **One options object per generator**, every option optional, so `randName()` on its own works.
 - **Seeded or secure.** Every generator and decorator takes a `random` source: a seeded one for a fixture that must repeat, a secure one for a token nobody may predict.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -330,6 +330,39 @@ randOrganization({ language: 'ko', type: 'company', output: 'detail' });
 | `output`                  | `'value' \| 'detail'`        | `'value'` |
 
 `type` is `company`, `nonprofit`, `school`, `government` or `public`, or an array of them; left out, companies come up most often. `industry` is one of ten, written into a company's name as a word for its business, and naming one with `type` left out asks for companies. `realism: 'invented'` builds the stem from the language's own sounds, for a name nobody has.
+
+## Fictional names and places
+
+Names for the characters of a story or a game, and the countries, regions, cities and districts of its map. A name is spelled in Latin letters first, English and British names among them, and written by its sound in every other language: `Artemis` is `아르테미스` and `アルテミス`. A list of languages draws one per result, and the detail form writes each result in all of them.
+
+```javascript
+import { randFictionalCountry, randFictionalDistrict, randFictionalName } from 'randino';
+
+randFictionalName({ language: 'en', count: 3 }); // ['Alice', 'Arsis', 'Emily']
+randFictionalName({ language: 'ko', includeSurname: true }); // ['엘라라 블랙우드']
+randFictionalCountry({ language: 'ko', count: 3 }); // ['에들린 왕국', '글래시아', '카스타비아 제국']
+randFictionalDistrict({ language: 'ko', count: 2 }); // ['그루거 파크', '이블린 베이']
+
+randFictionalName({ language: ['en', 'ko', 'ja'], output: 'detail' });
+// [{ name: 'Artemis', gender: 'female', language: 'en',
+//    forms: { en: 'Artemis', ko: '아르테미스', ja: 'アルテミス' } }]
+```
+
+`randFictionalRegion` and `randFictionalCity` fill in the levels between. Every place function takes the same options:
+
+| Option                    | Type                      | Default    |
+| ------------------------- | ------------------------- | ---------- |
+| `language`                | `FictionalLanguageOption` | `'all'`    |
+| `includeKind`             | `boolean`                 | _drawn_    |
+| `kindStyle`               | `FictionalKindStyle`      | _by level_ |
+| `count`                   | `number`                  | `1`        |
+| `realism`                 | `RandRealism`             | `'real'`   |
+| `minLength` / `maxLength` | `number`                  | —          |
+| `startsWith`              | `string`                  | —          |
+| `unique`                  | `boolean`                 | `false`    |
+| `output`                  | `'value' \| 'detail'`     | `'value'`  |
+
+`randFictionalName` takes `gender` and `includeSurname` (default `false`) in place of the two kind options. The kind is written in each language's words: a country's or a region's is translated (`에들린 왕국`) and a city's or a district's keeps the English word (`그루거 파크`); `kindStyle: 'borrowed'` or `'translated'` writes every kind one way (`에들린 킹덤`). `realism: 'invented'` builds names out of syllables and English halves, tens of thousands of them, none of which is a real country or a famous character or place.
 
 ## Dates
 

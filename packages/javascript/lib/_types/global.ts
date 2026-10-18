@@ -1055,6 +1055,162 @@ export interface OrganizationDetail {
 }
 
 /**
+ * The languages a fictional name or place is written in: one, several, or
+ * `'all'` of the nine word languages.
+ *
+ * A fictional name is one name however it is written — `Artemis`, `아르테미스`,
+ * `アルテミス` — so a list does two things at once. The value form writes each
+ * result in one language of the list, drawn per result the way `'all'` draws
+ * one; the detail form also writes every result in every language of the list,
+ * under `forms`.
+ */
+export type FictionalLanguageOption = WordLanguageOption | readonly WordLanguage[];
+
+export interface RandFictionalNameOptions extends RandCommonOptions {
+	/** Language, or languages, of the names. `'all'` mixes every language. Default `'all'`. */
+	language?: FictionalLanguageOption;
+	/** Gender the given name is drawn from. Default `'all'`. */
+	gender?: NameGenderOption;
+	/**
+	 * Follow the given name with a family name (`Elara Blackwood`). Default
+	 * `false`: a character in a story or a game is usually known by one name.
+	 */
+	includeSurname?: boolean;
+}
+
+/** A generated fictional name, written in every language the call asked for. */
+export interface FictionalNameDetail {
+	/** What the value form returns: the name in `language`. */
+	name: string;
+	gender: NameGender;
+	/** The language `name` is written in. */
+	language: WordLanguage;
+	/**
+	 * The same name in every language the call asked for, in the order it asked
+	 * for them: `{ en: 'Artemis', ko: '아르테미스' }`. The languages written in
+	 * Latin letters write a name the way English does.
+	 */
+	forms: Partial<Record<WordLanguage, string>>;
+}
+
+/**
+ * What kind of place a fictional place is, written beside its name. Each level
+ * has its own:
+ * - a country: `kingdom`, `empire`, `republic`, `principality`, `archduchy`,
+ *   `duchy`, `federation`, `confederation`, `dominion`, `theocracy`, `isles`;
+ * - a region: `province`, `march`, `county`, `barony`, `highlands`, `lowlands`,
+ *   `valley`, `forest`, `plains`, `coast`, `peninsula`, `moors`, `wilds`,
+ *   `isle`, `frontier`;
+ * - a city: `city`, `town`, `port`, `harbor`, `falls`, `crossing`, `bridge`,
+ *   `springs`, `landing`, `village`;
+ * - a district: `park`, `bay`, `hills`, `heights`, `square`, `quarter`,
+ *   `gardens`, `market`, `docks`, `terrace`, `green`, `grove`, `end`, `row`,
+ *   `village`.
+ */
+export type FictionalPlaceKind =
+	| 'kingdom'
+	| 'empire'
+	| 'republic'
+	| 'principality'
+	| 'archduchy'
+	| 'duchy'
+	| 'federation'
+	| 'confederation'
+	| 'dominion'
+	| 'theocracy'
+	| 'isles'
+	| 'province'
+	| 'march'
+	| 'county'
+	| 'barony'
+	| 'highlands'
+	| 'lowlands'
+	| 'valley'
+	| 'forest'
+	| 'plains'
+	| 'coast'
+	| 'peninsula'
+	| 'moors'
+	| 'wilds'
+	| 'isle'
+	| 'frontier'
+	| 'city'
+	| 'town'
+	| 'port'
+	| 'harbor'
+	| 'falls'
+	| 'crossing'
+	| 'bridge'
+	| 'springs'
+	| 'landing'
+	| 'village'
+	| 'park'
+	| 'bay'
+	| 'hills'
+	| 'heights'
+	| 'square'
+	| 'quarter'
+	| 'gardens'
+	| 'market'
+	| 'docks'
+	| 'terrace'
+	| 'green'
+	| 'grove'
+	| 'end'
+	| 'row';
+
+/**
+ * How the kind of a place is written in a language other than English:
+ * - `borrowed`: the English word, written in the language's own script —
+ *   `에들린 킹덤`, `グルーガー・パーク`, `Гругер-парк` — and unchanged in the
+ *   languages written in Latin letters (`Gruger Park`).
+ * - `translated`: the language's own word for it — `에들린 왕국`, `グルーガー公園`,
+ *   `Parque Gruger`.
+ *
+ * Left out, a language writes a kind the way it writes a real foreign place:
+ * the kind of a country or a region is translated (`에들린 왕국`, `Reino de
+ * Edlin`, `Долина Сильверфен`, the way `Death Valley` is `Valle de la Muerte`),
+ * and the kind of a city or a district keeps its English word (`그루거 파크`,
+ * `Gruger Park`, the way `Central Park` and `Pearl Harbor` do). Chinese
+ * translates every kind whatever this says, because it never writes one by its
+ * sound, and a language with no borrowed word in use for a kind writes its own
+ * either way: Korean has no `프로빈스`.
+ */
+export type FictionalKindStyle = 'borrowed' | 'translated';
+
+/** What `randFictionalCountry`, `randFictionalRegion`, `randFictionalCity` and `randFictionalDistrict` take. */
+export interface RandFictionalPlaceOptions extends RandCommonOptions {
+	/** Language, or languages, of the places. `'all'` mixes every language. Default `'all'`. */
+	language?: FictionalLanguageOption;
+	/**
+	 * Write the kind of place beside its name: `Kingdom of Edlin`, `Evelyn Bay`.
+	 * Left out, it is decided per result.
+	 */
+	includeKind?: boolean;
+	/** How a kind is written outside English. Left out, it depends on the level; see `FictionalKindStyle`. */
+	kindStyle?: FictionalKindStyle;
+}
+
+/** A generated fictional place, written in every language the call asked for. */
+export interface FictionalPlaceDetail {
+	/** What the value form returns: the place in `language`, its kind and all. */
+	place: string;
+	/** The place's own name in `language`, without its kind: `에들린` for `에들린 왕국`. */
+	name: string;
+	/** The kind of place written beside the name, or `null` for none. */
+	kind: FictionalPlaceKind | null;
+	/** Which level of a map the place is: a country, a region, a city or a district. */
+	level: LocationLevel;
+	/** The language `place` is written in. */
+	language: WordLanguage;
+	/**
+	 * The same place in every language the call asked for, in the order it asked
+	 * for them: `{ en: 'Kingdom of Edlin', ko: '에들린 왕국' }`.
+	 */
+	forms: Partial<Record<WordLanguage, string>>;
+}
+
+/**
  * One part of a date, largest first. Named as `unit`, it is the one part
  * `randDate` hands back, as a number: `minute` is `0` to `59`, `month` is `1` to
  * `12`.

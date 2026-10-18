@@ -1,0 +1,202 @@
+// The syllables an invented fictional name is built from, when `realism` asks
+// for one: a `head` to open on, at most one `middle`, and an ending that says
+// whether the name is a man's or a woman's. `Al` + `dric` is `Aldric`, `Va` + `le`
+// + `ria` is `Valeria`, `Ed` + `lyn` is `Edlyn`.
+//
+// Each syllable is spelled in the five scripts for the place it takes, and
+// joining the spellings writes the name in every script at once: a `middle` or
+// an ending always starts on a consonant, so no script has to merge two vowels.
+// The Latin and Cyrillic spellings are lower case, and the first letter of a
+// name is raised once it is joined. A syllable is read the way a made-up name
+// is read in a game — `a` as in `Aria`, `e` as in `Elara` — rather than the way
+// English spells its own words, so `Ar` is `아르`, `アル` and `阿尔`.
+//
+// Some pairs cannot be joined part by part, and `joinable` in `spelling.ts`
+// keeps them apart: a doubled letter, and an `sh` before an `l`.
+
+/** `head`, `middle`, `male` or `female`, then the five spellings. */
+export const FICTIONAL_SYLLABLES = `
+head | a | 아 | ア | 阿 | а
+head | e | 에 | エ | 埃 | э
+head | i | 이 | イ | 伊 | и
+head | o | 오 | オ | 奥 | о
+head | al | 알 | アル | 阿尔 | аль
+head | ar | 아르 | アル | 阿尔 | ар
+head | el | 엘 | エル | 埃尔 | эль
+head | er | 에르 | エル | 埃尔 | эр
+head | il | 일 | イル | 伊尔 | иль
+head | is | 이스 | イス | 伊斯 | ис
+head | or | 오르 | オル | 奥尔 | ор
+head | ul | 울 | ウル | 乌尔 | уль
+head | ed | 에드 | エド | 埃德 | эд
+head | os | 오스 | オス | 奥斯 | ос
+head | ber | 베르 | ベル | 贝尔 | бер
+head | bel | 벨 | ベル | 贝尔 | бель
+head | bri | 브리 | ブリ | 布里 | бри
+head | cal | 칼 | カル | 卡尔 | каль
+head | cor | 코르 | コル | 科尔 | кор
+head | da | 다 | ダ | 达 | да
+head | dar | 다르 | ダル | 达尔 | дар
+head | del | 델 | デル | 德尔 | дель
+head | dra | 드라 | ドラ | 德拉 | дра
+head | eli | 엘리 | エリ | 埃利 | эли
+head | fen | 펜 | フェン | 芬 | фен
+head | ga | 가 | ガ | 加 | га
+head | gal | 갈 | ガル | 加尔 | галь
+head | ha | 하 | ハ | 哈 | ха
+head | hal | 할 | ハル | 哈尔 | халь
+head | ira | 이라 | イラ | 伊拉 | ира
+head | ka | 카 | カ | 卡 | ка
+head | lan | 란 | ラン | 兰 | лан
+head | le | 레 | レ | 莱 | ле
+head | li | 리 | リ | 利 | ли
+head | lu | 루 | ル | 卢 | лу
+head | mal | 말 | マル | 马尔 | маль
+head | mar | 마르 | マル | 马尔 | мар
+head | mel | 멜 | メル | 梅尔 | мель
+head | mi | 미 | ミ | 米 | ми
+head | mor | 모르 | モル | 莫尔 | мор
+head | na | 나 | ナ | 纳 | на
+head | ner | 네르 | ネル | 内尔 | нер
+head | no | 노 | ノ | 诺 | но
+head | pel | 펠 | ペル | 佩尔 | пель
+head | ra | 라 | ラ | 拉 | ра
+head | ri | 리 | リ | 里 | ри
+head | ro | 로 | ロ | 罗 | ро
+head | sa | 사 | サ | 萨 | са
+head | se | 세 | セ | 塞 | се
+head | sel | 셀 | セル | 塞尔 | сель
+head | ser | 세르 | セル | 塞尔 | сер
+head | sil | 실 | シル | 西尔 | силь
+head | sol | 솔 | ソル | 索尔 | сол
+head | ta | 타 | タ | 塔 | та
+head | thal | 탈 | タル | 塔尔 | таль
+head | ti | 티 | ティ | 提 | ти
+head | tor | 토르 | トル | 托尔 | тор
+head | va | 바 | ヴァ | 瓦 | ва
+head | val | 발 | ヴァル | 瓦尔 | валь
+head | vel | 벨 | ヴェル | 维尔 | вель
+head | ves | 베스 | ヴェス | 维斯 | вес
+head | vi | 비 | ヴィ | 维 | ви
+head | za | 자 | ザ | 扎 | за
+head | zel | 젤 | ゼル | 泽尔 | зель
+middle | la | 라 | ラ | 拉 | ла
+middle | le | 레 | レ | 莱 | ле
+middle | li | 리 | リ | 利 | ли
+middle | lo | 로 | ロ | 洛 | ло
+middle | ra | 라 | ラ | 拉 | ра
+middle | re | 레 | レ | 雷 | ре
+middle | ri | 리 | リ | 里 | ри
+middle | ro | 로 | ロ | 罗 | ро
+middle | na | 나 | ナ | 纳 | на
+middle | ne | 네 | ネ | 内 | не
+middle | ni | 니 | ニ | 尼 | ни
+middle | da | 다 | ダ | 达 | да
+middle | de | 데 | デ | 德 | де
+middle | di | 디 | ディ | 迪 | ди
+middle | do | 도 | ド | 多 | до
+middle | ma | 마 | マ | 马 | ма
+middle | me | 메 | メ | 梅 | ме
+middle | mi | 미 | ミ | 米 | ми
+middle | va | 바 | ヴァ | 瓦 | ва
+middle | ve | 베 | ヴェ | 维 | ве
+middle | vi | 비 | ヴィ | 维 | ви
+middle | ta | 타 | タ | 塔 | та
+middle | te | 테 | テ | 特 | те
+middle | ti | 티 | ティ | 提 | ти
+middle | sa | 사 | サ | 萨 | са
+middle | se | 세 | セ | 塞 | се
+middle | si | 시 | シ | 西 | си
+middle | ga | 가 | ガ | 加 | га
+middle | phi | 피 | フィ | 菲 | фи
+middle | ka | 카 | カ | 卡 | ка
+middle | ba | 바 | バ | 巴 | ба
+male | ric | 릭 | リック | 里克 | рик
+male | dric | 드릭 | ドリック | 德里克 | дрик
+male | dor | 도르 | ドール | 多尔 | дор
+male | nor | 노르 | ノール | 诺尔 | нор
+male | mir | 미르 | ミル | 米尔 | мир
+male | ran | 란 | ラン | 兰 | ран
+male | ren | 렌 | レン | 伦 | рен
+male | lan | 란 | ラン | 兰 | лан
+male | len | 렌 | レン | 伦 | лен
+male | dan | 단 | ダン | 丹 | дан
+male | den | 덴 | デン | 登 | ден
+male | thas | 타스 | タス | 塔斯 | тас
+male | rius | 리우스 | リウス | 里乌斯 | риус
+male | lius | 리우스 | リウス | 利乌斯 | лиус
+male | mus | 무스 | ムス | 穆斯 | мус
+male | ros | 로스 | ロス | 罗斯 | рос
+male | las | 라스 | ラス | 拉斯 | лас
+male | vin | 빈 | ヴィン | 文 | вин
+male | wyn | 윈 | ウィン | 温 | вин
+male | gar | 가르 | ガル | 加尔 | гар
+male | mar | 마르 | マール | 马尔 | мар
+male | ron | 론 | ロン | 罗恩 | рон
+male | rion | 리온 | リオン | 里昂 | рион
+male | ven | 벤 | ヴェン | 文 | вен
+male | vos | 보스 | ヴォス | 沃斯 | вос
+male | dar | 다르 | ダール | 达尔 | дар
+male | kar | 카르 | カール | 卡尔 | кар
+male | tor | 토르 | トール | 托尔 | тор
+male | mond | 몬드 | モンド | 蒙德 | монд
+male | rian | 리안 | リアン | 里安 | риан
+male | lian | 리안 | リアン | 利安 | лиан
+male | sis | 시스 | シス | 西斯 | сис
+female | ra | 라 | ラ | 拉 | ра
+female | na | 나 | ナ | 娜 | на
+female | la | 라 | ラ | 拉 | ла
+female | ria | 리아 | リア | 莉娅 | рия
+female | lia | 리아 | リア | 莉娅 | лия
+female | nia | 니아 | ニア | 妮娅 | ния
+female | dia | 디아 | ディア | 迪娅 | дия
+female | sia | 시아 | シア | 西娅 | сия
+female | thea | 테아 | テア | 西娅 | тея
+female | dra | 드라 | ドラ | 德拉 | дра
+female | sa | 사 | サ | 莎 | са
+female | lyn | 린 | リン | 琳 | лин
+female | wen | 웬 | ウェン | 温 | вен
+female | belle | 벨 | ベル | 贝儿 | бель
+female | ta | 타 | タ | 塔 | та
+female | ris | 리스 | リス | 莉丝 | рис
+female | lis | 리스 | リス | 莉丝 | лис
+female | mira | 미라 | ミラ | 米拉 | мира
+female | nea | 네아 | ネア | 妮娅 | нея
+female | rielle | 리엘 | リエル | 莉尔 | риэль
+female | lara | 라라 | ララ | 拉拉 | лара
+female | nora | 노라 | ノーラ | 诺拉 | нора
+female | lena | 레나 | レナ | 莲娜 | лена
+`;
+
+/**
+ * The endings an invented country or region closes on, after a `head` and at
+ * most one `middle` of `FICTIONAL_SYLLABLES`: `Sil` + `va` + `ria` is
+ * `Silvaria`. The first cell says which levels may take the ending, `n` for a
+ * country and `r` for a region.
+ */
+export const FICTIONAL_PLACE_ENDINGS = `
+nr | ria | 리아 | リア | 里亚 | рия
+nr | nia | 니아 | ニア | 尼亚 | ния
+nr | lia | 리아 | リア | 利亚 | лия
+nr | dia | 디아 | ディア | 迪亚 | дия
+nr | via | 비아 | ヴィア | 维亚 | вия
+nr | sia | 시아 | シア | 西亚 | сия
+nr | thia | 티아 | ティア | 提亚 | тия
+nr | dora | 도라 | ドラ | 多拉 | дора
+nr | mora | 모라 | モラ | 莫拉 | мора
+nr | dor | 도르 | ドール | 多尔 | дор
+nr | nor | 노르 | ノール | 诺尔 | нор
+nr | mar | 마르 | マール | 马尔 | мар
+nr | heim | 하임 | ハイム | 海姆 | хейм
+nr | gard | 가르드 | ガルド | 加德 | гард
+nr | thas | 타스 | タス | 塔斯 | тас
+nr | ros | 로스 | ロス | 罗斯 | рос
+nr | mos | 모스 | モス | 莫斯 | мос
+nr | thar | 타르 | タール | 塔尔 | тар
+nr | wyn | 윈 | ウィン | 温 | вин
+nr | lor | 로르 | ロール | 洛尔 | лор
+nr | ris | 리스 | リス | 里斯 | рис
+nr | ra | 라 | ラ | 拉 | ра
+nr | na | 나 | ナ | 纳 | на
+n | ta | 타 | タ | 塔 | та
+`;
